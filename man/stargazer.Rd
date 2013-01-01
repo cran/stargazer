@@ -7,23 +7,25 @@
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-The \code{stargazer} command produces LaTeX code for well-formatted tables that hold regression analysis results from several models side-by-side, as well as summary statistics. It supports model objects from \code{\link{lm}}, \code{\link{glm}}, \code{svyglm}, \code{gee}, \code{\link{gam}}, \code{\link{polr}}, \code{\link{survreg}}, \code{\link{coxph}}, as well as from the implementation of these in \code{zelig}. It also supports the following \code{zelig} models for social network analysis: \code{"cloglog.net"}, \code{"gamma.net"}, and \code{"logit.net"}.
+%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+The \code{stargazer} command produces LaTeX code for well-formatted tables that hold regression analysis results from several models side-by-side, as well as summary statistics. It supports model objects from \code{lm}, \code{glm}, \code{svyglm}, \code{plm}, \code{betareg}, \code{gee}, \code{gam}, \code{polr}, \code{survreg}, \code{coxph}, \code{tobit} (AER), \code{ivreg} (AER), \code{zeroinfl} (pscl), \code{hurdle} (pscl), \code{multinom} (nnet) as well as from the implementation of these in \code{zelig}. It also supports the following \code{zelig} models for social network analysis: \code{"cloglog.net"}, \code{"gamma.net"}, \code{"probit.net"} and \code{"logit.net"}.
 }
 \usage{
 stargazer(  ..., 
-            title = "", style = "default", 
+            title = "", style = "default", summary = TRUE,
             covariate.labels = NULL, dep.var.labels = NULL,
-            decimal.mark = NULL, digit.separate = NULL, digit.separator = NULL,
+            align = FALSE, decimal.mark = NULL,
+            digit.separate = NULL, digit.separator = NULL,
             digits = NULL, digits.extra = NULL, initial.zero = NULL, intercept.top = NULL, 
             model.names = NULL, model.numbers = NULL, 
             notes = NULL, notes.align = NULL, notes.label = NULL, 
-            omit = NULL, omit.labels = NULL, omit.yes.no = c("Yes", "No"), 
-            ord.intercepts = FALSE, star.char = NULL, star.cutoffs = NULL,
+            omit = NULL, omit.labels = NULL, omit.stat = NULL, omit.yes.no = c("Yes", "No"), 
+            ord.intercepts = FALSE, star.char = NULL, star.cutoffs = NULL, zero.component = FALSE,
             nobs = TRUE, mean.sd = TRUE, min.max = TRUE, median = FALSE, iqr = FALSE )
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{\dots}{one or more model objects (for regression analysis tables) or data frames (for summary statistics).
+  \item{\dots}{one or more model objects (for regression analysis tables) or data frames (for summary statistics, or direct output of content).
 %%     ~~Describe \code{\dots} here~~
 }
   \item{title}{character string vector with titles for the tables.
@@ -33,15 +35,19 @@ stargazer(  ...,
 %%     ~~Describe \code{style} here~~
 }
 
-  \item{covariate.labels}{a character string vector of labels for covariates in regression tables. A value of \code{NA} for any element means that \code{stargazer} will print the corresponding variable name. In the default case of \code{NULL}, variable names are printed.%%     ~~Describe \code{covariate.labels} here~~
+  \item{summary}{a logical value indicating whether the package should output a summary statistics table when given a data frame. If \code{FALSE}, the package will instead output the contents of the data frame.}
+
+\item{covariate.labels}{a character string vector of labels for covariates in regression tables. A value of \code{NA} for any element means that \code{stargazer} will print the corresponding variable name. In the default case of \code{NULL}, variable names are printed.%%     ~~Describe \code{covariate.labels} here~~
 }
 
 \item{dep.var.labels}{a character string vector of labels for the dependent variables in regression tables. A value of \code{NA} for any element means that \code{stargazer} will print the corresponding variable name. In the default case of \code{NULL}, variable names are printed.%%     ~~Describe \code{dep.var.labels} here~~
 }
 
-  \item{decimal.mark}{character string that will serve as the decimal mark. For instance, the string \code{","} will represent decimal commas, while \code{"."} means tables will use decimal points.
-%%     ~~Describe \code{decimal.mark} here~~
-}
+  \item{align}{a logical value indicating whether numerical values in the same column should be aligned at the decimal mark. Requires \code{\\usepackage{dcolumn}} in LaTeX preamble.}
+
+  \item{decimal.mark}{character string that will serve as the decimal mark. For instance, the string \code{","} will represent decimal commas, while \code{"."} means tables will use decimal points.}
+
+
   \item{digit.separate}{a numerical vector that indicates where digit separators should be placed. The first element of the vector indicates the number of digits (counted from the decimal mark to the left) that will be separated. The second element indicates the number of digits that will be separated from that 'first' separator, and so on. A value of \code{3} corresponds to a thousands separator, while a value of \code{0} indicates no separation. Alternatively, \code{digit.separate} can be one of the following character strings: \code{"lakh"} (equivalent to \code{c(4,3)}), \code{"china"} or \code{"japan"} (both equivalent to a value of \code{4}).
 %%     ~~Describe \code{digit.separate} here~~
 }
@@ -66,7 +72,7 @@ stargazer(  ...,
  \item{model.numbers}{a logical value indicating whether models should be numbered. No number is used whenever a regression table includes only one model.
 %%     ~~Describe \code{model.numbers} here~~
 }
-  \item{notes}{a character string vector containing notes to be included below the table.
+  \item{notes}{a character string vector containing notes to be included below the table. The character strings can include special substrings that will be replaced by the corresponding cutoffs for statistical significance 'stars': \code{[*]}, \code{[**]}, and \code{[***]} will be replaced by the cutoffs, in percentage terms, for one, two and three 'stars,' respectively (e.g., 10, 5, and 1). Similarly, \code{[0.*]}, \code{[0.**]} and \code{[0.***]} will be replaced by the numerical value of cutoffs for one, two and three 'stars' (e.g., 0.1, 0.05, and 0.01). \code{[.*]}, \code{[.**]} and \code{[.***]} will omit the leading zeros (e.g., .1, .05, .01).
 %%     ~~Describe \code{notes} here~~
 }
   \item{notes.align}{a character string that specifies how notes should be aligned under the table. One of three strings can be used: \code{"l"} for left alignment, \code{"r"} for right alignment, and \code{"c"} for centering. This argument is not case-sensitive.
@@ -80,6 +86,8 @@ stargazer(  ...,
 }
   \item{omit.labels}{a character string vector of labels that correspond to each of the regular expressions in \code{omit}, and that will be used in a sub-table that indicates whether variables have been omitted from a given model. \code{omit} and \code{omit.labels} must be equal in length.%%     ~~Describe \code{omit.labels} here~~
 }
+  \item{omit.stat}{a character string vector that specifies which statistics should be omitted from regression table output. For instance \code{omit = c("ll","rsq")} will omit the log-likelihood and the R squared statistics. See the \link{list of statistic codes}. This argument is not case-sensitive.%%     ~~Describe \code{omit.stat} here~~
+} 
   \item{omit.yes.no}{a character string vector of length 2 that contains the 'yes' and 'no' strings to indicate whether, in any specific model, variables were omitted from the table, as specified by \code{"omit"}.
 %%     ~~Describe \code{omit.yes.no} here~~
 }
@@ -89,8 +97,11 @@ stargazer(  ...,
   \item{star.char}{character string to be used as the 'star' to denote statistical significance.
 %%     ~~Describe \code{star.char} here~~
 }
-  \item{star.cutoffs}{a numeric vector with a length of at least \code{1} and at most {3} that indicates the statistical signficance cutoffs for one, two and three 'stars,' respectively. For elements with \code{NA} values, the corresponding 'star' will not be used.
+  \item{star.cutoffs}{a numeric vector with a length of at least \code{1} and at most \code{3} that indicates the statistical signficance cutoffs for one, two and three 'stars,' respectively. For elements with \code{NA} values, the corresponding 'star' will not be used.
 %%     ~~Describe \code{star.cutoffs} here~~
+}
+  \item{zero.component}{a logical value indicating whether to report coefficients for the \code{zero} component of \code{zeroinfl} and \code{hurdle} estimation results. If \code{FALSE}, the \code{count} component is displayed.
+%%     ~~Describe \code{zero.component} here~~
 }
   \item{nobs}{a logical value that toggles whether the number of observations (N) for each variable is shown in summary statistics tables.}
   \item{mean.sd}{a logical value that toggles whether variable means and standard deviations are shown in summary statistics tables.}
@@ -113,10 +124,14 @@ stargazer(  ...,
 \author{
 %%  ~~who you are~~
 Marek Hlavac
-<mhlavac at alumni.princeton.edu>
+<hlavac at fas.harvard.edu>
 }
 \section{Acknowledgments}{
-I would like to thank Erin Baggott, Volha Charnych, John Coglianese, Christopher Lucas, Stephen Pettigrew and Daniel Yew Mao Lim for testing an early version of \code{stargazer}. Carl Jacob Liebersohn, and workshop participants have provided useful comments and suggestions. I am also grateful to Stefan Dimitriadis, Cheng Gao, Mallory James, Melissa Kline, Jeniffer Sheehy-Skeffington, Emily Stephen and Beth Truesdale for helping me identify journals on which \code{stargazer}'s table styles are based.
+I would like to thank everyone who has tested this package, or provided useful comments and suggestions. Please see \link{stargazer package acknowledgments}.
+}
+
+\section{Please cite as:}{
+ Marek Hlavac (2013). stargazer: LaTeX code for well-formatted regression and summary statistics tables. R package version 2.0. http://CRAN.R-project.org/package=stargazer 
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
@@ -128,6 +143,9 @@ Several packages by other authors provide functionality similar to that of \code
 \examples{
 ## create summary statistics table based for 'attitude' data frame
 stargazer(attitude)
+
+## list the content of the data frame 'attitude'
+stargazer(attitude, summary=FALSE)
 
 ## estimate and report results of 3 OLS models
 m1 <- lm(rating ~ complaints + privileges + learning + raises + critical, data=attitude)

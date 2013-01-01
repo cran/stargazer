@@ -1,39 +1,45 @@
+.onAttach <- 
+function(libname, pkgname) {
+  packageStartupMessage("\nPlease cite as: \n")
+  packageStartupMessage(" Marek Hlavac (2013). stargazer: LaTeX code for well-formatted regression and summary statistics tables. R package version 2.0. http://CRAN.R-project.org/package=stargazer \n")
+}
+
 .stargazer.wrap <-
-  function(...,title, style, covariate.labels, dep.var.labels, decimal.mark, digit.separate, digit.separator, digits, digits.extra, initial.zero, intercept.top, model.names, model.numbers, notes, notes.align, notes.label, omit, omit.labels, omit.yes.no, ord.intercepts, star.char, star.cutoffs, nobs, mean.sd, min.max, median, iqr) {
-
+  function(...,title, style, summary, covariate.labels, dep.var.labels, align, decimal.mark, digit.separate, digit.separator, digits, digits.extra, initial.zero, intercept.top, model.names, model.numbers, notes, notes.align, notes.label, omit, omit.labels, omit.stat, omit.yes.no, ord.intercepts, star.char, star.cutoffs, zero.component, nobs, mean.sd, min.max, median, iqr) {
+    
   .add.model <-
-  function(zelig.object) {
+  function(object.name) {
 
-  	.global.models <<- append(.global.models, .model.identify(zelig.object))
-  	.global.zelig.formulas.rhs <<- append(.global.zelig.formulas.rhs, .zelig.formula.rhs(zelig.object))
+  	.global.models <<- append(.global.models, .model.identify(object.name))
+  	.global.formulas.rhs <<- append(.global.formulas.rhs, .formula.rhs(object.name))
 
-  	.global.dependent.variables <<- append(.global.dependent.variables, .dependent.variable(zelig.object))
-  	.global.dependent.variables.written <<- append(.global.dependent.variables.written, .dependent.variable.written(zelig.object))
+  	.global.dependent.variables <<- append(.global.dependent.variables, .dependent.variable(object.name))
+  	.global.dependent.variables.written <<- append(.global.dependent.variables.written, .dependent.variable.written(object.name))
 
-  	.global.N <<- append(.global.N, .number.observations(zelig.object))
-  	.global.LL <<- append(.global.LL, .log.likelihood(zelig.object))
-  	.global.R2 <<- append(.global.R2, .r.squared(zelig.object))
-  	.global.max.R2 <<- append(.global.max.R2, .max.r.squared(zelig.object))
-  	.global.adj.R2 <<- append(.global.adj.R2, .adj.r.squared(zelig.object))
-  	.global.AIC <<- append(.global.AIC, .AIC(zelig.object))
-  	.global.scale <<- append(.global.scale, .get.scale(zelig.object))
-    .global.UBRE <<- append(.global.UBRE, .gcv.UBRE(zelig.object))
-  	.global.sigma2 <<- append(.global.sigma2, .get.sigma2(zelig.object))
+  	.global.N <<- append(.global.N, .number.observations(object.name))
+  	.global.LL <<- append(.global.LL, .log.likelihood(object.name))
+  	.global.R2 <<- append(.global.R2, .r.squared(object.name))
+  	.global.max.R2 <<- append(.global.max.R2, .max.r.squared(object.name))
+  	.global.adj.R2 <<- append(.global.adj.R2, .adj.r.squared(object.name))
+  	.global.AIC <<- append(.global.AIC, .AIC(object.name))
+  	.global.scale <<- append(.global.scale, .get.scale(object.name))
+    .global.UBRE <<- append(.global.UBRE, .gcv.UBRE(object.name))
+  	.global.sigma2 <<- append(.global.sigma2, .get.sigma2(object.name))
   	
-    .global.theta <<- cbind(.global.theta, .get.theta(zelig.object))
-  	.global.SER <<- cbind(.global.SER, .SER(zelig.object))
-  	.global.F.stat <<- cbind(.global.F.stat, .F.stat(zelig.object))
-  	.global.chi.stat <<- cbind(.global.chi.stat, .chi.stat(zelig.object))
-  	.global.wald.stat <<- cbind(.global.wald.stat, .wald.stat(zelig.object))
-  	.global.lr.stat <<- cbind(.global.lr.stat, .lr.stat(zelig.object))
-  	.global.logrank.stat <<- cbind(.global.logrank.stat, .logrank.stat(zelig.object))
-  	.global.null.deviance <<- cbind(.global.null.deviance, .null.deviance(zelig.object))
-  	.global.residual.deviance <<- cbind(.global.residual.deviance, .residual.deviance(zelig.object))
+    .global.theta <<- cbind(.global.theta, .get.theta(object.name))
+  	.global.SER <<- cbind(.global.SER, .SER(object.name))
+  	.global.F.stat <<- cbind(.global.F.stat, .F.stat(object.name))
+  	.global.chi.stat <<- cbind(.global.chi.stat, .chi.stat(object.name))
+  	.global.wald.stat <<- cbind(.global.wald.stat, .wald.stat(object.name))
+  	.global.lr.stat <<- cbind(.global.lr.stat, .lr.stat(object.name))
+  	.global.logrank.stat <<- cbind(.global.logrank.stat, .logrank.stat(object.name))
+  	.global.null.deviance <<- cbind(.global.null.deviance, .null.deviance(object.name))
+  	.global.residual.deviance <<- cbind(.global.residual.deviance, .residual.deviance(object.name))
 
-  	max.length <- length(.global.coefficient.variables)+length(.coefficient.variables(zelig.object))
+  	max.length <- length(.global.coefficient.variables)+length(.coefficient.variables(object.name))
 
   	# add RHS variables and coefficients
-  	coef.var <- .coefficient.variables(zelig.object)
+  	coef.var <- .coefficient.variables(object.name)
 
   	temp.gcv <- rep(NA,each=1,times=max.length)
 
@@ -41,14 +47,14 @@
 
   	how.many.gcv <- length(.global.coefficient.variables)
 
-  	position <- 1
+  	position <- 0
   	for (i in seq(1:length(coef.var))) {
 
   		found <- FALSE
   		for (j in seq(1:length(.global.coefficient.variables))) {
   				if (coef.var[i] == .global.coefficient.variables[j]) {
   					found <- TRUE
-  					for (k in seq(1:how.many.gcv)) {
+  					for (k in 1:how.many.gcv) {
   						if (coef.var[i]==temp.gcv[k]) {
   							position <- k
   						}
@@ -58,6 +64,12 @@
 
   		# If variable was found, no need to add it
   		if (found == FALSE) {
+   
+        # append new variable to list of regressors
+        while ((position < how.many.gcv) & (!(temp.gcv[position+1] %in% coef.var))) {
+          position <- position + 1
+        }
+        
   			temp.gcv <- append(temp.gcv, coef.var[i], after=position)
   			how.many.gcv <- how.many.gcv + 1
   			position <- position + 1
@@ -81,10 +93,10 @@
   				if (!is.null(.global.p.values)) { temp.p.values[row, col] <- .global.p.values[row, col] }
   			}
   		}
-  		if (!is.null(.zelig.coefficients(zelig.object)[row])) { temp.coefficients[row, ncol(temp.coefficients)] <- .zelig.coefficients(zelig.object)[row] }
-  		if (!is.null(.get.standard.errors(zelig.object)[row])) { temp.std.errors[row, ncol(temp.std.errors)] <- .get.standard.errors(zelig.object)[row] }
-  		if (!is.null(.get.t.stats(zelig.object)[row])) { temp.t.stats[row, ncol(temp.std.errors)] <- .get.t.stats(zelig.object)[row] }
-  		if (!is.null(.get.p.values(zelig.object)[row])) { temp.p.values[row, ncol(temp.std.errors)] <- .get.p.values(zelig.object)[row] }
+  		if (!is.null(.get.coefficients(object.name)[row])) { temp.coefficients[row, ncol(temp.coefficients)] <- .get.coefficients(object.name)[row] }
+  		if (!is.null(.get.standard.errors(object.name)[row])) { temp.std.errors[row, ncol(temp.std.errors)] <- .get.standard.errors(object.name)[row] }
+  		if (!is.null(.get.t.stats(object.name)[row])) { temp.t.stats[row, ncol(temp.std.errors)] <- .get.t.stats(object.name)[row] }
+  		if (!is.null(.get.p.values(object.name)[row])) { temp.p.values[row, ncol(temp.std.errors)] <- .get.p.values(object.name)[row] }
   	}
 
   	if (!is.null(temp.coefficients)) { .global.coefficients <<- temp.coefficients }
@@ -95,17 +107,20 @@
   }
 
   .adj.r.squared <-
-  function(zelig.object) {
+  function(object.name) {
 
-  	model.name <- .get.model.name(zelig.object)
+  	model.name <- .get.model.name(object.name)
 
   	if (!(model.name %in% c("arima"))) {
-  		if (!is.null(suppressMessages(summary(zelig.object)$adj.r.squared))) {
-  			return(as.vector(suppressMessages(summary(zelig.object)$adj.r.squared)))
+  		if (!is.null(suppressMessages(summary(object.name)$adj.r.squared))) {
+  			return(as.vector(suppressMessages(summary(object.name)$adj.r.squared)))
   		}
   		else if (model.name %in% c("normal.gam", "logit.gam", "probit.gam", "poisson.gam", "gam()")) {
-  			return(as.vector(summary(zelig.object)$r.sq))
+  			return(as.vector(summary(object.name)$r.sq))
   		}
+      else if (model.name %in% c("plm")) {
+        return(as.vector(summary(object.name)$r.squared["adjrsq"]))
+      }
   	}
   	return(NA)
   }
@@ -115,12 +130,12 @@
     style <- tolower(what.style)
   
     if (style == "all") {
-      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*(t)", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","AIC","UBRE","=!","notes")  
+      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*(t)", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","AIC","UBRE","residual deviance","null deviance","=!","notes")  
       .format.coefficient.table.parts <<- c("variable name","coefficient*","standard error","t-stat","p-value")  
     }
   
     else if (style == "all2") {
-      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*(t)", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","AIC","UBRE","=!","notes")  
+      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*(t)", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","AIC","UBRE","residual deviance","null deviance","=!","notes")  
       .format.coefficient.table.parts <<- c("variable name","coefficient*","standard error")  
     }
   
@@ -137,7 +152,7 @@
     
       .format.note.content <<- "\\textit{Notes:}"
       .format.note.alignment <<- "l"
-      .format.note.content <<- c("$^{***}$Significant at the 1 percent level.","$^{**}$Significant at the 5 percent level.","$^{*}$Significant at the 10 percent level.")
+      .format.note.content <<- c("$^{***}$Significant at the [***] percent level.","$^{**}$Significant at the [**] percent level.","$^{*}$Significant at the [*] percent level.")
     }
   
     # ajps = American Journal of Political Science
@@ -159,7 +174,7 @@
       .format.adj.R2 <<- "Adj. R-squared"
       .format.max.R2 <<- "Max. R-squared"
       .format.note <<- ""
-      .format.note.content <<- c("$^{***} p < .01; ^{**} p < .05; ^{*} p < .10$")
+      .format.note.content <<- c("$^{***} p < [.***]; ^{**} p < [.**]; ^{*} p < [.*]$")
       .format.note.alignment <<- "l"
       .format.s.stat.parts <<- c("-!","stat names","-!","statistics1","-!")
     }  
@@ -181,7 +196,7 @@
     
       .format.note <<- "\\textit{Notes:}"
       .format.note.alignment <<- "l"
-      .format.note.content <<- c("$^{*}P < .05$","$^{**}P < .01$","$^{***}P < .001$")
+      .format.note.content <<- c("$^{*}P < [.*]$","$^{**}P < [.**]$","$^{***}P < [.***]$")
       .format.one.star <<- 0.05
       .format.two.stars <<- 0.01
       .format.three.stars <<- 0.001
@@ -200,7 +215,7 @@
       .format.AIC <<- "AIC"
       .format.chi.stat <<- "chi$^{2}$"
       .format.note <<- ""
-      .format.note.content <<- c("$^{*} p < .10; ^{**} p < .05; ^{***} p < .01$")
+      .format.note.content <<- c("$^{*} p < [.*]; ^{**} p < [.**]; ^{***} p < [.***]$")
       .format.note.alignment <<- "l"
       .format.s.stat.parts <<- c("-!","stat names","-!","statistics1","-!")
     }
@@ -223,7 +238,7 @@
       .format.adj.R2 <<- "Adj. R-squared"
       .format.max.R2 <<- "Max. R-squared"
       .format.note <<- ""
-      .format.note.content <<- c("$^{\\bullet} p < .10; ^{\\bullet\\bullet} p < .05; ^{\\bullet\\bullet\\bullet} p < .01$")
+      .format.note.content <<- c("$^{\\bullet} p < [.*]; ^{\\bullet\\bullet} p < [.**]; ^{\\bullet\\bullet\\bullet} p < [.***]$")
       .format.note.alignment <<- "l"
       .format.s.stat.parts <<- c("-!","stat names","-!","statistics1","-!")
       .format.significance.star <<- "\\bullet"
@@ -240,7 +255,7 @@
       .format.AIC <<- "AIC"
       .format.chi.stat <<- "chi$^{2}$"
       .format.note <<- ""
-      .format.note.content <<- c("$^{*} p < .05; ^{**} p < .01; ^{***} p < .001$")
+      .format.note.content <<- c("$^{*} p < [.*]; ^{**} p < [.**]; ^{***} p < [.***]$")
       .format.one.star <<- 0.05
       .format.two.stars <<- 0.01
       .format.three.stars <<- 0.001
@@ -261,7 +276,7 @@
       .format.AIC <<- "AIC"
       .format.chi.stat <<- "Chi-Square"
       .format.note <<- ""
-      .format.note.content <<- c("$^{*} p < .05; ^{**} p < .01; ^{***} p < .001$")
+      .format.note.content <<- c("$^{*} p < [.*]; ^{**} p < [.**]; ^{***} p < [.***]$")
       .format.one.star <<- 0.05
       .format.two.stars <<- 0.01
       .format.three.stars <<- 0.001
@@ -278,7 +293,7 @@
       .format.s.coefficient.variables.capitalize <<- TRUE
       .format.intercept.name <<- "\\textit{Constant}"
       .format.N <<- "\\textit{Observations}"
-      .format.AIC <<- "\\textit{Akaike in.formation criterion}"
+      .format.AIC <<- "\\textit{Akaike information criterion}"
       .format.chi.stat <<- "\\textit{Chi-square}"
       .format.logrank.stat <<- "\\textit{Score (logrank) test}"
       .format.lr.stat <<- "\\textit{LR test}"
@@ -293,9 +308,8 @@
       .format.residual.deviance <<- "\\textit{Residual deviance}"
       .format.scale <<- "\\textit{Scale}"
       .format.wald.stat <<- "\\textit{Wald test}"
-    
       .format.note <<- "\\textit{Notes:}"
-      .format.note.content <<- c("$^{***} p < .01;  ^{**} p < .05; ^{*} p < .10$")
+      .format.note.content <<- c("$^{***} p < [.***];  ^{**} p < [.**]; ^{*} p < [.*]$")
       .format.note.alignment <<- "l"
       .format.s.stat.parts <<- c("-!","stat names","-!","statistics1","-!")
     }
@@ -315,7 +329,7 @@
       .format.N <<- "N"
       .format.AIC <<- "AIC"
       .format.note <<- "\\textit{Note:}"
-      .format.note.content <<- c("$^{***} p < .01; ^{**} p < .05; ^{*} p < .10$")
+      .format.note.content <<- c("$^{***} p < [.***]; ^{**} p < [.**]; ^{*} p < [.*]$")
       .format.note.alignment <<- "l"
       .format.s.stat.parts <<- c("-!","stat names","-!","statistics1","-!")
       .format.s.statistics.names <<- cbind(c("N","N"), c("nmiss","missing"), c("mean","Mean"), c("sd","SD"), c("median","Median"), c("min","Minimum"), c("max","Maximum"), c("mad","Median Abs. Dev."), c("p","Percentile(!)"))
@@ -328,7 +342,7 @@
       .format.s.stat.parts <<- c("-!","stat names","=!","statistics1","=!")
       .format.N <<- "\\textit{N}"
       .format.note <<- "\\textit{Notes:}"
-      .format.note.content <<- c("$^{***}$Significant at the 1 percent level.", "$^{**}$Significant at the 5 percent level.", "$^{*}$Significant at the 10 percent level.") 
+      .format.note.content <<- c("$^{***}$Significant at the [***] percent level.", "$^{**}$Significant at the [**] percent level.", "$^{*}$Significant at the [*] percent level.") 
     }
   
     # find style based on journal ("default" or other)
@@ -344,34 +358,36 @@
   }
 
   .AIC <-
-  function(zelig.object) {
+  function(object.name) {
   
-    model.name <- .get.model.name(zelig.object)
+    model.name <- .get.model.name(object.name)
   
     if (model.name %in% c("arima")) {
-      return(as.vector(zelig.object$aic))
-    }  
-    else if (!is.null(summary(zelig.object)$aic)) {
-      return(as.vector(summary(zelig.object)$aic)) 
+      return(as.vector(object.name$aic))
+    }
+    else if (!is.null(summary(object.name)$aic)) {
+      return(as.vector(summary(object.name)$aic)) 
+    }
+    else if (!is.null(object.name$AIC)) {
+      return(as.vector(object.name$AIC)) 
     }
   
     return(NA)
   }
 
   .chi.stat <-
-  function(zelig.object) {
+  function(object.name) {
     chi.output <- as.vector(rep(NA,times=3))
   
-    model.name <- .get.model.name(zelig.object)
+    model.name <- .get.model.name(object.name)
   
     if (!(model.name %in% c("arima","normal.gam","logit.gam","probit.gam","poisson.gam","gam()"))) {
-      if (!is.null(summary(zelig.object)$chi)) {
-        chi.value <- suppressMessages(summary(zelig.object)$chi)
-        df.value <- suppressMessages(summary(zelig.object)$df) - suppressMessages(summary(zelig.object)$idf)
+      if (!is.null(summary(object.name)$chi)) {
+        chi.value <- suppressMessages(summary(object.name)$chi)
+        df.value <- suppressMessages(summary(object.name)$df) - suppressMessages(summary(object.name)$idf)
         chi.p.value <- pchisq(chi.value, df.value, ncp=0, lower.tail = FALSE, log.p = FALSE)
         chi.output <- as.vector(c(chi.value, df.value, chi.p.value))
       }
-    
     }
   
     names(chi.output) <- c("statistic","df1","p-value")
@@ -380,6 +396,14 @@
 
   .coefficient.table.part <-
   function(part, which.variable, variable.name=NULL) {
+    
+    # decide whether to enter math mode, or not
+    if (.format.dec.mark.align==TRUE) {
+      c <- ""
+    }
+    else {
+      c <- "$"
+    }
 
   	# coefficient variable name
   	if (part=="variable name") {
@@ -399,15 +423,15 @@
   			if (!is.na(.global.coefficients[.global.coefficient.variables[which.variable],i])) {
 				
   				# report the coefficient
-  				cat(" & $", .iround(.global.coefficients[.global.coefficient.variables[which.variable],i],.format.round.digits),sep="")
+  				cat(" & ",c, .iround(.global.coefficients[.global.coefficient.variables[which.variable],i],.format.round.digits),sep="")
 
   				# add stars to denote statistical significance
   				if (part=="coefficient*") { 
   					p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
-  					.enter.significance.stars(p.value) 
+  					.enter.significance.stars(p.value, math.omit=TRUE) 
   				}
+          cat(c)
 			
-  				cat("$")
   			}
   			else {
   				cat(" & ",sep="")
@@ -422,15 +446,15 @@
   			if (!is.na(.global.std.errors[.global.coefficient.variables[which.variable],i])) {
 
   				# report standard errors
-  				cat(" & $", .format.std.errors.left, .iround(.global.std.errors[.global.coefficient.variables[which.variable],i],.format.round.digits),.format.std.errors.right,sep="")
+  				cat(" & ",c, .format.std.errors.left, .iround(.global.std.errors[.global.coefficient.variables[which.variable],i],.format.round.digits),.format.std.errors.right,sep="")
 
   				# add stars to denote statistical significance
   				if (part=="standard error*") { 
   					p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
-  					.enter.significance.stars(p.value) 
+  					.enter.significance.stars(p.value, math.omit=TRUE) 
   				}
+          cat(c)
 
-  				cat("$")
   			}
   			else {
   				cat(" & ",sep="")
@@ -446,15 +470,15 @@
   			if (!is.na(.global.p.values[.global.coefficient.variables[which.variable],i])) {
 
   				# report p-values
-  				cat(" & $", .format.p.values.left, .iround(.global.p.values[.global.coefficient.variables[which.variable],i],.format.round.digits,round.up.positive=TRUE),.format.p.values.right,sep="")
+  				cat(" & ",c, .format.p.values.left, .iround(.global.p.values[.global.coefficient.variables[which.variable],i],.format.round.digits,round.up.positive=TRUE),.format.p.values.right,sep="")
 
   				# add stars to denote statistical significance
   				if (part=="p-value*") { 
   					p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
-  					.enter.significance.stars(p.value) 
+  					.enter.significance.stars(p.value, math.omit=TRUE) 
   				}
+          cat(c)
 
-  				cat("$")
   			}
   			else {
   				cat(" & ",sep="")
@@ -468,15 +492,15 @@
   		for (i in seq(1:length(.global.models))) {
   			if (!is.na(.global.t.stats[.global.coefficient.variables[which.variable],i])) {
   				# report t-statistics
-  				cat(" & $", .format.t.stats.left, .iround(.global.t.stats[.global.coefficient.variables[which.variable],i],.format.round.digits),.format.t.stats.right,sep="")
+  				cat(" & ",c, .format.t.stats.left, .iround(.global.t.stats[.global.coefficient.variables[which.variable],i],.format.round.digits),.format.t.stats.right,sep="")
 
   				# add stars to denote statistical significance
   				if (part=="t-stat*") { 
   					p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
-  					.enter.significance.stars(p.value) 
+  					.enter.significance.stars(p.value, math.omit=TRUE) 
   				}
+          cat(c)
 
-  				cat("$")
   			}
   			else {
   				cat(" & ",sep="")
@@ -509,73 +533,122 @@
   }
 
   .coefficient.variables <-
-  function(zelig.object) {
+  function(object.name) {
 	
-  	model.name <- .get.model.name(zelig.object)
+  	model.name <- .get.model.name(object.name)
 
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.gee", "logit.gee", "probit.gee", "poisson.gee", "normal.gam", 
   				    "logit.gam", "probit.gam", "poisson.gam", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.gee", "gamma.survey",
-  				    "exp", "weibull", "coxph", "lognorm", "tobit", "glm()", "svyglm()", "gee()", "survreg()", "gam()")) {
-  		return(as.vector(names(zelig.object$coefficients)))
+  				    "exp", "weibull", "coxph", "lognorm", "tobit", "tobit(AER)", "glm()", "svyglm()", "gee()", "survreg()", "gam()", "plm", "ivreg")) {
+  		return(as.vector(names(object.name$coefficients)))
+  	}
+    else if (model.name %in% c("betareg")) {
+      return(as.vector(names(object.name$coefficients$mean)))
+    }
+  	else if (model.name %in% c("zeroinfl", "hurdle")) {
+      if (.global.zero.component==FALSE) {
+        return(as.vector(names(object.name$coefficients$count)))
+      }
+      else {
+        return(as.vector(names(object.name$coefficients$zero)))
+      }
   	}
   	else if (model.name %in% c("cloglog.net", "gamma.net", "logit.net", "probit.net")) {
-  		return(as.vector(rownames(summary(zelig.object)$coefficients))) 
+  		return(as.vector(rownames(summary(object.name)$coefficients))) 
   	}
   	else if (model.name %in% c("ologit", "oprobit", "polr()")) {
-  		coef.temp <- as.vector(rownames(suppressMessages(summary(zelig.object)$coefficients)))
-  		if (.format.ordered.intercepts == FALSE) { return(coef.temp[seq(from=1, to=length(coef.temp)-(length(suppressMessages(summary(zelig.object)$lev))-1))]) }
+  		coef.temp <- as.vector(rownames(suppressMessages(summary(object.name)$coefficients)))
+  		if (.format.ordered.intercepts == FALSE) { return(coef.temp[seq(from=1, to=length(coef.temp)-(length(suppressMessages(summary(object.name)$lev))-1))]) }
   		else { return(coef.temp) }
   	}
   	else if (model.name %in% c("arima")) {
-  		return(as.vector(names(zelig.object$coef)))
+  		return(as.vector(names(object.name$coef)))
   	}
+    else if (model.name %in% c("multinom")) {
+      return(as.vector(object.name$coefnames))
+    }
+  	
   	return(NULL)
   }
 
   .dependent.variable <-
-  function(zelig.object) as.vector(as.character(zelig.object$call$formula)[2])
-
+  function(object.name) {
+    if (!is.null(object.name$call$formula)) {
+      if (length(as.vector(as.character(object.name$call$formula)))>1) {
+        return(as.vector(as.character(object.name$call$formula)[2]))
+      }
+    }
+    if (!is.null(object.name$formula)) {
+      if (length(as.vector(as.character(object.name$formula)))>1) {   # this is for zelig$result ones
+        return(as.vector(as.character(object.name$formula)[2])) 
+      }
+    }
+    if (!is.null(object.name$formula2)) {
+      if (length(as.vector(as.character(object.name$formula2)))>1) {   # z.ls
+        return(as.vector(as.character(object.name$formula2)[2])) 
+      }      
+    }
+      
+  }
+  
   .dependent.variable.written <-
-  function(zelig.object) {
+  function(object.name) {
 	
-  	model.name <- .get.model.name(zelig.object)
+  	model.name <- .get.model.name(object.name)
 
-  	if (model.name %in% c("coxph","exp","lognorm","weibull","survreg()","arima")) {
-  		return( .inside.bracket(as.vector(as.character(zelig.object$call$formula)[2]))[1] )
+  	if (model.name %in% c("tobit","ologit","oprobit", "relogit", "coxph","exp","lognorm","weibull","survreg()","arima")) {
+  		written.var <- .inside.bracket(.dependent.variable(object.name))[1] 
   	}
-  	else { return( as.vector(as.character(zelig.object$call$formula)[2]) ) }
+  	else { written.var <- .dependent.variable(object.name) }
+    
+    # some formatting changes
+  	# remove everything before and including he last dollar sign from variable name
+  	temp <- strsplit(written.var,"$",fixed=TRUE)
+  	written.var <- temp[[1]][length(temp[[1]])]
+  	
+  	# if underscore in variable name, then insert an escape \ before it
+  	written.var <- gsub("_","\\_",written.var,fixed=TRUE)
+  	
+    return(written.var)
   }
 
   .enter.significance.stars <-
-  function(p.value) {
+  function(p.value, math.omit) {
     if ((!is.na(p.value)) & (!is.null(p.value))) {
+      
+      if (math.omit==TRUE) {
+        c <- ""
+      }
+      else {
+        c <- "$"
+      }
     
       # three stars
       if (!is.na(.format.three.stars)) {
-        if (p.value < .format.three.stars) { cat("^{",.format.significance.star,.format.significance.star,.format.significance.star,"}",sep="") }
+        if (p.value < .format.three.stars) { cat(c,"^{",.format.significance.star,.format.significance.star,.format.significance.star,"}",c,sep="") }
       }
     
       if (!is.na(.format.two.stars)) {
         if (!is.na(.format.three.stars)) {
-          if ((p.value >= .format.three.stars) & (p.value < .format.two.stars)) { cat("^{",.format.significance.star,.format.significance.star,"}",sep="") }
+          if ((p.value >= .format.three.stars) & (p.value < .format.two.stars)) { cat(c,"^{",.format.significance.star,.format.significance.star,"}",c,sep="") }
         }
         else {
-          if (p.value < .format.two.stars) { cat("^{",.format.significance.star,.format.significance.star,"}",sep="") }
+          if (p.value < .format.two.stars) { cat(c,"^{",.format.significance.star,.format.significance.star,"}",c,sep="") }
         }
       }
     
       if (!is.na(.format.one.star)) {
         if ((!is.na(.format.two.stars)) & (!is.na(.format.three.stars))) {
-          if ((p.value >= .format.two.stars) & (p.value >= .format.three.stars) & (p.value < .format.one.star)) { cat("^{",.format.significance.star,"}",sep="") }
+          if ((p.value >= .format.two.stars) & (p.value >= .format.three.stars) & (p.value < .format.one.star)) { cat(c,"^{",.format.significance.star,"}",c,sep="") }
         }
         else if ((!is.na(.format.two.stars)) & (is.na(.format.three.stars))) {
-          if ((p.value >= .format.two.stars) & (p.value < .format.one.star)) { cat("^{",.format.significance.star,"}",sep="") }
+          if ((p.value >= .format.two.stars) & (p.value < .format.one.star)) { cat(c,"^{",.format.significance.star,"}",c,sep="") }
         }
         else if ((is.na(.format.two.stars)) & (!is.na(.format.three.stars))) {
-          if ((p.value >= .format.three.stars) & (p.value < .format.one.star)) { cat("^{",.format.significance.star,"}",sep="") }
+          if ((p.value >= .format.three.stars) & (p.value < .format.one.star)) { cat(c,"^{",.format.significance.star,"}",c,sep="") }
         }
         else {
-          if (p.value < .format.one.star) { cat("^{",.format.significance.star,"}",sep="") }
+          if (p.value < .format.one.star) { cat(c,"^{",.format.significance.star,"}",c,sep="") }
         }
     
       }
@@ -585,16 +658,24 @@
   }
 
   .F.stat <-
-  function(zelig.object) {
+  function(object.name) {
   	F.stat.output <- as.vector(rep(NA,times=4))
 
-  	model.name <- .get.model.name(zelig.object)
+  	model.name <- .get.model.name(object.name)
 
   	if (!(model.name %in% c("arima"))) {
-  		if (!is.null(suppressMessages(summary(zelig.object)$fstatistic["value"]))) {
-  			F.stat.value <- summary(zelig.object)$fstatistic["value"]
-  			df.numerator <- summary(zelig.object)$fstatistic["numdf"]
-  			df.denominator <- summary(zelig.object)$fstatistic["dendf"]
+      if (model.name %in% c("plm")) {
+        F.stat.value <- summary(object.name)$fstatistic$statistic
+        df.numerator <- summary(object.name)$fstatistic$parameter["df1"]
+        df.denominator <- summary(object.name)$fstatistic$parameter["df2"]
+        F.stat.p.value <- summary(object.name)$fstatistic$p.value
+        
+        F.stat.output <- as.vector(c(F.stat.value, df.numerator, df.denominator, F.stat.p.value))
+      }
+  		else if (!is.null(suppressMessages(summary(object.name)$fstatistic["value"]))) {
+  			F.stat.value <- summary(object.name)$fstatistic["value"]
+  			df.numerator <- summary(object.name)$fstatistic["numdf"]
+  			df.denominator <- summary(object.name)$fstatistic["dendf"]
   			F.stat.p.value <- pf(F.stat.value, df.numerator, df.denominator, lower.tail=FALSE)
 
   			F.stat.output <- as.vector(c(F.stat.value, df.numerator, df.denominator, F.stat.p.value))
@@ -606,21 +687,21 @@
   }
 
   .gcv.UBRE <-
-  function(zelig.object) {
+  function(object.name) {
   
-    model.name <- .get.model.name(zelig.object)
+    model.name <- .get.model.name(object.name)
   
     if (!(model.name %in% c("arima"))) {
-      if (!is.null(zelig.object$gcv.ubre)) {
-        return(as.vector(zelig.object$gcv.ubre))
+      if (!is.null(object.name$gcv.ubre)) {
+        return(as.vector(object.name$gcv.ubre))
       }
     }
     return(NA)
   }
 
   .get.model.name <-
-  function(zelig.object) {
-  	return.value <- .model.identify(zelig.object)
+  function(object.name) {
+  	return.value <- .model.identify(object.name)
   	if (substr(return.value,1,5)=="glm()") { return.value <- "glm()" }
   	if (substr(return.value,1,8)=="svyglm()") { return.value <- "svyglm()" }
   	if (substr(return.value,1,5)=="gee()") { return.value <- "gee()" }
@@ -630,142 +711,224 @@
   	return(return.value)
   }
 
-  .get.p.values <-
-  function(zelig.object) {
+  .get.p.values.1 <-
+  function(object.name) {
 
-  	model.name <- .get.model.name(zelig.object)
+  	model.name <- .get.model.name(object.name)
 
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.survey",
-                            "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "svyglm()")) {
-  		return(summary(zelig.object)$coefficients[,4])
+                            "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "svyglm()", "plm", "ivreg")) {
+  		return(summary(object.name)$coefficients[,4])
   	}
+    else if (model.name %in% c("zeroinfl", "hurdle")) {
+      if (.global.zero.component==FALSE) {
+        return(summary(object.name)$coefficients$count[,4])  
+      }
+      else {
+        return(summary(object.name)$coefficients$zero[,4])
+      }
+      
+    }
   	else if (model.name %in% c("normal.gee", "logit.gee", "poisson.gee", "probit.gee", "gamma.gee", "gee()")) {
-  		return(2*pnorm(abs(summary(zelig.object)$coefficients[,"Robust z"]), mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE))
+  		return(2*pnorm(abs(summary(object.name)$coefficients[,"Robust z"]), mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE))
   	}
   	else if (model.name %in% c("normal.gam", "logit.gam", "probit.gam", "poisson.gam", "gam()")) {
-  		return(summary(zelig.object)$p.pv)
+  		return(summary(object.name)$p.pv)
   	}
   	else if (model.name %in% c("coxph")) {
-  		return(summary(zelig.object)$coef[,"Pr(>|z|)"])
+  		return(summary(object.name)$coef[,"Pr(>|z|)"])
   	}
   	else if (model.name %in% c("exp","lognorm","weibull","tobit", "survreg()")) {
-  		return(summary(zelig.object)$table[,"p"])
+  		return(summary(object.name)$table[,"p"])
   	}
   	else if (model.name %in% c("ologit", "oprobit", "polr()")) {
-  		coef.temp <- suppressMessages(summary(zelig.object)$coefficients[,"t value"])
-  		if (.format.ordered.intercepts == FALSE) { return(2*pt(abs(coef.temp[seq(from=1, to=length(coef.temp)-(length(suppressMessages(summary(zelig.object)$lev))-1))]), df=suppressMessages(summary(zelig.object)$edf), lower.tail = FALSE, log.p = FALSE)) }
+  		coef.temp <- suppressMessages(summary(object.name)$coefficients[,"t value"])
+  		if (.format.ordered.intercepts == FALSE) { return(2*pt(abs(coef.temp[seq(from=1, to=length(coef.temp)-(length(suppressMessages(summary(object.name)$lev))-1))]), df=suppressMessages(summary(object.name)$edf), lower.tail = FALSE, log.p = FALSE)) }
   		else { return(coef.temp) } 
   	}
   	else if (model.name %in% c("arima")) {
-  		return(2*pnorm( abs(zelig.object$coef / (sqrt(diag(zelig.object$var.coef))) ), mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE))
+  		return(2*pnorm( abs(object.name$coef / (sqrt(diag(object.name$var.coef))) ), mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE))
   	}
-        return(NULL)
+    else if (model.name %in% c("tobit(AER)")){
+      return(summary(object.name)$coefficients[,"Pr(>|z|)"])
+    }
+    else if (model.name %in% c("multinom")) {
+      return( 2*pnorm( abs( (summary(object.name)$coefficients) / (summary(object.name)$standard.errors) ) , mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE) )
+    }
+  	else if (model.name %in% c("betareg")) {
+  	  return(summary(object.name)$coefficients$mean[,"Pr(>|z|)"])
+  	}
+    return(NULL)
   }
+  
+  .get.p.values <-
+  function(object.name) {
+      out <- .get.p.values.1(object.name)
+      if (is.null(names(out))) {
+        names(out) <- .coefficient.variables(object.name)
+      }
+      return(out)
+  }
+  
 
   .get.scale <-
-  function(zelig.object) {
+  function(object.name) {
   
-    model.name <- .get.model.name(zelig.object)
+    model.name <- .get.model.name(object.name)
   
     if (!(model.name %in% c("arima"))) {
-      if (!is.null(zelig.object$scale)) {
-        if (model.name %in% c("normal.gee", "logit.gee", "poisson.gee", "probit.gee", "gamma.gee", "gee()", "exp","lognorm","weibull","tobit","survreg()")) {
-          return(as.vector(zelig.object$scale))
+      if (!is.null(object.name$scale)) {
+        if (model.name %in% c("normal.gee", "logit.gee", "poisson.gee", "probit.gee", "gamma.gee", "gee()", "exp","lognorm","weibull","tobit","survreg()","tobit(AER)")) {
+          return(as.vector(object.name$scale))
         }
       }
     }
     return(NA)
-  
-    pnorm( abs(zelig.object$coef / (sqrt(diag(zelig.object$var.coef))) ), mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE)
   }
 
   .get.sigma2 <-
-  function(zelig.object) {
+  function(object.name) {
   
-    model.name <- .get.model.name(zelig.object)
+    model.name <- .get.model.name(object.name)
   
-    if (!is.null(zelig.object$sigma2)) {
-        return(as.vector(zelig.object$sigma2))
+    if (!is.null(object.name$sigma2)) {
+        return(as.vector(object.name$sigma2))
     }
     return(NA)
   }
 
-  .get.standard.errors <-
-  function(zelig.object) {
+  .get.standard.errors.1 <-
+  function(object.name) {
 
-  	model.name <- .get.model.name(zelig.object)
+  	model.name <- .get.model.name(object.name)
 
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.survey",
-                            "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "svyglm()")) {
-  		return(summary(zelig.object)$coefficients[,"Std. Error"])
+                            "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "svyglm()", "plm", "ivreg")) {
+  		return(summary(object.name)$coefficients[,"Std. Error"])
+  	}
+  	if (model.name %in% c("zeroinfl", "hurdle")) {
+      if (.global.zero.component == FALSE) {
+        return(summary(object.name)$coefficients$count[,"Std. Error"])  
+      }
+      else {
+        return(summary(object.name)$coefficients$zero[,"Std. Error"])
+      }
   	}
   	else if (model.name %in% c("normal.gee", "logit.gee", "poisson.gee",  "probit.gee", "gamma.gee", "gee()")) {
-  		return(summary(zelig.object)$coefficients[,"Robust S.E."])
+  		return(summary(object.name)$coefficients[,"Robust S.E."])
   	}
   	else if (model.name %in% c("normal.gam", "logit.gam", "probit.gam", "poisson.gam", "gam()")) {
-  	  temp.se <- summary(zelig.object)$se
-      names(temp.se) <- names(summary(zelig.object)$p.coeff)
+  	  temp.se <- summary(object.name)$se
+      names(temp.se) <- names(summary(object.name)$p.coeff)
       return(temp.se)
   	}
   	else if (model.name %in% c("coxph")) {
-  		return(summary(zelig.object)$coef[,"se(coef)"])
+  		return(summary(object.name)$coef[,"se(coef)"])
   	}
   	else if (model.name %in% c("exp","lognorm","weibull","tobit","survreg()")) {
-  		return(summary(zelig.object)$table[,"Std. Error"])
+  		return(summary(object.name)$table[,"Std. Error"])
   	}
   	else if (model.name %in% c("ologit", "oprobit", "polr()")) {
-  		se.temp <- suppressMessages(summary(zelig.object)$coefficients[,"Std. Error"])
-  		if (.format.ordered.intercepts == FALSE) { return(se.temp[seq(from=1, to=length(se.temp)-(length(suppressMessages(summary(zelig.object)$lev))-1))]) }
+  		se.temp <- suppressMessages(summary(object.name)$coefficients[,"Std. Error"])
+  		if (.format.ordered.intercepts == FALSE) { return(se.temp[seq(from=1, to=length(se.temp)-(length(suppressMessages(summary(object.name)$lev))-1))]) }
   		else { return(se.temp) }
   	}
   	else if (model.name %in% c("arima")) {
-  		return( sqrt(diag(zelig.object$var.coef)) )
+  		return( sqrt(diag(object.name$var.coef)) )
   	}
+  	else if (model.name %in% c("tobit(AER)")){
+  	  return(summary(object.name)$coefficients[,"Std. Error"])
+  	}
+  	else if (model.name %in% c("multinom")) {
+  	  return(summary(object.name)$standard.errors)
+  	}
+  	else if (model.name %in% c("betareg")) {
+  	  return(summary(object.name)$coefficients$mean[,"Std. Error"])
+  	}
+  	
     return(NULL)
   }
+  
+  .get.standard.errors <-
+  function(object.name) {
+      out <- .get.standard.errors.1(object.name)
+      if (is.null(names(out))) {
+        names(out) <- .coefficient.variables(object.name)
+      }
+      return(out)
+  }
 
-  .get.t.stats <-
-  function(zelig.object) {
+  .get.t.stats.1 <-
+  function(object.name) {
 
-  	model.name <- .get.model.name(zelig.object)
+  	model.name <- .get.model.name(object.name)
 
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.survey",
-      				    "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "svyglm()")) {
-  		return(summary(zelig.object)$coefficients[,3])
+      				    "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "svyglm()","plm", "ivreg")) {
+  		return(summary(object.name)$coefficients[,3])
   	}
+    else if (model.name %in% c("zeroinfl", "hurdle")) {
+      if (.global.zero.component == FALSE) {
+        return(summary(object.name)$coefficients$count[,3])  
+      }
+      else {
+        return(summary(object.name)$coefficients$zero[,3])
+      }
+      
+    }
   	else if (model.name %in% c("normal.gee", "logit.gee", "poisson.gee",  "probit.gee", "gamma.gee", "gee()")) {
-  		return(summary(zelig.object)$coefficients[,"Robust z"])
+  		return(summary(object.name)$coefficients[,"Robust z"])
   	}
   	else if (model.name %in% c("normal.gam", "logit.gam", "probit.gam", "poisson.gam", "gam()")) {
-  		return(summary(zelig.object)$p.t)
+  		return(summary(object.name)$p.t)
   	}
   	else if (model.name %in% c("coxph")) {
-  		return(summary(zelig.object)$coef[,"z"])
+  		return(summary(object.name)$coef[,"z"])
   	}
   	else if (model.name %in% c("exp","lognorm","weibull", "tobit","survreg()")) {
-  		return(summary(zelig.object)$table[,"z"])
+  		return(summary(object.name)$table[,"z"])
   	}
   	else if (model.name %in% c("ologit", "oprobit", "polr()")) {
-  		tstat.temp <- suppressMessages(summary(zelig.object)$coefficients[,"t value"])
-  		if (.format.ordered.intercepts == FALSE) { return(tstat.temp[seq(from=1, to=length(tstat.temp)-(length(suppressMessages(summary(zelig.object)$lev))-1))]) }
+  		tstat.temp <- suppressMessages(summary(object.name)$coefficients[,"t value"])
+  		if (.format.ordered.intercepts == FALSE) { return(tstat.temp[seq(from=1, to=length(tstat.temp)-(length(suppressMessages(summary(object.name)$lev))-1))]) }
   		else { return(tstat.temp) }
   	}
   	else if (model.name %in% c("arima")) {
-  		return( zelig.object$coef / (sqrt(diag(zelig.object$var.coef))) )
+  		return( object.name$coef / (sqrt(diag(object.name$var.coef))) )
   	}
+  	else if (model.name %in% c("tobit(AER)")){
+  	  return(summary(object.name)$coefficients[,"z value"])
+  	}
+  	else if (model.name %in% c("multinom")) {
+  	  return( (summary(object.name)$coefficients) / (summary(object.name)$standard.errors) )
+  	}
+  	else if (model.name %in% c("betareg")) {
+  	  return(summary(object.name)$coefficients$mean[,"z value"])
+  	}
+  	
   	return(NULL)
   }
+  
+  .get.t.stats <-
+  function(object.name) {
+    out <- .get.t.stats.1(object.name)
+    if (is.null(names(out))) {
+      names(out) <- .coefficient.variables(object.name)
+    }
+    return(out)
+  }
+  
 
   .get.theta <-
-  function(zelig.object) {
+  function(object.name) {
     theta.output <- as.vector(rep(NA,times=4))
   
-    model.name <- .get.model.name(zelig.object)
+    model.name <- .get.model.name(object.name)
   
     if (!(model.name %in% c("arima"))) {
-      if ((!is.null(zelig.object$theta)) & (!is.null(zelig.object$SE.theta))) {
-        theta.value <- zelig.object$theta
-        theta.se.value <- zelig.object$SE.theta
+      if ((!is.null(object.name$theta)) & (!is.null(object.name$SE.theta))) {
+        theta.value <- object.name$theta
+        theta.se.value <- object.name$SE.theta
         theta.tstat.value <- theta.value / theta.se.value
         theta.p.value <- 2*pnorm(abs(theta.tstat.value), mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE)
       
@@ -888,6 +1051,7 @@
 
   .is.all.integers <-
   function(x) {
+    if (!is.numeric(x)) { return(FALSE) }
     if ((sum(as.integer(x)==x, na.rm=TRUE)) == sum(!is.na(x))) {
       return (TRUE)
     }
@@ -895,33 +1059,33 @@
   }
 
   .log.likelihood <-
-  function(zelig.object) {
+  function(object.name) {
 
-  	model.name <- .get.model.name(zelig.object)
+  	model.name <- .get.model.name(object.name)
 
-  	if (model.name %in% c("arima")) {
-  		return(as.vector(zelig.object$loglik))
+  	if (model.name %in% c("arima", "betareg", "zeroinfl", "hurdle")) {
+  		return(as.vector(object.name$loglik))
   	}
-  	else if (!is.null(zelig.object$aic)) {
-  		return(as.vector(-(0.5)*(zelig.object$aic-2*length(summary(zelig.object)$coefficients[,"Estimate"]))))
+  	else if (model.name %in% c("coxph", "exp", "weibull", "lognorm","tobit", "tobit(AER)", "survreg()")) {
+  		return(as.vector(summary(object.name)$loglik[2]))
   	}
-  	else if (model.name %in% c("coxph", "exp", "weibull", "lognorm","tobit", "survreg()")) {
-  		return(as.vector(summary(zelig.object)$loglik[2]))
+  	else if (!is.null(object.name$aic)) {
+  	  return(as.vector(-(0.5)*(object.name$aic-2*length(summary(object.name)$coefficients[,"Estimate"]))))
   	}
   	return(NA)
   }
 
   .logrank.stat <-
-  function(zelig.object) {
+  function(object.name) {
     logrank.output <- as.vector(rep(NA,times=3))
   
-    model.name <- .get.model.name(zelig.object)
+    model.name <- .get.model.name(object.name)
   
     if (!(model.name %in% c("arima"))) {
-      if (!is.null(summary(zelig.object)$logtest)) {
-        logrank.value <- suppressMessages(summary(zelig.object)$sctest[1])
-        df.value <- suppressMessages(summary(zelig.object)$sctest[2])
-        logrank.p.value <- suppressMessages(summary(zelig.object)$sctest[3])
+      if (!is.null(summary(object.name)$logtest)) {
+        logrank.value <- suppressMessages(summary(object.name)$sctest[1])
+        df.value <- suppressMessages(summary(object.name)$sctest[2])
+        logrank.p.value <- suppressMessages(summary(object.name)$sctest[3])
         logrank.output <- as.vector(c(logrank.value, df.value, logrank.p.value))
       }
     
@@ -932,16 +1096,16 @@
   }
 
   .lr.stat <-
-  function(zelig.object) {
+  function(object.name) {
     log.output <- as.vector(rep(NA,times=3))
   
-    model.name <- .get.model.name(zelig.object)
+    model.name <- .get.model.name(object.name)
     
     if (!(model.name %in% c("arima"))) {
-      if (!is.null(summary(zelig.object)$logtest)) {
-        log.value <- suppressMessages(summary(zelig.object)$logtest[1])
-        df.value <- suppressMessages(summary(zelig.object)$logtest[2])
-        log.p.value <- suppressMessages(summary(zelig.object)$logtest[3])
+      if (!is.null(summary(object.name)$logtest)) {
+        log.value <- suppressMessages(summary(object.name)$logtest[1])
+        df.value <- suppressMessages(summary(object.name)$logtest[2])
+        log.p.value <- suppressMessages(summary(object.name)$logtest[3])
         log.output <- as.vector(c(log.value, df.value, log.p.value))
       }
       
@@ -952,231 +1116,275 @@
   }
 
   .max.r.squared <-
-  function(zelig.object) {
+  function(object.name) {
   
-    model.name <- .get.model.name(zelig.object)
+    model.name <- .get.model.name(object.name)
   
     if (!(model.name %in% c("arima"))) {
       if (model.name %in% c("coxph")) {
-        return(as.vector(summary(zelig.object)$rsq[2]))
+        return(as.vector(summary(object.name)$rsq[2]))
       }
     }
     return(NA)
   }
-
+  
   .model.identify <-
-  function(zelig.object) {
-  	if (zelig.object$call[1]=="lm()") { return("ls") }
-  	else if (zelig.object$call[1]=="glm()") {
-  		if (zelig.object$family$family=="gaussian") {
-  			if (zelig.object$family$link=="identity") {
+  function(object.name) {
+    
+   if (!is.null(object.name$call)) {
+    
+  	if (object.name$call[1]=="lm()") { return("ls") }
+  	else if (object.name$call[1]=="glm()") {
+  		if (object.name$family$family=="gaussian") {
+  			if (object.name$family$link=="identity") {
   				return("normal")
   			}
   		}
-  		else if (zelig.object$family$family=="binomial") {
-  			if (zelig.object$family$link=="probit") {
+  		else if (object.name$family$family=="binomial") {
+  			if (object.name$family$link=="probit") {
   				return("probit")
   			}
-  			if (zelig.object$family$link=="logit") {
+  			if (object.name$family$link=="logit") {
   				return("logit")
 	  		}
 
 	  	}
-	  	else if (zelig.object$family$family=="poisson") {
-  			if (zelig.object$family$link=="log") {
+	  	else if (object.name$family$family=="poisson") {
+  			if (object.name$family$link=="log") {
   				return("poisson")
   			}
   		}
-  		else if (zelig.object$family$family=="Gamma") {
-  			if (zelig.object$family$link=="inverse") {
+  		else if (object.name$family$family=="Gamma") {
+  			if (object.name$family$link=="inverse") {
   				return("gamma")
   			}
   		}
-  		return(paste("glm()#",zelig.object$family$family,"#",zelig.object$family$link, sep=""))
+  		return(paste("glm()#",object.name$family$family,"#",object.name$family$link, sep=""))
   	}
 
-  	else if (zelig.object$call[1]=="svyglm()") {
-  		if (zelig.object$family$family=="gaussian") {
-  			if (zelig.object$family$link=="identity") {
+  	else if (object.name$call[1]=="svyglm()") {
+  		if (object.name$family$family=="gaussian") {
+  			if (object.name$family$link=="identity") {
   				return("normal.survey")
   			}
   		}
-  		else if ((zelig.object$family$family=="binomial") | (zelig.object$family$family=="quasibinomial")) {
-  			if (zelig.object$family$link=="probit") {
+  		else if ((object.name$family$family=="binomial") | (object.name$family$family=="quasibinomial")) {
+  			if (object.name$family$link=="probit") {
   				return("probit.survey")
   			}
-  			if (zelig.object$family$link=="logit") {
+  			if (object.name$family$link=="logit") {
   				return("logit.survey")
   			}
 
   		}
-  		else if (zelig.object$family$family=="poisson") {
-  			if (zelig.object$family$link=="log") {
+  		else if (object.name$family$family=="poisson") {
+  			if (object.name$family$link=="log") {
   				return("poisson.survey")
   			}
   		}
-  		else if (zelig.object$family$family=="Gamma") {
-  			if (zelig.object$family$link=="inverse") {
+  		else if (object.name$family$family=="Gamma") {
+  			if (object.name$family$link=="inverse") {
   				return("gamma.survey")
   			}
   		}
-  		return(paste("svyglm()#",zelig.object$family$family,"#",zelig.object$family$link, sep=""))
+  		return(paste("svyglm()#",object.name$family$family,"#",object.name$family$link, sep=""))
   	}
 
-  	else if (zelig.object$call[1]=="gam()") {
-  		if (zelig.object$family$family=="gaussian") {
-  			if (zelig.object$family$link=="identity") {
+  	else if (object.name$call[1]=="gam()") {
+  		if (object.name$family$family=="gaussian") {
+  			if (object.name$family$link=="identity") {
   				return("normal.gam")
   			}
   		}
-  		else if (zelig.object$family$family=="binomial")  {
-  			if (zelig.object$family$link=="probit") {
+  		else if (object.name$family$family=="binomial")  {
+  			if (object.name$family$link=="probit") {
   				return("probit.gam")
   			}
-  			if (zelig.object$family$link=="logit") {
+  			if (object.name$family$link=="logit") {
   				return("logit.gam")
   			}
 
   		}
-  		else if (zelig.object$family$family=="poisson") {
-  			if (zelig.object$family$link=="log") {
+  		else if (object.name$family$family=="poisson") {
+  			if (object.name$family$link=="log") {
   				return("poisson.gam")
   			}
   		}
-  		else if (zelig.object$family$family=="Gamma") {
-  			if (zelig.object$family$link=="inverse") {
+  		else if (object.name$family$family=="Gamma") {
+  			if (object.name$family$link=="inverse") {
   				return("gamma.gam")
   			}
   		}
-  		return(paste("gam()#",zelig.object$family$family,"#",zelig.object$family$link, sep=""))
+  		return(paste("gam()#",object.name$family$family,"#",object.name$family$link, sep=""))
   	}
 	
-  	else if (zelig.object$call[1]=="polr()") {
-  		if (zelig.object$method=="logistic") {
+  	else if (object.name$call[1]=="polr()") {
+  		if (object.name$method=="logistic") {
   			return("ologit")
   		}
-  		else if (zelig.object$method=="probit") {
+  		else if (object.name$method=="probit") {
   			return("oprobit")
   		}
-  		return(paste("polr()#",zelig.object$method, sep=""))
+  		return(paste("polr()#",object.name$method, sep=""))
   	}
 
 
-  	else if (zelig.object$call[1]=="gee()") {
-  		if (zelig.object$family$family=="gaussian") {
-  			if (zelig.object$family$link=="identity") {
+  	else if (object.name$call[1]=="gee()") {
+  		if (object.name$family$family=="gaussian") {
+  			if (object.name$family$link=="identity") {
   				return("normal.gee")
   			}
   		}
-  		else if (zelig.object$family$family=="binomial") {
-  			if (zelig.object$family$link=="probit") {
+  		else if (object.name$family$family=="binomial") {
+  			if (object.name$family$link=="probit") {
   				return("probit.gee")
   			}
-  			if (zelig.object$family$link=="logit") {
+  			if (object.name$family$link=="logit") {
   				return("logit.gee")
   			}
 
   		}
-  		else if (zelig.object$family$family=="poisson") {
-  			if (zelig.object$family$link=="log") {
+  		else if (object.name$family$family=="poisson") {
+  			if (object.name$family$link=="log") {
   				return("poisson.gee")
   			}
   		}
-  		else if (zelig.object$family$family=="Gamma") {
-  			if (zelig.object$family$link=="inverse") {
+  		else if (object.name$family$family=="Gamma") {
+  			if (object.name$family$link=="inverse") {
   				return("gamma.gee")
   			}
   		}
-  		return(paste("gee()#",zelig.object$family$family,"#",zelig.object$family$link, sep=""))
+  		return(paste("gee()#",object.name$family$family,"#",object.name$family$link, sep=""))
   	}
 
-  	else if (zelig.object$call[1]=="survreg()") {
-  		if (zelig.object$dist=="exponential") {
+  	else if (object.name$call[1]=="survreg()") {
+  		if (object.name$dist=="exponential") {
   			return("exp")
   		}
-  		else if (zelig.object$dist=="weibull") {
+  		else if (object.name$dist=="weibull") {
   			return("weibull")
   		}
-  		else if (zelig.object$dist=="lognorm") {
+  		else if (object.name$dist=="lognorm") {
   			return("lognormal")
   		}
-  		return(paste("survreg()#",zelig.object$dist, sep=""))
+      else if (object.name$dist=="gaussian") {
+        return("tobit")
+      }
+  		return(paste("survreg()#",object.name$dist, sep=""))
   	}
 
-  	else if (zelig.object$call[1]=="glm.nb()") {
+  	else if (object.name$call[1]=="glm.nb()") {
   		return("negbin")
   	}
 
-  	else if (zelig.object$call[1]=="coxph()") {
+  	else if (object.name$call[1]=="coxph()") {
   		return("coxph")
   	}
+    
+    else if (object.name$call[1]=="relogit()") {
+      return("relogit")
+    }
+  	else if (object.name$call[1]=="netbinom()") {
+  	  if (object.name$call$LF=="probit") { return("probit.net") }      
+      if (object.name$call$LF=="logit") { return("logit.net") }
+  	  if (object.name$call$LF=="cloglog") { return("cloglog.net") }
+  	}
+  	else if (object.name$call[1]=="netgamma()") {
+  	  return("gamma.net")
+  	}
 
-  	else if (zelig.object$call[1]=="zelig()") {
-        if (zelig.object$call$model %in% c("ls","normal","logit","probit","relogit","poisson","poisson.survey",
+  	else if (object.name$call[1]=="zelig()") {
+        if (object.name$call$model %in% c("ls","normal","logit","probit","relogit","poisson","poisson.survey",
                                            "negbin","probit.survey","logit.survey","normal.gee","logit.gee","probit.gee",
                                            "poisson.gee","normal.gam","logit.gam","probit.gam","poisson.gam","exp",
                                            "coxph","weibull","lognorm","normal.survey","gamma","gamma.survey",
                                            "gamma.gee","cloglog.net","logit.net","probit.net","gamma.net","ologit",
                                            "oprobit","arima","tobit")) {
-            return(zelig.object$call$model)
+            return(object.name$call$model)
   		    }
           else { return("unsupported zelig") }
   	}
-
-  	return("unknown")
+    
+  	else if (object.name$call[1]=="tobit()") {
+  	  return("tobit(AER)")
+  	}
+    
+    else if (object.name$call[1]=="multinom()") {
+      return("multinom")
+    }
+    
+  	else if (object.name$call[1]=="betareg()") {
+  	  return("betareg")
+  	}
+  	else if (object.name$call[1]=="zeroinfl()") {
+  	  return("zeroinfl")
+  	}
+  	else if (object.name$call[1]=="hurdle()") {
+  	  return("hurdle")
+  	}  	
+  	else if (object.name$call[1]=="plm()") {
+  	  return("plm")
+  	}  	
+  	else if (object.name$call[1]=="ivreg()") {
+  	  return("ivreg")
+  	} 
+   }
+  	
+   return("unknown")
+    
   }
 
   .new.table <-
-  function(zelig.object) {
+  function(object.name) {
 
-  	.global.models <<- suppressMessages(as.vector(.model.identify(zelig.object)))
-    .global.zelig.formulas.rhs <<- suppressMessages(.zelig.formula.rhs(zelig.object))
-  	.global.dependent.variables <<- suppressMessages(.dependent.variable(zelig.object))
-  	.global.dependent.variables.written <<- suppressMessages(.dependent.variable.written(zelig.object))
-  	.global.coefficient.variables <<- suppressMessages(.coefficient.variables(zelig.object))
-  	.global.coefficients <<- suppressMessages(cbind(.zelig.coefficients(zelig.object)))
-  	.global.std.errors <<- suppressMessages(cbind(.get.standard.errors(zelig.object)))
-  	.global.t.stats <<- suppressMessages(cbind(.get.t.stats(zelig.object)))
-  	.global.p.values <<- suppressMessages(cbind(.get.p.values(zelig.object)))
+  	.global.models <<- suppressMessages(as.vector(.model.identify(object.name)))
+    .global.formulas.rhs <<- suppressMessages(.formula.rhs(object.name))
+  	.global.dependent.variables <<- suppressMessages(.dependent.variable(object.name))
+  	.global.dependent.variables.written <<- suppressMessages(.dependent.variable.written(object.name))
+  	.global.coefficient.variables <<- suppressMessages(.coefficient.variables(object.name))
+  	.global.coefficients <<- suppressMessages(cbind(.get.coefficients(object.name)))
+  	.global.std.errors <<- suppressMessages(cbind(.get.standard.errors(object.name)))
+  	.global.t.stats <<- suppressMessages(cbind(.get.t.stats(object.name)))
+  	.global.p.values <<- suppressMessages(cbind(.get.p.values(object.name)))
 
-  	.global.N <<- suppressMessages(.number.observations(zelig.object))
-  	.global.LL <<- suppressMessages(.log.likelihood(zelig.object))
-  	.global.R2 <<- suppressMessages(.r.squared(zelig.object))
-  	.global.max.R2 <<- suppressMessages(.max.r.squared(zelig.object))
-  	.global.adj.R2 <<- suppressMessages(.adj.r.squared(zelig.object))
-  	.global.AIC <<- suppressMessages(.AIC(zelig.object))
-    .global.scale <<- suppressMessages(.get.scale(zelig.object))
-    .global.UBRE <<- suppressMessages(.gcv.UBRE(zelig.object))
-  	.global.sigma2 <<- suppressMessages(.get.sigma2(zelig.object))
-  	.global.theta <<- suppressMessages(.get.theta(zelig.object))
+  	.global.N <<- suppressMessages(.number.observations(object.name))
+  	.global.LL <<- suppressMessages(.log.likelihood(object.name))
+  	.global.R2 <<- suppressMessages(.r.squared(object.name))
+  	.global.max.R2 <<- suppressMessages(.max.r.squared(object.name))
+  	.global.adj.R2 <<- suppressMessages(.adj.r.squared(object.name))
+  	.global.AIC <<- suppressMessages(.AIC(object.name))
+    .global.scale <<- suppressMessages(.get.scale(object.name))
+    .global.UBRE <<- suppressMessages(.gcv.UBRE(object.name))
+  	.global.sigma2 <<- suppressMessages(.get.sigma2(object.name))
+  	.global.theta <<- suppressMessages(.get.theta(object.name))
 
-  	.global.SER <<- suppressMessages(.SER(zelig.object))
-  	.global.F.stat <<- suppressMessages(.F.stat(zelig.object))
-    .global.chi.stat <<- suppressMessages(.chi.stat(zelig.object))
-  	.global.wald.stat <<- suppressMessages(.wald.stat(zelig.object))
-  	.global.lr.stat <<- suppressMessages(.lr.stat(zelig.object))
-  	.global.logrank.stat <<- suppressMessages(.logrank.stat(zelig.object))
-  	.global.null.deviance <<- suppressMessages(.null.deviance(zelig.object))
-  	.global.residual.deviance <<- suppressMessages(.residual.deviance(zelig.object))
+  	.global.SER <<- suppressMessages(.SER(object.name))
+  	.global.F.stat <<- suppressMessages(.F.stat(object.name))
+    .global.chi.stat <<- suppressMessages(.chi.stat(object.name))
+  	.global.wald.stat <<- suppressMessages(.wald.stat(object.name))
+  	.global.lr.stat <<- suppressMessages(.lr.stat(object.name))
+  	.global.logrank.stat <<- suppressMessages(.logrank.stat(object.name))
+  	.global.null.deviance <<- suppressMessages(.null.deviance(object.name))
+  	.global.residual.deviance <<- suppressMessages(.residual.deviance(object.name))
 
   }
 
   .null.deviance <-
-  function(zelig.object) {
+  function(object.name) {
   	null.deviance.output <- as.vector(rep(NA,times=3))
 
-  	model.name <- .get.model.name(zelig.object)
+  	model.name <- .get.model.name(object.name)
 
   	if (!(model.name %in% c("arima"))) {
-  		if (!is.null(suppressMessages(summary(zelig.object)$null.deviance))) {
-  			null.deviance.value <- suppressMessages(summary(zelig.object)$null.deviance)
-  			df.value <- zelig.object$df.null
+  		if (!is.null(suppressMessages(summary(object.name)$null.deviance))) {
+  			null.deviance.value <- suppressMessages(summary(object.name)$null.deviance)
+  			df.value <- object.name$df.null
 
   			null.deviance.output <- as.vector(c(null.deviance.value, df.value, NA))
   		}
-  		else if (!is.null(zelig.object$null.deviance)) {
-  		  null.deviance.value <- zelig.object$null.deviance
-  		  df.value <- zelig.object$df.null
+  		else if (!is.null(object.name$null.deviance)) {
+  		  null.deviance.value <- object.name$null.deviance
+  		  df.value <- object.name$df.null
 		  
   		  null.deviance.output <- as.vector(c(null.deviance.value, df.value, NA))
   		}
@@ -1187,28 +1395,37 @@
   }
 
   .number.observations <-
-  function(zelig.object) {
+  function(object.name) {
   
-    model.name <- .get.model.name(zelig.object)
+    model.name <- .get.model.name(object.name)
   
     if (model.name %in% c("ls", "normal", "logit", "probit", "relogit",
                           "poisson", "negbin", "normal.survey", "poisson.survey",
                           "probit.survey", "logit.survey", "gamma", "gamma.survey",
                           "cloglog.net", "gamma.net", "logit.net",
-                          "probit.net", "z.arima", "glm()", "svyglm()")) {
-      return(as.vector(zelig.object$df.residual+length(zelig.object$coefficients)))
+                          "probit.net", "z.arima", "glm()", "svyglm()", "plm")) {
+      return(as.vector(object.name$df.residual+length(object.name$coefficients)))
+    }
+    else if (model.name %in% c("hurdle", "zeroinfl")) {
+      return(as.vector(object.name$n))
+    }
+    else if (model.name %in% c("ivreg")) {
+      return(as.vector(object.name$nobs))
     }
     if (model.name %in% c("normal.gee", "logit.gee", "poisson.gee",
-                          "probit.gee", "gamma.gee", "gee()")) {
-      return(as.vector(summary(zelig.object)$nobs))
+                          "probit.gee", "gamma.gee", "gee()", "betareg")) {
+      return(as.vector(summary(object.name)$nobs))
     }
     else if (model.name %in% c("normal.gam", "logit.gam", "probit.gam",
                                "poisson.gam", "coxph", "exp", "lognorm", "weibull", "survreg()",
                                "gam()")) {
-      return(as.vector(summary(zelig.object)$n))
+      return(as.vector(summary(object.name)$n))
     }
     else if (model.name %in% c("ologit", "oprobit", "polr()")) {
-      return(as.vector(summary(zelig.object)$nobs))
+      return(as.vector(summary(object.name)$nobs))
+    }
+    else if (model.name %in% c("tobit(AER)")) {
+      return(as.vector(summary(object.name)$n["Total"]))
     }
     return(NA)
   }
@@ -1270,8 +1487,15 @@
   		if (sum(!is.na(.global.var.name))!=0) {
   			cat (.format.var.name)
   			for (i in seq(1:length(.global.models))) {
-  	 			if (!is.na(.global.var.name[i])) { cat(" & $",.iround(.global.var.name[i], decimal.digits),"$", sep="") }
-  				else { cat(" & ", sep="") }
+  	 			if (!is.na(.global.var.name[i])) { 
+             if (.format.dec.mark.align == TRUE) {
+                cat(" & \\multicolumn{1}{c}{$",.iround(.global.var.name[i], decimal.digits),"$}", sep="")
+             }
+             else {
+               cat(" & $",.iround(.global.var.name[i], decimal.digits),"$", sep="")
+             }
+          }
+  	 			else { cat(" & ", sep="") }
   			}
   			cat(" \\\\ \n")
   			.table.part.published[part.number] <<- TRUE
@@ -1316,7 +1540,7 @@
 
   					for (i in seq(from=2, to=length(df.list))) {
   						if (i>=3) { cat(.format.df.separator) }
-  						cat("$",df.list[i],"$",sep="")
+  						cat(df.list[i],sep="")
   					}
   					cat(.format.df.right,sep="")
   				}
@@ -1324,13 +1548,18 @@
 		
   			# now, go column by column
   			for (i in seq(1:length(.global.models))) {
-  	 			if (!is.na(.global.var.name["statistic",i])) { 
-  					cat(" & $",.iround(.global.var.name["statistic",i], decimal.digits), sep="") 
+  	 			if (!is.na(.global.var.name["statistic",i])) {
+             
+  	 			  if (.format.dec.mark.align==TRUE) {
+  					  cat(" & \\multicolumn{1}{c}{$",.iround(.global.var.name["statistic",i], decimal.digits), sep="") 
+  	 			  }
+            else {
+              cat(" & $",.iround(.global.var.name["statistic",i], decimal.digits), sep="")
+            }
 
   					# significance stars
-  					if ((significance.stars == TRUE) & (!is.na(.global.var.name["p-value",i]))) { .enter.significance.stars(.global.var.name["p-value",i]) }
+  					if ((significance.stars == TRUE) & (!is.na(.global.var.name["p-value",i]))) { .enter.significance.stars(.global.var.name["p-value",i], math.omit=TRUE) }
 
-  					cat("$")
 										
   					# degrees of freedom - only report by statistics if not in the left column already
   					if (report.df.left.column == FALSE) {
@@ -1339,7 +1568,7 @@
   							for (j in seq(1:(nrow(.global.var.name)- 2))) {
   								if (!is.na(.global.var.name[paste("df",as.character(j),sep=""),i])) {
   									if (j>=2) { cat(.format.df.separator) }
-  									cat("$",.global.var.name[paste("df",as.character(j),sep=""),i],"$",sep="")
+  									cat(.global.var.name[paste("df",as.character(j),sep=""),i],sep="")
   								}
   							}
   							cat(.format.df.right,sep="")
@@ -1350,10 +1579,18 @@
   					if ((report.p.value == TRUE) & (!is.na(.global.var.name["p-value",i]))) {
   						cat(" ",.format.p.value.left,sep="")
   						if (!is.na(.global.var.name[paste("df",as.character(j),sep=""),i])) { 
-  							cat("$",.iround(.global.var.name["p-value",i],.format.round.digits, round.up.positive=TRUE),"$",sep="") 
+  							cat(.iround(.global.var.name["p-value",i],.format.round.digits, round.up.positive=TRUE),sep="") 
   						}
   						cat(.format.p.value.right,sep="")
   					}
+            
+            if (.format.dec.mark.align==TRUE) {
+              cat("$}")  
+            }
+            else {
+              cat("$")
+            }
+            
   				}
   				else { cat(" & ", sep="") }
   			}
@@ -1370,21 +1607,33 @@
   	    # now, go column by column
   	    for (i in seq(1:length(.global.models))) {
   	      if (!is.na(.global.var.name["statistic",i])) { 
-  	        cat(" & $",.iround(.global.var.name["statistic",i], decimal.digits), sep="") 
+
+            if (.format.dec.mark.align == TRUE) {
+              cat(" & \\multicolumn{1}{c}{$",.iround(.global.var.name["statistic",i], decimal.digits), sep="")  
+            }
+            else {
+              cat(" & $",.iround(.global.var.name["statistic",i], decimal.digits), sep="")
+            }
+  	        
 	        
   	        # significance stars
-  	        if ((significance.stars == TRUE) & (!is.na(.global.var.name["p-value",i]))) { .enter.significance.stars(.global.var.name["p-value",i]) }
-	        
-  	        cat("$")
+  	        if ((significance.stars == TRUE) & (!is.na(.global.var.name["p-value",i]))) { .enter.significance.stars(.global.var.name["p-value",i], math.omit=TRUE) }
 	        
   	        # standard errors
-  	        if ((report.se == TRUE) & (!is.na(.global.var.name["se",i]))) { cat(" ",.format.se.left,"$",.iround(.global.var.name["se",i], decimal.digits),"$",.format.se.right,sep="") }
+  	        if ((report.se == TRUE) & (!is.na(.global.var.name["se",i]))) { cat(" ",.format.se.left,.iround(.global.var.name["se",i], decimal.digits),.format.se.right,sep="") }
           
   	        # t-statistics
-  	        if ((report.tstat == TRUE) & (!is.na(.global.var.name["tstat",i]))) { cat(" ",.format.tstat.left,"$",.iround(.global.var.name["tstat",i], decimal.digits),"$",.format.tstat.right,sep="") }
+  	        if ((report.tstat == TRUE) & (!is.na(.global.var.name["tstat",i]))) { cat(" ",.format.tstat.left, .iround(.global.var.name["tstat",i], decimal.digits),.format.tstat.right,sep="") }
           
   	        # p-values
-  	        if ((report.tstat == TRUE) & (!is.na(.global.var.name["p-value",i]))) { cat(" ",.format.p.value.left,"$",.iround(.global.var.name["p-value",i], decimal.digits),"$",.format.p.value.right,sep="") }
+  	        if ((report.tstat == TRUE) & (!is.na(.global.var.name["p-value",i]))) { cat(" ",.format.p.value.left,.iround(.global.var.name["p-value",i], decimal.digits),.format.p.value.right,sep="") }
+            
+            if (.format.dec.mark.align == TRUE) {
+              cat("$}")
+            }
+            else {
+              cat("$")
+            }
   	      }
   	      else { cat(" & ", sep="") }
   	    }
@@ -1454,11 +1703,20 @@
   			if (different.dependent.variable == TRUE) {
           label.counter <- label.counter + 1 
   		 		if (how.many.columns == 1) {
-            if (is.na(.format.dep.var.labels[label.counter])) {
-  					  if (.format.dependent.variables.capitalize == TRUE) { cat(" & ",.format.dependent.variables.left,toupper(as.character(.global.dependent.variables.written[i])),.format.dependent.variables.right, sep="") }
-  					  else { cat(" & ",.format.dependent.variables.left,as.character(.global.dependent.variables.written[i]),.format.dependent.variables.right, sep="") }
+            if (.format.dec.mark.align==TRUE) {
+  		 		    if (is.na(.format.dep.var.labels[label.counter])) {
+  		 		      if (.format.dependent.variables.capitalize == TRUE) { cat(" & \\multicolumn{1}{c}{",.format.dependent.variables.left,toupper(as.character(.global.dependent.variables.written[i])),.format.dependent.variables.right,"}", sep="") }
+  		 		      else { cat(" & \\multicolumn{1}{c}{",.format.dependent.variables.left,as.character(.global.dependent.variables.written[i]),.format.dependent.variables.right,"}", sep="") }
+  		 		    }
+  		 		    else { cat(" & \\multicolumn{1}{c}{",.format.dependent.variables.left,.format.dep.var.labels[label.counter],.format.dependent.variables.right,"}", sep="") }
             }
-            else { cat(" & ",.format.dependent.variables.left,.format.dep.var.labels[label.counter],.format.dependent.variables.right, sep="") }
+            else {
+              if (is.na(.format.dep.var.labels[label.counter])) {
+  					    if (.format.dependent.variables.capitalize == TRUE) { cat(" & ",.format.dependent.variables.left,toupper(as.character(.global.dependent.variables.written[i])),.format.dependent.variables.right, sep="") }
+  					    else { cat(" & ",.format.dependent.variables.left,as.character(.global.dependent.variables.written[i]),.format.dependent.variables.right, sep="") }
+              }
+              else { cat(" & ",.format.dependent.variables.left,.format.dep.var.labels[label.counter],.format.dependent.variables.right, sep="") }
+            }
   				}
   				else {
             if (is.na(.format.dep.var.labels[label.counter])) {
@@ -1541,8 +1799,15 @@
   				else if ((as.character(.global.dependent.variables[i])) != (as.character(.global.dependent.variables[i+1]))) {different.model <- TRUE}   # subsume models under dependent variables
 
   				if (different.model == TRUE) {
-  			 		if (how.many.columns == 1) {cat(" & ",.format.models.left,as.character(renamed.global.models[row,i]),.format.models.right, sep="")}
-  					else {cat(" & \\multicolumn{",how.many.columns,"}{c}{",.format.models.left,as.character(renamed.global.models[row,i]),"}",.format.models.right, sep="")}
+  			 		if (how.many.columns == 1) {
+              if (.format.dec.mark.align == TRUE) {  
+  			 		    cat(" & \\multicolumn{1}{c}{",.format.models.left,as.character(renamed.global.models[row,i]),.format.models.right,"}", sep="")
+              }
+              else {
+                cat(" & ",.format.models.left,as.character(renamed.global.models[row,i]),.format.models.right, sep="")
+              }
+  			 		}
+  					else {cat(" & \\multicolumn{",how.many.columns,"}{c}{",.format.models.left,as.character(renamed.global.models[row,i]),.format.models.right,"}", sep="")}
 
   					how.many.columns <- 0
   				}
@@ -1581,8 +1846,14 @@
   		  .table.insert.space()
   		  cat(.format.numbers.text)
   		  for (i in seq(1:length(.global.models))) {
-  	 		  if (.format.numbers.roman == TRUE) { cat(" & ",.format.numbers.left,.roman.numeral(i),.format.numbers.right, sep="") }
-  	 		  else { cat(" & ",.format.numbers.left,i,.format.numbers.right, sep="") }
+          if (.format.dec.mark.align==TRUE) {
+  	 		    if (.format.numbers.roman == TRUE) { cat(" & \\multicolumn{1}{c}{",.format.numbers.left,.roman.numeral(i),.format.numbers.right,"}", sep="") }
+  	 		    else { cat(" & \\multicolumn{1}{c}{",.format.numbers.left,i,.format.numbers.right,"}", sep="") }
+          }
+          else {
+            if (.format.numbers.roman == TRUE) { cat(" & ",.format.numbers.left,.roman.numeral(i),.format.numbers.right, sep="") }
+            else { cat(" & ",.format.numbers.left,i,.format.numbers.right, sep="") }
+          }
 
 		    }
 		    cat("\\\\ \n")
@@ -1633,7 +1904,12 @@
         for (i in seq(1:length(.format.omit.regexp))) {
   			  cat (.format.omit.labels[i])
   			  for (j in seq(1:length(.global.models))) {
-  		 		  cat(" & ",.format.omit.table[i,j], sep="")
+            if (.format.dec.mark.align == TRUE) {
+  		 		    cat(" & \\multicolumn{1}{c}{",.format.omit.table[i,j],"}", sep="")
+            }
+            else {
+              cat(" & ",.format.omit.table[i,j], sep="")
+            }
     			}
   			  cat(" \\\\ \n")
   			}
@@ -1738,6 +2014,8 @@
   	else if (part=="notes") {
   		if (.format.note != "") { cat(.format.note) }
   		for (i in seq(1:length(.format.note.content))) {
+        
+        # print individual notes
   			if (.format.note == "") { cat("\\multicolumn{",length(.global.models)+1,"}{",.format.note.alignment,"}{",.format.note.content[i],"} \\\\ \n", sep="") }
   			else { cat(" & \\multicolumn{",length(.global.models),"}{",.format.note.alignment,"}{",.format.note.content[i],"} \\\\ \n", sep="") }
   		}
@@ -1755,36 +2033,42 @@
   }
 
   .r.squared <-
-  function(zelig.object) {
+  function(object.name) {
 
-  	model.name <- .get.model.name(zelig.object)
+  	model.name <- .get.model.name(object.name)
 
   	if (!(model.name %in% c("arima"))) {
-  		if (!is.null(summary(zelig.object)$r.squared)) {
-  			return(as.vector(summary(zelig.object)$r.squared)) 
+      if (model.name %in% c("plm")) {
+        return(as.vector(summary(object.name)$r.squared["rsq"]))
+      }
+      else if (model.name %in% c("betareg")) {
+        return(as.vector(summary(object.name)$pseudo.r.squared))
+      }
+  		else if (!is.null(summary(object.name)$r.squared)) {
+  			return(as.vector(summary(object.name)$r.squared)) 
   		}
   		else if (model.name %in% c("coxph")) {
-  			return(as.vector(summary(zelig.object)$rsq[1]))
+  			return(as.vector(summary(object.name)$rsq[1]))
   		}
   	}
   	return(NA)
   }
 
   .residual.deviance <-
-  function(zelig.object) {
+  function(object.name) {
   	residual.deviance.output <- as.vector(rep(NA,times=3))
 
-  	model.name <- .get.model.name(zelig.object)
+  	model.name <- .get.model.name(object.name)
 
-  	if (!(model.name %in% c("arima"))) {
-  		if (!is.null(summary(zelig.object)$deviance)) {
-  			residual.deviance.value <- suppressMessages(summary(zelig.object)$deviance)
-  			df.value <- zelig.object$df.residual
+  	if (!(model.name %in% c("arima", "multinom"))) {
+  		if (!is.null(summary(object.name)$deviance)) {
+  			residual.deviance.value <- suppressMessages(summary(object.name)$deviance)
+  			df.value <- object.name$df.residual
   			residual.deviance.output <- as.vector(c(residual.deviance.value, df.value, NA))
   		}
-  		else if (!is.null(zelig.object$deviance)) {
-  		  residual.deviance.value <- zelig.object$deviance
-  		  df.value <- zelig.object$df.residual
+      else if (!is.null(object.name$deviance)) {
+  		  residual.deviance.value <- object.name$deviance
+  		  df.value <- object.name$df.residual
   		  residual.deviance.output <- as.vector(c(residual.deviance.value, df.value, NA))
   		}
   	}
@@ -1884,15 +2168,15 @@
   }
 
   .SER <-
-  function(zelig.object) {
+  function(object.name) {
   	SER.output <- as.vector(rep(NA,times=3))
 
-  	model.name <- .get.model.name(zelig.object)
+  	model.name <- .get.model.name(object.name)
 
   	if (!(model.name %in% c("arima"))) {
-  		if (!is.null(suppressMessages(summary(zelig.object)$sigma))) {
-  			sigma.value <-suppressMessages(summary(zelig.object)$sigma)
-  			df.residual.value <- zelig.object$df.residual
+  		if (!is.null(suppressMessages(summary(object.name)$sigma))) {
+  			sigma.value <-suppressMessages(summary(object.name)$sigma)
+  			df.residual.value <- object.name$df.residual
 
   			SER.output <- as.vector(c(sigma.value, df.residual.value, NA))
   		}
@@ -1933,6 +2217,181 @@
   		}
   		suppressMessages(.publish.table())
   	}
+  }
+  
+  .data.frame.table.header <-
+    function(object) {
+      cat("\\begin{table}[htb] \\centering \n",sep="")
+      cat("  \\caption{", .format.title, "} \n",sep="")   
+      cat("\\footnotesize \n",sep="")
+      cat("\n")
+      
+      .formatting.alignment <- "@{\\extracolsep{5pt}} "
+      for (i in seq(1:(length(names(object))))) {
+        if (.format.dec.mark.align == FALSE) {
+          .formatting.alignment <- paste(.formatting.alignment, "c ", sep="")
+        }
+        else {
+          .formatting.alignment <- paste(.formatting.alignment, "D{", .format.decimal.character,"}{", .format.decimal.character,"}{-", .format.s.round.digits,"} ", sep="")
+        }
+      }
+      #
+      
+      
+      cat("\\begin{tabular}{",.formatting.alignment,"} \n",sep="")
+    }
+  
+  .stargazer.data.frame.table <-
+  function(object) {
+    if (length(names(object)) < 1) {
+      cat("% Error: Data frame columns do not have any names.\n")
+    }
+    else if ((nrow(object) < 1) | (ncol(object) < 1)) {
+      cat("% Error: Data frame must have at least one row and one column.\n")
+    }
+    else {
+      .table.info.comment()
+      
+      #create table header
+      .data.frame.table.header(object)
+      .table.insert.space()
+      
+      for (i in seq(1:length(.format.s.stat.parts))) {
+        .data.frame.table.part(object,.format.s.stat.parts[i])
+      }
+      
+      cat("\\normalsize \n")
+      cat("\\end{tabular} \n")
+      cat("\\end{table} \n")
+    }
+  }
+  
+  .data.frame.table.part <-
+  function(object, part) {
+    if (part=="stat names") {
+      
+      x.which <- 0
+      
+      if (is.null(.format.covariate.labels)) { .format.covariate.labels <<- NA }
+      
+      for (x in seq(1:length(names(object)))) {
+        
+        omitted <- FALSE
+        
+        
+        if (!is.null(.format.omit.regexp)) {
+          for (j in seq(1:length(.format.omit.regexp))) {
+            if (length(grep(.format.omit.regexp[j], names(object)[x], fixed=FALSE))!=0) { omitted <- TRUE  }
+          }
+        }
+        
+        if (omitted == FALSE) {
+          
+          x.which <- x.which + 1
+          
+          if (x >= 2) { cat(" & ", sep="")}
+        
+          # if underscore in variable name, then insert an escape \ before it
+          name.printed <- gsub("_","\\_",names(object)[x],fixed=TRUE)
+                
+          if (is.na(.format.covariate.labels[x.which])) {
+            if (.format.coefficient.variables.capitalize == TRUE) { name.printed <- toupper(name.printed) }
+          }
+          else { name.printed <- .format.covariate.labels[x.which] }
+      
+        
+          if (.format.dec.mark.align==TRUE) {
+            cat("\\multicolumn{1}{c}{",.format.s.statistics.names.left, name.printed,.format.s.statistics.names.right,"}", sep="")  
+          }
+          else {
+            cat(.format.s.statistics.names.left, name.printed,.format.s.statistics.names.right, sep="")  
+          }
+        }
+        
+      }
+      cat(" \\\\ \n")
+    }
+    
+    if (substr(part,1,10)=="statistics") {
+      for (y in seq(1:nrow(object))) {
+        for (x in seq(1:length(names(object)))) {
+          
+          omitted <- FALSE
+          
+          if (!is.null(.format.omit.regexp)) {
+            for (j in seq(1:length(.format.omit.regexp))) {
+              if (length(grep(.format.omit.regexp[j], names(object)[x], fixed=FALSE))!=0) { omitted <- TRUE  }
+            }
+          }
+          
+          if (omitted == FALSE) {     
+            if (x >= 2) { cat(" & ", sep="") }
+            
+            if (is.numeric(object[y,x])) {
+              if (.format.dec.mark.align==TRUE) {
+                cat(.format.s.coefficient.variables.left, object[y, x], .format.s.coefficient.variables.right, sep="")  
+              }
+              else {
+                cat("$",.format.s.coefficient.variables.left, object[y, x], .format.s.coefficient.variables.right, "$",sep="")  
+              }
+            }
+            else {
+              if (.format.dec.mark.align==TRUE) {
+                cat("\\multicolumn{1}{c}{",.format.s.coefficient.variables.left, object[y, x], .format.s.coefficient.variables.right,"}", sep="")  
+              }
+              else {
+                cat(.format.s.coefficient.variables.left, object[y, x], .format.s.coefficient.variables.right, sep="")  
+              }
+              
+            }
+            
+          }
+          
+          
+            
+        }
+        # add empty lines
+        how.many.empty.lines <- as.numeric(substr(part,11,nchar(part)))
+        if (is.na(how.many.empty.lines)) { how.many.empty.lines <- 1 } 
+        
+        for (j in seq(1:how.many.empty.lines)) {
+          cat(" \\\\ \n") 
+        }
+      }
+    
+    }
+        
+    
+    # notes
+    else if (part=="notes") {
+      if (.format.s.note != "") cat(.format.s.note)
+      for (i in seq(1:length(.format.s.note.content))) {
+        if (.format.s.note == "") { cat("\\multicolumn{",length(.format.s.statistics.list)+1,"}{",.format.s.note.alignment,"}{",.format.s.note.content[i],"} \\\\ \n", sep="") }
+        else { cat(" & \\multicolumn{",length(.format.s.statistics.list),"}{",.format.s.note.alignment,"}{",.format.s.note.content[i],"} \\\\ \n", sep="") }
+      }
+    }	
+    
+    
+    # empty line
+    else if (part==" ") {
+      .table.empty.line()
+    }
+    
+    # horizontal line
+    else if (part=="-!") {
+      cat("\\hline ")
+      .table.insert.space()
+      cat(" \n")
+    }
+    
+    # double horizontal line
+    else if (part=="=!") {
+      cat("\\hline \n") 
+      cat("\\hline ")
+      .table.insert.space()
+      cat(" \n")
+    }
+    
   }
 
   .stargazer.summ.stat.table <-
@@ -2027,11 +2486,16 @@
     cat("\n")
 
    #
-   .formatting.alignment <- "@{\\extracolsep{5pt}}l"
-  for (i in seq(1:(length(.format.s.statistics.list)+1))) {
-  	.formatting.alignment <- paste(.formatting.alignment, "c", sep="")
-   }
-   #
+   .formatting.alignment <- "@{\\extracolsep{5pt}}l "
+   for (i in seq(1:(length(.format.s.statistics.list)))) {
+    	if (.format.dec.mark.align == FALSE) {
+        .formatting.alignment <- paste(.formatting.alignment, "c ", sep="")
+    	}
+      else {
+        .formatting.alignment <- paste(.formatting.alignment, "D{", .format.decimal.character,"}{", .format.decimal.character,"}{-", .format.s.round.digits,"} ", sep="")
+      }
+    }
+    #
 
    cat("\\begin{tabular}{",.formatting.alignment,"} \n",sep="")
   }
@@ -2045,10 +2509,10 @@
   		  for (i in seq(1:length(.format.s.statistics.list))) {
   			  for (j in seq(1:ncol(.format.s.statistics.names))) {
   				  if ((substr(.format.s.statistics.list[i],1,1)=="p") & (substr(.format.s.statistics.list[i],1,1)==.format.s.statistics.names[1,j])) {
-  					  cat(" & ", .format.s.statistics.names.left, sub("!", substr(.format.s.statistics.list[i],2,nchar(.format.s.statistics.list[i])), .format.s.statistics.names[2,j], ignore.case =FALSE, fixed=TRUE), .format.s.statistics.names.right, sep="")
+  					  cat(" & \\multicolumn{1}{c}{", .format.s.statistics.names.left, sub("!", substr(.format.s.statistics.list[i],2,nchar(.format.s.statistics.list[i])), .format.s.statistics.names[2,j], ignore.case =FALSE, fixed=TRUE), .format.s.statistics.names.right,"}", sep="")
   				  }
   				  else if (.format.s.statistics.list[i]==.format.s.statistics.names[1,j]) {
-  				  	cat(" & ", .format.s.statistics.names.left, .format.s.statistics.names[2,j], .format.s.statistics.names.right, sep="")
+  				  	cat(" & \\multicolumn{1}{c}{", .format.s.statistics.names.left, .format.s.statistics.names[2,j], .format.s.statistics.names.right, "}", sep="")
   			  	}
   			  }
   		  }
@@ -2076,15 +2540,32 @@
         
           if (omitted==FALSE) {
             i.label <- i.label + 1
+            
+            # if underscore in variable name, then insert an escape \ before it
+            name.printed <- gsub("_","\\_",names(object)[i],fixed=TRUE)
+            
             if (is.na(.format.covariate.labels[i.label])) { 
-  				    if ( .format.s.coefficient.variables.capitalize == TRUE) { cat(.format.s.coefficient.variables.left, toupper(names(object)[i]), .format.s.coefficient.variables.right, sep="") }
-  				    else { cat(.format.s.coefficient.variables.left, names(object)[i], .format.s.coefficient.variables.right, sep="") }
+  				    if ( .format.s.coefficient.variables.capitalize == TRUE) { cat(.format.s.coefficient.variables.left, toupper(name.printed), .format.s.coefficient.variables.right, sep="") }
+  				    else { cat(.format.s.coefficient.variables.left, name.printed, .format.s.coefficient.variables.right, sep="") }
             }
             else { cat(.format.s.coefficient.variables.left, .format.covariate.labels[i.label], .format.s.coefficient.variables.right, sep="") }
 
             if (length(.format.s.statistics.list)>=1) {
 	  			    for (j in seq(1:length(.format.s.statistics.list))) {
-	  	 			    cat(" & ", .summ.stat.publish.statistic(object, i, .format.s.statistics.list[j]), sep="")
+                
+                # if aligning decimal marks, need to use multicolumn for anything w/o decimal mark
+                if (.format.dec.mark.align == FALSE) {   # not aligning
+                  cat(" & ", .summ.stat.publish.statistic(object, i, .format.s.statistics.list[j]), sep="")  
+                }
+                else {     # aligning
+                  if (.is.all.integers(.summ.stat.publish.statistic(object, i, .format.s.statistics.list[j]))) {
+                    cat(" & \\multicolumn{1}{c}{", .summ.stat.publish.statistic(object, i, .format.s.statistics.list[j]),"}", sep="")
+                  }
+                  else {
+                    cat(" & ", .summ.stat.publish.statistic(object, i, .format.s.statistics.list[j]), sep="")
+                  }
+                }
+	  	 			    
 	  			    }
             }
             
@@ -2163,11 +2644,18 @@
   		if (substr(local.coefficient.var.name, nchar(local.coefficient.var.name)-3, nchar(local.coefficient.var.name)) == "TRUE") {
 
   			### only remove TRUE if added by Zelig, rather than pre-existing in the formula name
-  			if (length(grep(local.coefficient.var.name, .global.zelig.formulas.rhs,fixed=TRUE))==0) {    
+  			if (length(grep(local.coefficient.var.name, .global.formulas.rhs,fixed=TRUE))==0) {    
   				local.coefficient.var.name <- substr(local.coefficient.var.name, 1, nchar(local.coefficient.var.name)-4)
   			}
   		}
-
+      
+      # remove everything before and including he last dollar sign from variable name
+      temp <- strsplit(local.coefficient.var.name,"$",fixed=TRUE)
+      local.coefficient.var.name <- temp[[1]][length(temp[[1]])]
+      
+      # if underscore in variable name, then insert an escape \ before it
+      local.coefficient.var.name <- gsub("_","\\_",local.coefficient.var.name,fixed=TRUE)
+      
   		if (length(.format.coefficient.table.parts)>=1) {
   			for (i in seq(1:length(.format.coefficient.table.parts))) {
   				.coefficient.table.part(part=.format.coefficient.table.parts[i], which.variable, variable.name=local.coefficient.var.name)
@@ -2186,7 +2674,12 @@
    #
   .formatting.alignment <- "@{\\extracolsep{5pt}}l"
   for (i in seq(1:length(.global.models))) {
-  	.formatting.alignment <- paste(.formatting.alignment, "c", sep="")
+  	if (.format.dec.mark.align==FALSE) {
+      .formatting.alignment <- paste(.formatting.alignment, "c", sep="")
+  	}
+    else {
+  	  .formatting.alignment <- paste(.formatting.alignment, "D{", .format.decimal.character,"}{", .format.decimal.character,"}{-", .format.round.digits,"} ", sep="")
+    }
   }
   #
 
@@ -2199,6 +2692,10 @@
     cat("% Table created by ", .global.package.name, " v.", .global.package.version, " by ", .global.package.author.name, ", ", .global.package.author.affiliation, ". E-mail: ", .global.package.author.email, "\n", sep="")  
     cat("% Date and time:", format(Sys.time(), "%a, %b %d, %Y - %X"))
     cat("\n")
+    if (.format.dec.mark.align==TRUE) {
+      cat("% Requires \\usepackage{dcolumn} in LaTeX preamble.")
+      cat("\n")
+    }
   }
 
   .table.insert.space <-
@@ -2210,17 +2707,24 @@
   function (x) gsub("^\\s+|\\s+$", "", x)
 
   .wald.stat <-
-  function(zelig.object) {
+  function(object.name) {
     wald.output <- as.vector(rep(NA,times=3))
   
-    model.name <- .get.model.name(zelig.object)
+    model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima"))) {
-      if (!is.null(summary(zelig.object)$waldtest)) {
-        wald.value <- suppressMessages(summary(zelig.object)$waldtest[1])
-        df.value <- suppressMessages(summary(zelig.object)$waldtest[2])
-        wald.p.value <- suppressMessages(summary(zelig.object)$waldtest[3])
+    if (!(model.name %in% c("arima", "ivreg"))) {
+      if (!is.null(summary(object.name)$waldtest)) {
+        wald.value <- suppressMessages(summary(object.name)$waldtest[1])
+        df.value <- suppressMessages(summary(object.name)$waldtest[2])
+        wald.p.value <- suppressMessages(summary(object.name)$waldtest[3])
         wald.output <- as.vector(c(wald.value, df.value, wald.p.value))
+      }
+      else if (model.name %in% c("tobit(AER)")) {
+        wald.value <- summary(object.name)$wald
+        df.value <- summary(object.name)$df - summary(object.name)$idf
+        wald.p.value <- pchisq(wald.value, df.value, lower.tail=FALSE)
+        wald.output <- as.vector(c(wald.value, df.value, wald.p.value))
+        
       }
     
     }
@@ -2229,41 +2733,67 @@
     return(cbind(wald.output))
   }
 
-  .zelig.coefficients <-
-  function(zelig.object) {
+  .get.coefficients.1 <-
+  function(object.name) {
 
-  	model.name <- .get.model.name(zelig.object)
+  	model.name <- .get.model.name(object.name)
 	
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.survey",
-     				    "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "svyglm()")) {
-  		return(summary(zelig.object)$coefficients[,"Estimate"])
+     				    "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "svyglm()", "plm", "ivreg")) {
+  		return(summary(object.name)$coefficients[,"Estimate"])
   	}
+    else if (model.name %in% c("zeroinfl", "hurdle")) {
+      if (.global.zero.component==FALSE) {
+        return(summary(object.name)$coefficients$count[,"Estimate"])  
+      }
+      else {
+        return(summary(object.name)$coefficients$zero[,"Estimate"])
+      }
+    }
   	else if (model.name %in% c("normal.gee", "logit.gee", "probit.gee", "poisson.gee", "gamma.gee", "gee()")) {
-  		return(summary(zelig.object)$coefficients[,"Estimate"])
+  		return(summary(object.name)$coefficients[,"Estimate"])
   	}
   	else if (model.name %in% c("normal.gam", "logit.gam", "probit.gam", "poisson.gam", "gam()")) {
-  		return(summary(zelig.object)$p.coeff)
+  		return(summary(object.name)$p.coeff)
   	}
   	else if (model.name %in% c("coxph")) {
-  		return(summary(zelig.object)$coef[,"coef"])
+  		return(summary(object.name)$coef[,"coef"])
   	}
   	else if (model.name %in% c("exp","lognorm","weibull","tobit","survreg()")) {
-  		return(summary(zelig.object)$table[,"Value"])
+  		return(summary(object.name)$table[,"Value"])
   	}
   	else if (model.name %in% c("ologit", "oprobit", "polr()")) {
-  		coef.temp <- suppressMessages(summary(zelig.object)$coefficients[,"Value"])
-  		if (.format.ordered.intercepts == FALSE) { return(coef.temp[seq(from=1, to=length(coef.temp)-(length(suppressMessages(summary(zelig.object)$lev))-1))]) }
+  		coef.temp <- suppressMessages(summary(object.name)$coefficients[,"Value"])
+  		if (.format.ordered.intercepts == FALSE) { return(coef.temp[seq(from=1, to=length(coef.temp)-(length(suppressMessages(summary(object.name)$lev))-1))]) }
   		else { return(coef.temp) }
   	}
   	else if (model.name %in% c("arima")) {
-  		return( zelig.object$coef )
+  		return( object.name$coef )
   	}
+  	else if (model.name %in% c("tobit(AER)")){
+  	  return(summary(object.name)$coefficients[,"Estimate"])
+  	}
+    else if (model.name %in% c("multinom")){
+      return(summary(object.name)$coefficients)
+    }
+  	else if (model.name %in% c("betareg")){
+  	  return(summary(object.name)$coefficients$mean[,"Estimate"])
+  	}  	
   	else { return(NULL) }
 
   }
+  
+  .get.coefficients <-
+  function(object.name) {
+    out <- .get.coefficients.1(object.name)
+    if (is.null(names(out))) {
+      names(out) <- .coefficient.variables(object.name)
+    }
+    return(out)
+  }
 
-  .zelig.formula.rhs <-
-  function(zelig.object) as.vector(as.character(zelig.object$call$formula)[3])
+  .formula.rhs <-
+  function(object.name) as.vector(as.character(object.name$call$formula)[3])
 
 
 ###########################################
@@ -2280,13 +2810,22 @@
     
     ## check if argument input is ok
     if (how.many.objects < 1) { error.present <- c(error.present, "% Error: At least one object is required.\n") }
-    
+  
     # identify objects
     for (i in seq(1:how.many.objects)) {
       if (!is.data.frame(objects[[i]])) {
-        if (is.atomic(objects[[i]])) { error.present <- c(error.present, "% Error: Object must originate from lm(), glm(), svyglm(), gee(), gam(), polr(), survreg(); the implementation of these in zelig(); or be a data frame.\n") }
-        else if (is.null(objects[[i]]$call)) { error.present <- c(error.present, "% Error: Object must originate from lm(), glm(), svyglm(), gee(), gam(), polr(), survreg(); the implementation of these in zelig(); or be a data frame.\n") }
-        else if (.model.identify(objects[[i]])=="unknown") { error.present <- c(error.present, "% Error: Object must originate from lm(), glm(), svyglm(), gee(), gam(), polr(), survreg(); the implementation of these in zelig(); or be a data frame.\n") }
+        
+        # if zelig$result relevant, identify this automatically
+        if (!is.null(objects[[i]]$zelig.call)) {
+          if (!is.null(objects[[i]]$formula)) { formula <- objects[[i]]$formula }
+          objects[[i]] <- objects[[i]]$result          
+          if (!is.null(formula)) { objects[[i]]$formula2 <- formula }
+        }
+        
+        ###
+        if (is.atomic(objects[[i]])) { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
+        else if (is.null(objects[[i]]$call)) { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
+        else if (.model.identify(objects[[i]])=="unknown") { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
         else if (.model.identify(objects[[i]])=="unsupported zelig") { error.present <- c(error.present, "% Error: Unsupported 'zelig' model.\n") }
       }
     }
@@ -2302,12 +2841,18 @@
       }
     }
     
+    if (!is.logical(summary)) { error.present <- c(error.present, "% Error: Argument 'summary' must be of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(summary) != 1) & (!is.null(summary))) { error.present <- c(error.present, "% Error: Argument 'summary' must be of length 1.'\n") }
+  
     if ((!is.character(covariate.labels)) & (!is.null(covariate.labels))) { error.present <- c(error.present, "% Error: Argument 'covariate.labels' must be NULL (default), or a vector of type 'character.'") }
     if ((!is.character(dep.var.labels)) & (!is.null(dep.var.labels))) { error.present <- c(error.present, "% Error: Argument 'dep.var.labels' must be NULL (default), or a vector of type 'character.'") }
     
     if ((!is.character(decimal.mark)) & (!is.null(decimal.mark))) { error.present <- c(error.present, "% Error: Argument 'decimal.mark' must be NULL (default), or of type 'character.'\n") }
     if ((length(decimal.mark) != 1) & (!is.null(decimal.mark))) { error.present <- c(error.present, "% Error: Argument 'decimal.mark' must be of length 1.'\n") }
-    
+  
+    if (!is.logical(align)) { error.present <- c(error.present, "% Error: Argument 'align' must be of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(align) != 1) & (!is.null(align))) { error.present <- c(error.present, "% Error: Argument 'align' must be of length 1.'\n") }
+  
     if ((!is.numeric(digit.separate)) & (!is.null(digit.separate))) { error.present <- c(error.present, "% Error: Argument 'digit.separate' must be NULL (default), a vector of type 'numeric,' or \"lakh\"/\"china\"/\"japan\".\n") }
     
     if ((!is.character(digit.separator)) & (!is.null(digit.separator))) { error.present <- c(error.present, "% Error: Argument 'digit.separator' must be NULL (default), or of type 'character.'\n") }
@@ -2316,13 +2861,13 @@
     if ((!is.numeric(digits)) & (!is.null(digits))) { error.present <- c(error.present, "% Error: Argument 'digits' must be NULL (default), or of type 'numeric.'\n") }
     if ((length(digits) != 1) & (!is.null(digits))) { error.present <- c(error.present, "% Error: Argument 'digits' must be of length 1.'\n") }
     if (!is.null(digits)) {
-      if ((digits>=0) & (is.numeric(digits))) { error.present <- c(error.present, "% Error: Argument 'digits' must be >= 0.'\n") }
+      if ((digits<0) & (is.numeric(digits))) { error.present <- c(error.present, "% Error: Argument 'digits' must be >= 0.'\n") }
     }
     
     if ((!is.numeric(digits.extra)) & (!is.null(digits.extra))) { error.present <- c(error.present, "% Error: Argument 'digits.extra' must be NULL (default), or of type 'numeric.'\n") }
     if ((length(digits.extra) != 1) & (!is.null(digits.extra))) { error.present <- c(error.present, "% Error: Argument 'digits.extra' must be of length 1.'\n") }
     if (!is.null(digits.extra)) {
-      if ((digits.extra>=0) & (is.numeric(digits.extra))) { error.present <- c(error.present, "% Error: Argument 'digits.extra' must be >= 0.'\n") }
+      if ((digits.extra<0) & (is.numeric(digits.extra))) { error.present <- c(error.present, "% Error: Argument 'digits.extra' must be >= 0.'\n") }
     }
     
     if ((!is.logical(initial.zero)) & (!is.null(initial.zero))) { error.present <- c(error.present, "% Error: Argument 'initial.zero' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
@@ -2352,6 +2897,15 @@
     if (!is.null(omit.labels)) {
       if (length(omit) != length(omit.labels)) { error.present <- c(error.present, "% Error: Arguments 'omit.labels' must be NULL (default; no omissions), or equal in length to 'omit.labels'.'\n") }
     }
+  
+    if ((!is.character(omit.stat)) & (!is.null(omit.stat))) { error.present <- c(error.present, "% Error: Argument 'omit.stat' must be NULL (default), or a vector of type 'character.'") }
+    omit.stat.acceptable <- c("n","rsq","adj.rsq","max.rsq","ll","aic","scale","ubre","sigma2","ser","f","theta","chi2","wald","lr","logrank","null.dev","res.dev")     # list of statistic codes that are acceptable
+    if (is.character(omit.stat)) {
+      is.acceptable <- unique(tolower(omit.stat) %in% omit.stat.acceptable)
+      if (length(is.acceptable)>1) { is.acceptable <- FALSE }
+      if (!is.acceptable) { error.present <- c(error.present, "% Error: Unknown statistic in 'omit.stat' argument.") }
+    } 
+  
     if ((!is.character(omit.yes.no)) & (!is.null(omit.yes.no))) { error.present <- c(error.present, "% Error: Argument 'omit.yes.no' must be a vector of type 'character.'") }
     if ((length(omit.yes.no) != 2) & (!is.null(omit.yes.no))) { error.present <- c(error.present, "% Error: Argument 'omit.yes.no' must be of length 2.'\n") }
     
@@ -2368,6 +2922,9 @@
       if ( !((length(star.cutoffs) >= 1) & (length(star.cutoffs) <= 3)) & (!is.null(star.cutoffs))) { error.present <- c(error.present, "% Error: Argument 'star.cutoffs' must be a vector with at least one and at most three elements.\n") }
       if (sum(star.cutoffs[!is.na(star.cutoffs)] == sort(star.cutoffs, decreasing = TRUE, na.last=NA)) != length(star.cutoffs[!is.na(star.cutoffs)])) { error.present <- c(error.present, "% Error: The elements of 'star.cutoffs' must be in weakly decreasing order.\n") }
     }
+  
+    if (!is.logical(zero.component)) { error.present <- c(error.present, "% Error: Argument 'zero.component' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(zero.component) != 1) & (!is.null(zero.component))) { error.present <- c(error.present, "% Error: Argument 'zero.component' must be of length 1.'\n") }
     
     if ((!is.logical(nobs)) & (!is.null(nobs))) { error.present <- c(error.present, "% Error: Argument 'nobs' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
     if ((length(nobs) != 1) & (!is.null(nobs))) { error.present <- c(error.present, "% Error: Argument 'nobs' must be of length 1.'\n") }
@@ -2396,16 +2953,19 @@
     .publish.horizontal.line <- NULL
     .table.part.published <- NULL
     .format.omit.table <- NULL
+  
+    # should we include a summary statistics table when given a data frame
+    .global.summary <- TRUE
 
     # info about the package and author
     .global.package.name <- "StarGazer"
-    .global.package.version <- "1.0"
+    .global.package.version <- "2.0"
     .global.package.author.name <- "Marek Hlavac"
     .global.package.author.affiliation <- "Harvard University"
-    .global.package.author.email <- "mhlavac at alumni.princeton.edu"
+    .global.package.author.email <- "hlavac at fas.harvard.edu"
     
     # statistics (.global variables)
-    .global.zelig.formulas.rhs <- NULL
+    .global.formulas.rhs <- NULL
     .global.models <- NULL
     .global.dependent.variables <- NULL
     .global.coefficient.variables <- NULL
@@ -2422,6 +2982,7 @@
     .global.UBRE <- NULL    # UBRE score (GAM)
     .global.sigma2 <- NULL  # sigma2 from arima
     .global.theta <- NULL   # theta from negative binomial
+    .global.zero.component <- NULL # zero, as opposed to count, component in hurdle and zeroinfl
     
     # with degrees of freedom
     .global.SER <- NULL   # residual standard error; standard error of the regression
@@ -2461,7 +3022,7 @@
     .format.model.names.include <- TRUE
     .format.model.names <- NULL
     .format.model.names <- cbind(c("aov","ANOVA",""), c("arima","ARIMA",""), c("blogit","bivariate","logistic"))
-    .format.model.names <- cbind(.format.model.names, c("bprobit","bivariate","probit"), c("chopit","compound hierarchical","ordered probit"))
+    .format.model.names <- cbind(.format.model.names, c("bprobit","bivariate","probit"), c("betareg", "beta",""), c("chopit","compound hierarchical","ordered probit"))
     .format.model.names <- cbind(.format.model.names, c("cloglog.net","network compl.","log log"), c("coxph","Cox","prop. hazards"))
     .format.model.names <- cbind(.format.model.names, c("ei.dynamic","Quinn dynamic","ecological inference"), c("ei.hier","$2 \times 2$ hierarchical","ecological inference"))
     .format.model.names <- cbind(.format.model.names, c("ei.RxC","hierarchical multinominal-Dirichlet","ecological inference"), c("exp","exponential",""))
@@ -2477,9 +3038,10 @@
     .format.model.names <- cbind(.format.model.names, c("ls","OLS",""), c("ls.mixed","mixed effect","linear"))
     .format.model.names <- cbind(.format.model.names, c("ls.net","network","least squares"), c("mlogit","multinomial","logistic"))
     .format.model.names <- cbind(.format.model.names, c("mlogit.bayes","Bayesian","multinomial logistic"), c("negbin","negative","binomial"), c("normal","normal",""))
+    .format.model.names <- cbind(.format.model.names, c("multinom","multinomial log-linear","(neural networks)"))
     .format.model.names <- cbind(.format.model.names, c("normal.bayes","Bayesian","normal"), c("normal.gam","GAM","(continuous)"))
     .format.model.names <- cbind(.format.model.names, c("normal.gee","normal generalized","estimating equation"), c("normal.net","network","normal"))
-    .format.model.names <- cbind(.format.model.names, c("normal.survey","survey-weighted","normal"), c("ologit","ordinal","logistic"))
+    .format.model.names <- cbind(.format.model.names, c("normal.survey","survey-weighted","normal"), c("ologit","ordered","logistic"))
     .format.model.names <- cbind(.format.model.names, c("oprobit","ordered","probit"), c("oprobit.bayes","Bayesian","ordered probit"))
     .format.model.names <- cbind(.format.model.names, c("poisson","Poisson",""), c("poisson.bayes","Bayesian","Poisson"))
     .format.model.names <- cbind(.format.model.names, c("poisson.gam","GAM","(count)"), c("poisson.mixed","mixed effects","Poisson"))
@@ -2489,9 +3051,11 @@
     .format.model.names <- cbind(.format.model.names, c("probit.mixed","mixed effects","probit"), c("probit.net","network","probit"))
     .format.model.names <- cbind(.format.model.names, c("probit.survey","survey-weighted","probit"), c("relogit","rare events","logistic"))
     .format.model.names <- cbind(.format.model.names, c("sur","SUR",""), c("threesls","3SLS",""))
-    .format.model.names <- cbind(.format.model.names, c("tobit","Tobit",""), c("tobit.bayes","Bayesian","Tobit"))
+    .format.model.names <- cbind(.format.model.names, c("tobit","Tobit",""), c("tobit(AER)","Tobit",""), c("tobit.bayes","Bayesian","Tobit"))
     .format.model.names <- cbind(.format.model.names, c("twosls","2SLS",""), c("weibull","Weibull",""))
-    
+    .format.model.names <- cbind(.format.model.names, c("zeroinfl","zero-inflated","count data"), c("hurdle","hurdle",""))
+    .format.model.names <- cbind(.format.model.names, c("plm","panel","linear"), c("ivreg","instrumental","variable"))
+  
     # if you use, say, glm() that does not correspond to one of the pre-defined models, put this as family and link
     .format.model.function <- TRUE
     .format.model.family <- ""
@@ -2547,6 +3111,7 @@
     .format.round.digits <- 3
     # for decimal comma use: .format.decimal.character <- "{,}"
     .format.decimal.character <- "."
+    .format.dec.mark.align <- FALSE
     
     .format.table.parts <- c("=!","dependent variable label","dependent variables","models","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","scale","sigma2","theta(se)*", "AIC","UBRE", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","null deviance(df)","residual deviance(df)","=!","notes")
     
@@ -2592,7 +3157,7 @@
     .format.intercept.bottom <- TRUE
     .format.note <- "\\textit{Note:} "
     .format.note.alignment <- "r"
-    .format.note.content <- c("$^{*}p<0.10; ^{**}p<0.05; ^{***}p<0.01$")
+    .format.note.content <- c("$^{*}p<[0.*]; ^{**}p<[0.**]; ^{***}p<[0.***]$")
     
     # additional lines
     .format.additional.lines.titles <- NULL
@@ -2624,7 +3189,10 @@
     # continue only if no errors
     if (is.null(error.present)) {
       
-      ## use .formatting arguments
+      # summary statistic table or regular table of data frame contents
+      if (!is.null(.global.summary)) { .global.summary <- summary }
+      
+      ## use formatting arguments
       
       # if not case-sensitive, transfer to lower case
       if (!is.null(digit.separate)) { digit.separate <- tolower(digit.separate) }
@@ -2641,8 +3209,32 @@
         .format.omit.no <- omit.yes.no[2]
       }
       
+      # remove omitted statistics from table parts
+      if (!is.null(omit.stat)) {
+        .lower.omit.stat <- tolower(omit.stat)    # make it all lower-case
+        if ("n" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="N"] }
+        if ("rsq" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="R-squared"] }
+        if ("adj.rsq" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="adjusted R-squared"] }
+        if ("max.rsq" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="max R-squared"] }
+        if ("ll" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="log likelihood"] }
+        if ("scale" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="scale"] }
+        if ("sigma2" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="sigma2"] }        
+        if ("theta" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,5)!="theta"] }
+        if ("aic" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="AIC"] }
+        if ("ubre" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[.format.table.parts!="UBRE"] }
+        if ("ser" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,3)!="SER"] }
+        if ("f" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,11)!="F statistic"] }
+        if ("chi2" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,4)!="chi2"] }
+        if ("wald" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,4)!="Wald"] }
+        if ("lr" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,2)!="LR"] }
+        if ("logrank" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,7)!="logrank"] }
+        if ("null.dev" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,13)!="null deviance"] }
+        if ("res.dev" %in% .lower.omit.stat) { .format.table.parts <- .format.table.parts[substr(.format.table.parts,1,17)!="residual deviance"] }
+      }
+      
       # digits, initial.zeros, decimal characters
       if (!is.null(decimal.mark)) { .format.decimal.character <- decimal.mark }
+      if (!is.null(align)) { .format.dec.mark.align <- align }
       if (!is.null(digit.separator)) { .format.digit.separator <- digit.separator }
       if (!is.null(initial.zero)) { .format.initial.zero <- initial.zero }
       
@@ -2678,9 +3270,30 @@
         .format.three.stars <- star.cutoffs[3]
       }
       
+      # zero vs. count component
+      .global.zero.component <- zero.component
+      
       # notes
+      
+      # replace star cutoffs in the notes section
+      if (!is.na(.format.one.star)) {
+        .format.note.content <- gsub("[.*]", gsub("^[0]+", "",.format.one.star), .format.note.content, fixed=TRUE)  
+        .format.note.content <- gsub("[0.*]", .format.one.star, .format.note.content, fixed=TRUE)
+        .format.note.content <- gsub("[*]", .format.one.star*100, .format.note.content, fixed=TRUE)        
+      }
+      if (!is.na(.format.two.stars)) {
+        .format.note.content <- gsub("[.**]", gsub("^[0]+", "",.format.two.stars), .format.note.content, fixed=TRUE)        
+        .format.note.content <- gsub("[0.**]", .format.two.stars, .format.note.content, fixed=TRUE)
+        .format.note.content <- gsub("[**]", .format.two.stars*100, .format.note.content, fixed=TRUE)        
+      }
+      if (!is.na(.format.three.stars)) {
+        .format.note.content <- gsub("[.***]", gsub("^[0]+", "",.format.three.stars), .format.note.content, fixed=TRUE)
+        .format.note.content <- gsub("[0.***]", .format.three.stars, .format.note.content, fixed=TRUE)
+        .format.note.content <- gsub("[***]", .format.three.stars*100, .format.note.content, fixed=TRUE)
+      }
+      
       if (!is.null(notes)) { 
-        .format.note.content <- notes 
+        .format.note.content <- notes
         .format.s.note.content <- notes
       }
       if (!is.null(notes.align)) { 
@@ -2721,8 +3334,14 @@
           if (!is.na(title[number.of.table])) { .format.title <- title[number.of.table] }
           else { .format.title <- title[length(title)] }
           
-          .stargazer.summ.stat.table(objects[[i]])
-          invisible.output <- c(invisible.output, invisible(capture.output(.stargazer.summ.stat.table(objects[[i]]),file=NULL)) )
+          if (.global.summary==TRUE) {
+            .stargazer.summ.stat.table(objects[[i]])
+            invisible.output <- c(invisible.output, invisible(capture.output(.stargazer.summ.stat.table(objects[[i]]),file=NULL)) )
+          }
+          else {
+            .stargazer.data.frame.table(objects[[i]])
+            invisible.output <- c(invisible.output, invisible(capture.output(.stargazer.data.frame.table(objects[[i]]),file=NULL)) )
+          }
           regression.table.objects <- NULL
         }
         else {
