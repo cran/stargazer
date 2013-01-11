@@ -11,6 +11,7 @@ I would like to thank everyone who has tested this package, or provided useful s
 
 \section{Thank you:}{
 Erin Baggott, Harvard University, USA\cr
+Ruben de Bliek, Erasmus University Rotterdam, the Netherlands\cr
 Volha Charnych, Harvard University, USA\cr
 John Coglianese, Harvard University, USA\cr
 Stefan Dimitriadis, Harvard University, USA\cr
@@ -35,6 +36,11 @@ Steffen Zittlau, University of Mannheim, Germany\cr
 }
 
 \section{What's new?}{
+v. 2.0.1: \cr
+\cr
+- Fixed bugs: \cr
+-- stargazer now reports the correct number of observations for plm() models \cr
+\cr
 v. 2.0: \cr
 \cr
 - New models: \cr
@@ -48,6 +54,7 @@ v. 2.0: \cr
     \cr
 - New features: \cr
 -- direct output of data frames into LaTeX (\code{summary = FALSE}) \cr
+-- ability to omit the reporting of selected statistics (using argument \code{omit.stat})
 -- alignment of columns at the decimal mark (\code{align = TRUE}) \cr
 -- automatic coordination of star cutoffs and values in regression table notes \cr
 \cr

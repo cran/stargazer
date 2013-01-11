@@ -131,7 +131,8 @@ I would like to thank everyone who has tested this package, or provided useful c
 }
 
 \section{Please cite as:}{
- Marek Hlavac (2013). stargazer: LaTeX code for well-formatted regression and summary statistics tables. R package version 2.0. http://CRAN.R-project.org/package=stargazer 
+ Marek Hlavac (2013). stargazer: LaTeX code for well-formatted regression and summary statistics tables.\cr
+ R package version 2.0.1. http://CRAN.R-project.org/package=stargazer 
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

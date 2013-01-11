@@ -1,7 +1,8 @@
 .onAttach <- 
 function(libname, pkgname) {
   packageStartupMessage("\nPlease cite as: \n")
-  packageStartupMessage(" Marek Hlavac (2013). stargazer: LaTeX code for well-formatted regression and summary statistics tables. R package version 2.0. http://CRAN.R-project.org/package=stargazer \n")
+  packageStartupMessage(" Marek Hlavac (2013). stargazer: LaTeX code for well-formatted regression and summary statistics tables.")
+  packageStartupMessage(" R package version 2.0.1. http://CRAN.R-project.org/package=stargazer \n")
 }
 
 .stargazer.wrap <-
@@ -1403,8 +1404,11 @@ function(libname, pkgname) {
                           "poisson", "negbin", "normal.survey", "poisson.survey",
                           "probit.survey", "logit.survey", "gamma", "gamma.survey",
                           "cloglog.net", "gamma.net", "logit.net",
-                          "probit.net", "z.arima", "glm()", "svyglm()", "plm")) {
+                          "probit.net", "z.arima", "glm()", "svyglm()")) {
       return(as.vector(object.name$df.residual+length(object.name$coefficients)))
+    }
+    else if (model.name %in% c("plm")) {
+      return(as.vector(length(object.name$residual)))
     }
     else if (model.name %in% c("hurdle", "zeroinfl")) {
       return(as.vector(object.name$n))
@@ -2959,7 +2963,7 @@ function(libname, pkgname) {
 
     # info about the package and author
     .global.package.name <- "StarGazer"
-    .global.package.version <- "2.0"
+    .global.package.version <- "2.0.1"
     .global.package.author.name <- "Marek Hlavac"
     .global.package.author.affiliation <- "Harvard University"
     .global.package.author.email <- "hlavac at fas.harvard.edu"

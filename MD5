@@ -1,8 +1,8 @@
-6ecbdbf0bad7f213ad7cf46501aa7066 *DESCRIPTION
+c451f16a11dc21f0410192d692cbcfb8 *DESCRIPTION
 012592abf4b40a8d741b299df2ded05a *NAMESPACE
-f40889b7c36c59a65c6e58826897544d *R/stargazer-internal.R
+dd03636cf71ddd884d5ecab389ecd0aa *R/stargazer-internal.R
 fd45296d1771c89354454e52cb404529 *R/stargazer.R
-bf2400cc882289359a186ae27b9bb45e *man/stargazer.Rd
-f0f3a8eee470dfceea2546ecb89afe31 *man/stargazer_acknowledge.Rd
+39975f4f5a8eeec2b67496a0f3fdacc3 *man/stargazer.Rd
+fbe0d0cbb32cd8bde68f22d65f70d1b3 *man/stargazer_acknowledge.Rd
 43976a286ae63f985e48d7c067157c05 *man/stargazer_stat_code_list.Rd
 89c4e888363d64d032611013536449d4 *man/stargazer_style_list.Rd
