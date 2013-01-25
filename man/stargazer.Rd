@@ -8,19 +8,21 @@
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-The \code{stargazer} command produces LaTeX code for well-formatted tables that hold regression analysis results from several models side-by-side, as well as summary statistics. It supports model objects from \code{lm}, \code{glm}, \code{svyglm}, \code{plm}, \code{betareg}, \code{gee}, \code{gam}, \code{polr}, \code{survreg}, \code{coxph}, \code{tobit} (AER), \code{ivreg} (AER), \code{zeroinfl} (pscl), \code{hurdle} (pscl), \code{multinom} (nnet) as well as from the implementation of these in \code{zelig}. It also supports the following \code{zelig} models for social network analysis: \code{"cloglog.net"}, \code{"gamma.net"}, \code{"probit.net"} and \code{"logit.net"}.
+The \code{stargazer} command produces LaTeX code for well-formatted tables that hold regression analysis results from several models side-by-side, as well as summary statistics. It supports model objects from  \code{betareg} (betareg), \code{coxph} (survival), \code{clm} (ordinal), \code{clogit} (survival), \code{ergm} (ergm), \code{gam} (mgcv), \code{gee} (gee), \code{glm} (stats), \code{glmer} (lme4), \code{gls} (nlme), \code{hurdle} (pscl),  \code{ivreg} (AER), \code{lm} (stats), \code{lmer} (lme4), \code{lmrob} (robustbase), \code{multinom} (nnet), \code{nlmer} (lme4), \code{plm} (plm), \code{pmg} (plm), \code{polr} (MASS), \code{rlm} (MASS), \code{svyglm} (survey), \code{survreg} (survival), \code{tobit} (AER), \code{zeroinfl} (pscl), as well as from the implementation of these in \code{zelig}. It also supports the following \code{zelig} models for social network analysis: \code{"cloglog.net"}, \code{"gamma.net"}, \code{"probit.net"} and \code{"logit.net"}.
 }
 \usage{
 stargazer(  ..., 
             title = "", style = "default", summary = TRUE,
-            covariate.labels = NULL, dep.var.labels = NULL,
-            align = FALSE, decimal.mark = NULL,
-            digit.separate = NULL, digit.separator = NULL,
+            covariate.labels = NULL, dep.var.labels = NULL, align = FALSE,
+            coef = NULL, se = NULL, t = NULL, p = NULL,
+            t.auto = TRUE, p.auto = TRUE,
+            decimal.mark = NULL, digit.separate = NULL, digit.separator = NULL,
             digits = NULL, digits.extra = NULL, initial.zero = NULL, intercept.top = NULL, 
-            model.names = NULL, model.numbers = NULL, 
+            label = "", model.names = NULL, model.numbers = NULL, 
             notes = NULL, notes.align = NULL, notes.label = NULL, 
             omit = NULL, omit.labels = NULL, omit.stat = NULL, omit.yes.no = c("Yes", "No"), 
             ord.intercepts = FALSE, star.char = NULL, star.cutoffs = NULL, zero.component = FALSE,
+            summary.logical = TRUE,
             nobs = TRUE, mean.sd = TRUE, min.max = TRUE, median = FALSE, iqr = FALSE )
 }
 %- maybe also 'usage' for other objects documented here.
@@ -44,7 +46,19 @@ stargazer(  ...,
 }
 
   \item{align}{a logical value indicating whether numerical values in the same column should be aligned at the decimal mark. Requires \code{\\usepackage{dcolumn}} in LaTeX preamble.}
-
+  
+    \item{coef}{a list of numerical vectors that will replace the default coefficient values for each model. Element names will be used to match coefficients to individual covariates, and should therefore match covariate names. A \code{NULL} vector indicates that, for a given model, the default set of coefficients should be used. By contrast, an \code{NA} vector means that all of the model's coefficients should be left blank.}
+    
+    \item{se}{a list of numerical vectors that will replace the default coefficient values for each model. Behaves exactly like the argument \code{coef}.}
+    
+    \item{t}{a list of numerical vectors that will replace the default test statistics (e.g., t-scores, or z-scores) for each model. Like \code{coef} and \code{se}, test statistics are matched to covariates by their element names.}
+    
+    \item{p}{a list of numerical vectors that will replace the default p-values for each model. Matched by element names. These will form the basis of decisions about significance stars.}
+    
+  \item{t.auto}{a logical value that indicates whether \code{stargazer} should calculate the test statistics (i.e., the z-scores) automatically if standard errors are supplied by the user (from argument \code{se}). If \code{FALSE}, the package will use model's default values if \code{t} is \code{NULL}. }
+ 
+  \item{p.auto}{a logical value that indicates whether \code{stargazer} should calculate the p-values, using the standard normal distribution, standard errors are supplied by the user (from argument \code{se}). If \code{FALSE}, the package will use model's default values if \code{p} is \code{NULL}. }
+ 
   \item{decimal.mark}{character string that will serve as the decimal mark. For instance, the string \code{","} will represent decimal commas, while \code{"."} means tables will use decimal points.}
 
 
@@ -54,7 +68,7 @@ stargazer(  ...,
   \item{digit.separator}{character string that will serve as the digit (e.g., thousands) separator. Commonly used strings include \code{","} for a comma separator, \code{" "} for a single space separator, and \code{""} for no separation.
 %%     ~~Describe \code{digit.separator} here~~
 }
-  \item{digits}{integer that indicates how many decimal places should be used.
+  \item{digits}{integer that indicates how many decimal places should be used. A value of \code{NA} indicates that no rounding should be done at all, and that all available decimal places should be reported.
 %%     ~~Describe \code{digits} here~~
 }
   \item{digits.extra}{integer indicating the maximum number of additional decimal places to be used if a number, rounded to \code{digits} decimal places, is equal to zero.
@@ -66,6 +80,10 @@ stargazer(  ...,
   \item{intercept.top}{a logical value indicating whether the intercept (or constant) coefficients should be on top, rather than on the bottom, of the table.
 %%     ~~Describe \code{intercept.top} here~~
 }
+  \item{label}{a character string containing the \code{\\label{}} TeX markers for the tables.
+%%     ~~Describe \code{intercept.top} here~~
+}
+ 
  \item{model.names}{a logical value indicating whether model names should be included in the table.
 %%     ~~Describe \code{model.names} here~~
 }
@@ -103,6 +121,9 @@ stargazer(  ...,
   \item{zero.component}{a logical value indicating whether to report coefficients for the \code{zero} component of \code{zeroinfl} and \code{hurdle} estimation results. If \code{FALSE}, the \code{count} component is displayed.
 %%     ~~Describe \code{zero.component} here~~
 }
+ \item{summary.logical}{a logical value indicating whether logical variables should be reported in summary statistics table. If so, they will be treated as if  they had values of 0 (corresponding to \code{FALSE}) and 1 (\code{TRUE}). 
+%%     ~~Describe \code{zero.component} here~~
+}
   \item{nobs}{a logical value that toggles whether the number of observations (N) for each variable is shown in summary statistics tables.}
   \item{mean.sd}{a logical value that toggles whether variable means and standard deviations are shown in summary statistics tables.}
   \item{min.max}{a logical value that toggles whether variable minima and maxima are shown in summary statistics tables.}
@@ -123,24 +144,22 @@ stargazer(  ...,
 }
 \author{
 %%  ~~who you are~~
-Marek Hlavac
-<hlavac at fas.harvard.edu>
+Marek Hlavac   < hlavac at fas.harvard.edu > \cr
+Harvard University, Political Economy and Government \cr
 }
-\section{Acknowledgments}{
-I would like to thank everyone who has tested this package, or provided useful comments and suggestions. Please see \link{stargazer package acknowledgments}.
+\section{Acknowledgments and New Features}{
+I would like to thank everyone who has tested this package, or provided useful comments and suggestions. Please see \link{stargazer package acknowledgments}. \cr
+\cr
+See \link{stargazer news} for a list of new models and features in each release of stargazer.
 }
 
 \section{Please cite as:}{
- Marek Hlavac (2013). stargazer: LaTeX code for well-formatted regression and summary statistics tables.\cr
- R package version 2.0.1. http://CRAN.R-project.org/package=stargazer 
+Hlavac, Marek (2013). stargazer: LaTeX code for well-formatted regression and summary statistics tables.\cr
+ R package version 3.0. http://CRAN.R-project.org/package=stargazer 
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
-\seealso{
-Several packages by other authors provide functionality similar to that of \code{stargazer}. These include \code{xtable} by David B. Dahl and \code{apsrtable} by Michael Malecki.
-%% ~~objects to See Also as \code{\link{help}}, ~~~
-}
 \examples{
 ## create summary statistics table based for 'attitude' data frame
 stargazer(attitude)
@@ -148,12 +167,16 @@ stargazer(attitude)
 ## list the content of the data frame 'attitude'
 stargazer(attitude, summary=FALSE)
 
-## estimate and report results of 3 OLS models
-m1 <- lm(rating ~ complaints + privileges + learning + raises + critical, data=attitude)
-m2 <- lm(rating ~ complaints + privileges + learning, data=attitude)
-m3 <- lm(rating ~ learning + critical + advance, data=attitude)
+##  2 OLS models
+linear.1 <- lm(rating ~ complaints + privileges + learning + raises + critical, data=attitude)
+linear.2 <- lm(rating ~ complaints + privileges + learning, data=attitude)
 
-stargazer(m1, m2, m3)
+## create an indicator dependent variable, and run a probit model
+ 
+attitude$high.rating <- (attitude$rating > 70)
+probit.model <- glm(high.rating ~ learning + critical + advance, data=attitude, family = binomial(link = "probit"))
+ 
+stargazer(linear.1, linear.2, probit.model, title="Regression Results")
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

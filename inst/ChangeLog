@@ -1,0 +1,66 @@
+stargazer - What's new?
+
+This page summarizes the models, features, and bug fixes that were introduced in each release of stargazer. 
+
+Please note that I am always looking for comments and suggestions. 
+Do not hesitate to contact me at hlavac [at] fas.harvard.edu.
+
+v. 3.0: 
+
+- New models: 
+-- clm (ordinal) 
+-- clogit (survival) 
+-- ergm (ergm) 
+-- glmer (lme4) 
+-- gls (nlme) 
+-- lmer (lme4) 
+-- lmrob (robustbase)
+-- nlmer (lme4)
+-- pmg (plm)
+-- rlm (MASS)
+
+- New features:
+-- users can customize coefficients (argument coef), standard errors (se), test statistics (t), and p-values (p)
+-- automatic calculation of z-scores and p-values when the user supplies custom standard errors (can be toggled using arguments t.auto and p.auto)
+-- ability to set \label{} markers in TeX for each table (using argument label)
+-- summary statistics table can now report logical (i.e., dummy, indicator) variables as if they had values of 0 (corresponding to FALSE) and 1 (TRUE). See argument summary.logical.
+-- user can choose between rounding to a set number of decimal places (argument digits) and reporting all available decimal places (by setting digits equal to NA) 
+-- can omit all test statistics 
+
+- Fixed bugs: 
+-- package runs much faster 
+-- corrected p-values for polr() and zelig oprobit, ologit models 
+-- coxph now, by default, reports robust standard errors, for consistency with its summary() output 
+-- multinom models now report the first set of coefficients (when multiple sets are present), instead of producing an error
+-- singularities in model estimation results no longer disrupt the output 
+-- model formulas can now be symbols 
+-- no more warnings when creating summary statistics tables 
+-- minor formatting changes
+
+v. 2.0.1: 
+
+- Fixed bugs: 
+-- stargazer now reports the correct number of observations for plm() models 
+
+v. 2.0: 
+
+- New models: 
+-- betareg (betareg) 
+-- hurdle (pscl) 
+-- ivreg (AER) 
+-- multinom (nnet) 
+-- plm (plm) 
+-- tobit (AER) 
+-- zeroinfl (pscl) 
+  
+- New features: 
+-- direct output of data frames into LaTeX (summary = FALSE) 
+-- ability to omit the reporting of selected statistics (using argument omit.stat)
+-- alignment of columns at the decimal mark (align = TRUE) 
+-- automatic coordination of star cutoffs and values in regression table notes
+
+- Fixed bugs: 
+-- argument \digits now works properly 
+-- \code{stargazer} updated to reflect, and work properly with, recent changes to Zelig
+-- variable names can now contain dollar signs and underscores 
+-- some minor formatting fixes 

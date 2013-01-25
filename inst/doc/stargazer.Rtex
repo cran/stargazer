@@ -1,0 +1,182 @@
+%% LyX 2.0.2 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[11pt,english]{article}
+\usepackage{ae,aecompl}
+\renewcommand{\familydefault}{\rmdefault}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+\usepackage{babel}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage[unicode=true]
+ {hyperref}
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+%\VignetteIndexEntry{stargazer}
+\usepackage{dcolumn}
+
+\makeatother
+
+\begin{document}
+
+\title{stargazer: \\
+beautiful \LaTeX{} tables from R statistical output}
+
+
+\author{Marek Hlavac%
+\thanks{Harvard University, Political Economy and Government; hlavac@fas.harvard.edu%
+}\\
+Harvard University}
+
+\maketitle
+
+\section{Introduction}
+
+\emph{stargazer} is an R package that creates \LaTeX{} code for well-formatted
+regression tables, with multiple models side-by-side, as well as for
+summary statistics tables. It can also output the content of data
+frames directly into \LaTeX{}.
+
+
+\section{Why Should I Use \emph{stargazer}?}
+
+Compared to available alternatives, \emph{stargazer} excels in three
+regards: its ease of use, the large number of models it supports,
+and its beautiful aesthetics. These advantages have made it the R-to-\LaTeX{}
+package of choice for many satisfied users at research institutions
+around the world.
+
+
+\subsection{Ease of Use}
+
+\emph{stargazer} was designed with the user's comfort in mind. The
+learning curve is very mild, and all arguments are very intuitive,
+so that even a beginning user of R or \LaTeX{} can quickly become
+familiar with the package's many capabilities. The package is intelligent,
+and tries to minimize the amount of effort the user has to put into
+adjusting argument values.
+
+If \emph{stargazer} is given a set of regression model objects, for
+instance, the package will create a side-by-side regression table.
+By contrast, if the user feeds it a data frame, \emph{stargazer} will
+know that the user is most likely looking for a summary statistics
+table or -- if the \emph{summary} argument is set to FALSE -- wants
+to output the content of the data frame.\newpage{}
+
+A quick reproducible example shows just how easy \emph{stargazer}
+is to use. You can install \emph{stargazer} from CRAN in the usual
+way:\\
+
+
+\noindent \verb|install.packages("stargazer")| \newline
+\verb|library(stargazer)| \newline
+
+To create a summary statistics table from the \emph{`attitude'} data
+frame (which should be available with your default installation of
+R), simply run the following:\\
+
+
+\noindent \verb|stargazer("attitude")| 
+
+\begin{table}[htb] \centering    \caption{}    \label{}  \footnotesize 
+\begin{tabular}{@{\extracolsep{5pt}}l c c c c c }  \\[-1.8ex]\hline  \hline \\[-1.8ex]  Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Max} \\  \hline \\[-1.8ex]  rating & 30 & 64.633 & 12.173 & 40 & 85 \\  complaints & 30 & 66.600 & 13.315 & 37 & 90 \\  privileges & 30 & 53.133 & 12.235 & 30 & 83 \\  learning & 30 & 56.367 & 11.737 & 34 & 75 \\  raises & 30 & 64.633 & 10.397 & 43 & 88 \\  critical & 30 & 74.767 & 9.895 & 49 & 92 \\  advance & 30 & 42.933 & 10.289 & 25 & 72 \\   \hline \\[-1.8ex]  \normalsize  \end{tabular}  \end{table} 
+
+To output the contents of the first four rows of some data frame,
+specify the part of the data frame you would like to see, and set
+the \emph{summary} option to FALSE:\\
+
+
+\noindent \verb|stargazer("attitude", summary=FALSE)| 
+
+\begin{table}[htb] \centering    \caption{}    \label{}  \footnotesize 
+\begin{tabular}{@{\extracolsep{5pt}} c c c c c c c }  \\[-1.8ex]\hline  \hline \\[-1.8ex]  rating & complaints & privileges & learning & raises & critical & advance \\  \hline \\[-1.8ex]  $43$ & $51$ & $30$ & $39$ & $61$ & $92$ & $45$ \\  $63$ & $64$ & $51$ & $54$ & $63$ & $73$ & $47$ \\  $71$ & $70$ & $68$ & $69$ & $76$ & $86$ & $48$ \\  $61$ & $63$ & $45$ & $47$ & $54$ & $84$ & $35$ \\  \hline \\[-1.8ex]  \normalsize  \end{tabular}  \end{table} 
+
+Now, let us try to create a simple regression table with three side-by-side
+models -- two Ordinary Least Squares (OLS) and one probit regression
+model -- using the \emph{lm()} and \emph{glm()} functions. We can
+set the\emph{ align} argument to TRUE, so that coefficients in each
+column are aligned along the decimal point. \emph{Table 3} shows the
+result.\newpage{}
+
+\begin{table}[htb] \centering    \caption{Regression Results}    \label{}  \footnotesize 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{3}{c}{\textit{Dependent variable:}} \\  \cline{2-4}  \\[-1.8ex] & \multicolumn{2}{c}{rating} & \multicolumn{1}{c}{high.rating} \\  \\[-1.8ex] & \multicolumn{2}{c}{\textit{OLS}} & \multicolumn{1}{c}{\textit{probit}} \\  \\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\  \hline \\[-1.8ex]   complaints & 0.692^{***} & 0.682^{***} &  \\    & (0.149) & (0.129) &  \\    & & & \\   privileges & -0.104 & -0.103 &  \\    & (0.135) & (0.129) &  \\    & & & \\   learning & 0.249 & 0.238^{*} & 0.164^{***} \\    & (0.160) & (0.139) & (0.053) \\    & & & \\   raises & -0.033 &  &  \\    & (0.202) &  &  \\    & & & \\   critical & 0.015 &  & -0.001 \\    & (0.147) &  & (0.044) \\    & & & \\   advance &  &  & -0.062 \\    &  &  & (0.042) \\    & & & \\   Constant & 11.011 & 11.258 & -7.476^{**} \\    & (11.704) & (7.318) & (3.570) \\    & & & \\  \hline \\[-1.8ex]  Observations & \multicolumn{1}{c}{$30$} & \multicolumn{1}{c}{$30$} & \multicolumn{1}{c}{$30$} \\  R$^{2}$ & \multicolumn{1}{c}{$0.715$} & \multicolumn{1}{c}{$0.715$} &  \\  Adjusted R$^{2}$ & \multicolumn{1}{c}{$0.656$} & \multicolumn{1}{c}{$0.682$} &  \\  Log likelihood &  &  & \multicolumn{1}{c}{$-9.087$} \\  Akaike Inf. Crit. &  &  & \multicolumn{1}{c}{$26.175$} \\  Residual Std. Error & \multicolumn{1}{c}{$7.139 (df = 24)$} & \multicolumn{1}{c}{$6.863 (df = 26)$} &  \\  F statistic & \multicolumn{1}{c}{$12.063^{***} (df = 5; 24)$} & \multicolumn{1}{c}{$21.743^{***} (df = 3; 26)$} &  \\  \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{3}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table}In \emph{Table 4}, we go a little bit further, and make some formatting
+and labeling adjustments. In particular, we use \emph{omit.stat} to
+leave out several statistics -- namely, the log-likelihood (``\emph{LL'}'),
+residual standard error (``\emph{ser}'') and the F-statistic (``\emph{f}'').
+Additionally, we label each of the dependent and independent variables
+with an easy-to-understand name. To do so, we use the \emph{dep.var.labels}
+and \emph{covariate.labels} arguments. The result is a complex, publication-quality
+\LaTeX{} table. The relevant command call looks like this:\\
+
+
+\noindent \verb|stargazer(linear.1, linear.2, probit.model, title="Regression Results",| \newline
+\verb|align=TRUE, dep.var.labels=c("Overall Rating","High Rating"),| \newline
+\verb|covariate.labels=c("Handling of Complaints","No Special Privileges",|
+\newline \verb|"Opportunity to Learn","Performance-Based Raises","Too Critical","Advancement"),|
+\newline \verb|omit.stat=c("LL","ser","f"))|
+
+\begin{table}[htb] \centering    \caption{Regression Results}    \label{}  \footnotesize 
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{3}{c}{\textit{Dependent variable:}} \\  \cline{2-4}  \\[-1.8ex] & \multicolumn{2}{c}{Overall Rating} & \multicolumn{1}{c}{High Rating} \\  \\[-1.8ex] & \multicolumn{2}{c}{\textit{OLS}} & \multicolumn{1}{c}{\textit{probit}} \\  \\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\  \hline \\[-1.8ex]   Handling of Complaints & 0.692^{***} & 0.682^{***} &  \\    & (0.149) & (0.129) &  \\    & & & \\   No Special Privileges & -0.104 & -0.103 &  \\    & (0.135) & (0.129) &  \\    & & & \\   Opportunity to Learn & 0.249 & 0.238^{*} & 0.164^{***} \\    & (0.160) & (0.139) & (0.053) \\    & & & \\   Performance-Based Raises & -0.033 &  &  \\    & (0.202) &  &  \\    & & & \\   Too Critical & 0.015 &  & -0.001 \\    & (0.147) &  & (0.044) \\    & & & \\   Advancement &  &  & -0.062 \\    &  &  & (0.042) \\    & & & \\   Constant & 11.011 & 11.258 & -7.476^{**} \\    & (11.704) & (7.318) & (3.570) \\    & & & \\  \hline \\[-1.8ex]  Observations & \multicolumn{1}{c}{$30$} & \multicolumn{1}{c}{$30$} & \multicolumn{1}{c}{$30$} \\  R$^{2}$ & \multicolumn{1}{c}{$0.715$} & \multicolumn{1}{c}{$0.715$} &  \\  Adjusted R$^{2}$ & \multicolumn{1}{c}{$0.656$} & \multicolumn{1}{c}{$0.682$} &  \\  Akaike Inf. Crit. &  &  & \multicolumn{1}{c}{$26.175$} \\  \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{3}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table}
+
+
+\subsection{Many supported models}
+
+\emph{stargazer} supports objects from the most widely used statistical
+functions and packages. In particular, the package supports model
+objects from \emph{betareg} (betareg), \emph{coxph }(survival), \emph{clm
+}(ordinal), \emph{clogit }(survival), \emph{ergm }(ergm), \emph{gam
+}(mgcv),\emph{ gee }(gee),\emph{ glm }(stats),\emph{ glmer }(lme4),
+\emph{gls} (nlme), \emph{hurdle }(pscl), \emph{ivreg} (AER), \emph{lm
+}(stats), \emph{lmer} (lme4), \emph{lmrob} (robustbase), \emph{multinom}
+(nnet), \emph{nlmer} (lme4), \emph{plm} (plm), \emph{pmg} (plm), \emph{polr}
+(MASS), \emph{rlm} (MASS), \emph{svyglm} (survey), \emph{survreg }(survival),
+\emph{tobit} (AER), \emph{zeroinfl} (pscl), as well as from the implementation
+of these in \emph{zelig}. In addition, stargazer also supports the
+following zelig models for social network analysis: ``\emph{cloglog.net}'',
+``\emph{gamma.net}'', ``\emph{probit.net}'' and ``\emph{logit.net}''. 
+
+The number of models and objects that \emph{stargazer} can accommodate
+puts it ahead of most of the alternative R-to-\LaTeX{} options. As
+the development of the package continues, this list will continue
+expanding to matching models, as well as new, user-made, or customized
+statistical models. 
+
+
+\subsection{Beautiful aesthetics}
+
+\emph{stargazer} is very pleasing to the eye, and allows the user
+to customize all variable labels, as well as the formatting of the
+resulting table. If you'd like to create tables that look like those
+from your discipline's leading journal, \emph{stargazer} can help
+you with that as well. You can use the style argument to choose a
+template of your choice. Economics and management scholars can thus
+create tables that resemble those published in the \emph{American
+Economic Review}, in the \emph{Quarterly Journal of Economics}, or
+in \emph{Administrative Science Quarterly}. Political scientists can
+avail themselves of templates based on the \emph{American Political
+Science Review}, the \emph{American Journal of Political Science},
+and on \emph{International Organization}. For sociologists and demographers,
+the \emph{American Sociological Review}, the \emph{American Sociological
+Review} and \emph{Demography} are available.\newpage{}
+
+
+\section{Citing \emph{stargazer} in Research Publications}
+
+If you use the \emph{stargazer} package in your research publications,
+please remember to include the following citation:\\
+
+
+\noindent \texttt{Hlavac, Marek (2013). stargazer: LaTeX code for
+well-formatted regression and summary statistics tables. R package
+version 3.0. http://CRAN.R-project.org/package=stargazer}~\\
+\texttt{}~\\
+\texttt{}~\\
+
+
+\noindent \textbf{Note:} This document's description of the \emph{stargazer}
+package was adapted from \href{http://www.r-bloggers.com/stargazer-package-for-beautiful-latex-tables-from-r-statistical-models-output/}{my guest blog post}
+on Tal Galili's excellent \href{http://www.r-statistics.com/}{R-statistics blog}.
+\end{document}

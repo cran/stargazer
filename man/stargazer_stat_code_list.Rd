@@ -13,12 +13,14 @@ The following character strings can be used in the \code{omit.stat} argument of 
 \section{}{
 
 \tabular{ll}{
+  \code{"all"} \tab all statistics \cr
   \code{"n"} \tab number of observations \cr
   \code{"rsq"} \tab R-squared \cr
   \code{"adj.rsq"} \tab adjusted R-squared \cr
   \code{"max.rsq"} \tab maximum R-squared \cr
   \code{"ll"} \tab log-likelihood \cr
   \code{"aic"} \tab Akaike Information Criterion \cr
+  \code{"bic"} \tab Bayesian Information Criterion \cr
   \code{"scale"} \tab scale \cr
   \code{"ubre"} \tab Un-Biased Risk Estimator \cr
   \code{"sigma2"} \tab sigma squared \cr
