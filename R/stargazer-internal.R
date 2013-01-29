@@ -2,7 +2,7 @@
 function(libname, pkgname) {
   packageStartupMessage("\nPlease cite as: \n")
   packageStartupMessage(" Hlavac, Marek (2013). stargazer: LaTeX code for well-formatted regression and summary statistics tables.")
-  packageStartupMessage(" R package version 3.0. http://CRAN.R-project.org/package=stargazer \n")
+  packageStartupMessage(" R package version 3.0.1. http://CRAN.R-project.org/package=stargazer \n")
 }
 
 .stargazer.wrap <-
@@ -1335,7 +1335,7 @@ function(libname, pkgname) {
   .is.all.integers <-
   function(x) {
       if (!is.numeric(x)) { return(FALSE) }
-      if (length(x) == length(is.wholenumber(x)[(!is.na(x)) & (is.wholenumber(x)==TRUE)])) {
+      if (length(x[!is.na(x)]) == length(is.wholenumber(x)[(!is.na(x)) & (is.wholenumber(x)==TRUE)])) {
         return(TRUE)
       }
       else { return (FALSE) }
@@ -2694,12 +2694,12 @@ function(libname, pkgname) {
           if (omitted == FALSE) {     
             if (x >= 2) { cat(" & ", sep="") }
             
-            how.much.to.round <- .format.round.digits
+            .how.much.to.round <- .format.round.digits
             if (is.numeric(object[y,x])) {
               
               if (.is.all.integers(object[y,x])) { .how.much.to.round <- 0 }
               
-              rounded.object <- .iround(object[y,x],.how.much.to.round)
+              rounded.object <- .iround(object[y,x], .how.much.to.round)
               
               if (.format.dec.mark.align==TRUE) {
                 cat(rounded.object, sep="")  
@@ -2710,6 +2710,8 @@ function(libname, pkgname) {
             }
             else {
               adjusted.object <- .remove.special.chars(object[y, x])
+              if (is.na(adjusted.object)) { adjusted.object <- "" }
+                
               if (.format.dec.mark.align==TRUE) {
                 cat("\\multicolumn{1}{c}{", adjusted.object, "}", sep="")  
               }
@@ -2885,7 +2887,7 @@ function(libname, pkgname) {
 
    cat("\\begin{tabular}{",.formatting.alignment,"} \n",sep="")
   }
-
+  
   .summ.stat.table.part <-
   function(object, part) {
 
@@ -2917,6 +2919,9 @@ function(libname, pkgname) {
         
           # skip all of this if omitted based on regular expression
           omitted <- FALSE
+          
+          # also omit if all missing values
+          if (!any(!is.na(object[,i]))) { omitted <- TRUE }
         
          if (!is.null(.format.omit.regexp)) {
             for (j in seq(1:length(.format.omit.regexp))) {
@@ -3434,7 +3439,7 @@ function(libname, pkgname) {
 
     # info about the package and author
     .global.package.name <- "StarGazer"
-    .global.package.version <- "3.0"
+    .global.package.version <- "3.0.1"
     .global.package.author.name <- "Marek Hlavac"
     .global.package.author.affiliation <- "Harvard University"
     .global.package.author.email <- "hlavac at fas.harvard.edu"

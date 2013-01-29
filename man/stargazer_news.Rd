@@ -10,6 +10,12 @@ This page summarizes the models, features, and bug fixes that were introduced in
 }
 
 \section{What's new?}{
+v. 3.0.1: \cr
+\cr
+- Fixed bugs: \cr
+-- corrected an issue that led to problems when printing data frames with multiple decimal places\cr
+-- some reporting and formatting changes to summary statistics and data frame tables \cr
+\cr
 v. 3.0: \cr
 \cr
 - New models: \cr

@@ -3,7 +3,13 @@ stargazer - What's new?
 This page summarizes the models, features, and bug fixes that were introduced in each release of stargazer. 
 
 Please note that I am always looking for comments and suggestions. 
-Do not hesitate to contact me at hlavac [at] fas.harvard.edu.
+Do not hesitate to contact me at hlavac [at] fas.harvard.edu
+
+v. 3.0.1: 
+
+- Fixed bugs:
+-- corrected an issue that led to problems when printing data frames with multiple decimal places
+-- some reporting and formatting changes to summary statistics and data frame tables
 
 v. 3.0: 
 

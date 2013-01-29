@@ -2,8 +2,8 @@ Package: stargazer
 Type: Package
 Title: LaTeX code for well-formatted regression and summary statistics
         tables
-Version: 3.0
-Date: 2013-01-25
+Version: 3.0.1
+Date: 2013-01-29
 Author: Marek Hlavac <hlavac@fas.harvard.edu>
 Maintainer: Marek Hlavac <hlavac@fas.harvard.edu>
 Description: Produces LaTeX code for well-formatted tables that hold
@@ -12,6 +12,6 @@ Description: Produces LaTeX code for well-formatted tables that hold
 License: GPL (>= 2)
 LazyLoad: yes
 Collate: 'stargazer-internal.R' 'stargazer.R'
-Packaged: 2013-01-26 02:48:10 UTC; Marek Hlavac
+Packaged: 2013-01-30 21:22:16 UTC; Marek Hlavac
 Repository: CRAN
-Date/Publication: 2013-01-26 08:33:23
+Date/Publication: 2013-01-30 23:28:34

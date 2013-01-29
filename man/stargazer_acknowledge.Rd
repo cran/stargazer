@@ -12,6 +12,7 @@ I would like to thank everyone who has tested this package, or provided useful s
 \section{Thank you:}{
 Erin Baggott, Harvard University, USA\cr
 Ruben de Bliek, Erasmus University Rotterdam, the Netherlands\cr
+Julian Chan, Boston University, USA\cr
 Volha Charnych, Harvard University, USA\cr
 John Coglianese, Harvard University, USA\cr
 Stefan Dimitriadis, Harvard University, USA\cr
@@ -23,6 +24,7 @@ Rebecca Goldstein, Harvard University, USA\cr
 Josiah Grover, Ball State University, USA\cr
 Connor Huff, Harvard University, USA\cr
 Melissa Kline, Massachussetts Institute of Technology, USA\cr
+Maxim Kovalenko, University of Antwerp, Belgium\cr
 Johannes Kutsam, Johann Kepler University, Linz, Austria \cr
 Akos Lada, Harvard University, USA\cr
 Carl Jacob Liebersohn, Massachussetts Institute of Technology, USA\cr
