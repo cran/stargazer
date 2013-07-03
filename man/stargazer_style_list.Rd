@@ -2,7 +2,7 @@
 \alias{list of supported styles}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{List of supported styles for \code{\link{stargazer}}
+\title{stargazer: list of supported styles
 %%  ~~function to do ... ~~
 }
 \description{

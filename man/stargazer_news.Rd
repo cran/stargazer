@@ -10,6 +10,51 @@ This page summarizes the models, features, and bug fixes that were introduced in
 }
 
 \section{What's new?}{
+v. 4.0: \cr
+\cr
+- New models: \cr
+-- aftreg (eha) \cr
+-- bj (rms) \cr
+-- coxreg (eha) \cr
+-- cph (rms) \cr
+-- dynlm (dynlm) \cr
+-- errorsarlm (spdep) \cr
+-- Glm (rms) \cr
+-- Gls (rms) \cr
+-- gmm (gmm) \cr
+-- hetglm (glmx) \cr
+-- lrm (rms) \cr
+-- mlreg (eha) \cr
+-- lagsarlm (spdep) \cr
+-- ols (rms) \cr
+-- phreg (eha) \cr
+-- psm (rms) \cr
+-- rem.dyad (relevent) \cr
+-- rq (quantreg) \cr
+-- Rq (rms) \cr
+-- weibreg (eha) \cr
+\cr
+- New features: \cr
+-- the package can produce ASCII text output, in addition to LaTeX code (argument \code{type}) \cr
+-- output directly to .tex or .txt files (argument \code{out}) \cr
+-- column labels (arguments \code{column.labels} and \code{column.separate}) \cr
+-- confidence intervals (arguments \code{ci}, \code{ci.level} and \code{ci.separator})\cr
+-- coefficients and standard errors/confidence intervals can now be reported in the same row (argument \code{single.row}) \cr
+-- users can choose to omit all empty lines in a table (argument \code{no.space}) \cr
+-- notes can now be appended to, rather than always replace, the default notes for a given style (argument \code{notes.append}) \cr
+-- ability to customize the dependent variable caption (argument \code{dep.var.caption}) \cr
+-- font size can now be changed (argument \code{font.size}) \cr
+-- comments header (with package and author name, version, date and time) can now be suppressed (argument \code{header}) \cr
+-- ability to change or disable the floating environment (arguments \code{float} and \code{float.env}) \cr
+-- table placement settings (argument \code{table.placement}) \cr
+-- customization of column spacing (argument \code{column.sep.width}) \cr
+-- perl-compatible regular expressions (argument \code{perl}) \cr
+\cr
+- Fixed bugs: \cr
+-- all columns are now displayed for \code{multinom} objects \cr
+-- better positioning of tables in the LaTeX document\cr
+-- minor formatting changes \cr
+\cr
 v. 3.0.1: \cr
 \cr
 - Fixed bugs: \cr

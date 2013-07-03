@@ -1,117 +1,140 @@
 .onAttach <- 
 function(libname, pkgname) {
   packageStartupMessage("\nPlease cite as: \n")
-  packageStartupMessage(" Hlavac, Marek (2013). stargazer: LaTeX code for well-formatted regression and summary statistics tables.")
-  packageStartupMessage(" R package version 3.0.1. http://CRAN.R-project.org/package=stargazer \n")
+  packageStartupMessage(" Hlavac, Marek (2013). stargazer: LaTeX code and ASCII text for well-formatted regression and summary statistics tables.")
+  packageStartupMessage(" R package version 4.0. http://CRAN.R-project.org/package=stargazer \n")
 }
 
 .stargazer.wrap <-
-  function(...,title, style, summary, covariate.labels, dep.var.labels, align, coef, se, t, p, t.auto, p.auto, decimal.mark, digit.separate, digit.separator, digits, digits.extra, initial.zero, intercept.top, label, model.names, model.numbers, notes, notes.align, notes.label, omit, omit.labels, omit.stat, omit.yes.no, ord.intercepts, star.char, star.cutoffs, zero.component, summary.logical, nobs, mean.sd, min.max, median, iqr) {
-    
+  function(..., type, title, style, summary, out, covariate.labels, column.labels, column.separate, dep.var.caption, dep.var.labels, dep.var.labels.include, align, coef, se, t, p, t.auto, p.auto, ci, ci.level, ci.separator, column.sep.width, decimal.mark, digit.separate, digit.separator, digits, digits.extra, float, float.env, font.size, header, initial.zero, intercept.top, label, model.names, model.numbers, no.space, notes, notes.align, notes.append, notes.label, omit, omit.labels, omit.stat, omit.yes.no, ord.intercepts, perl, rq.se, single.row, star.char, star.cutoffs, suppress.errors, table.placement, zero.component, summary.logical, nobs, mean.sd, min.max, median, iqr, warn) {
+     
   .add.model <-
   function(object.name, user.coef=NULL, user.se=NULL, user.t=NULL, user.p=NULL, auto.t=TRUE, auto.p=TRUE) {
     
-    .summary.object <<- summary(object.name)
-
-  	.global.models <<- append(.global.models, .model.identify(object.name))
+    if (class(object.name)[1] == "Glm") {
+        .summary.object <<- summary.glm(object.name)
+    }
+    else if (!(.model.identify(object.name) %in% c("aftreg", "coxreg","phreg","weibreg", "Glm", "bj", "cph", "lrm", "ols", "psm", "Rq"))) {
+      .summary.object <<- summary(object.name)
+    }
+    else {
+      .summary.object <<- object.name
+    }
+    
+    if (.model.identify(object.name) == "rq") {
+      .summary.object <<- suppressMessages(summary(object.name, se=.format.rq.se))
+    }
+    
+    model.num.total <- 1   # model number for multinom, etc.
+    if (.model.identify(object.name) == "multinom") {
+      if (!is.null(nrow(.summary.object$coefficients))) {
+        model.num.total <-  nrow(.summary.object$coefficients)
+      }
+    }
+    
+    for (model.num in 1:model.num.total) {
+      
+      .global.models <<- append(.global.models, .model.identify(object.name))
   	
-  	.global.dependent.variables <<- append(.global.dependent.variables, .dependent.variable(object.name))
-  	.global.dependent.variables.written <<- append(.global.dependent.variables.written, .dependent.variable.written(object.name))
+  	  .global.dependent.variables <<- append(.global.dependent.variables, .dependent.variable(object.name, model.num))
+  	  .global.dependent.variables.written <<- append(.global.dependent.variables.written, .dependent.variable.written(object.name, model.num))
 
-  	.global.N <<- append(.global.N, .number.observations(object.name))
-  	.global.LL <<- append(.global.LL, .log.likelihood(object.name))
-  	.global.R2 <<- append(.global.R2, .r.squared(object.name))
-  	.global.max.R2 <<- append(.global.max.R2, .max.r.squared(object.name))
-  	.global.adj.R2 <<- append(.global.adj.R2, .adj.r.squared(object.name))
-  	.global.AIC <<- append(.global.AIC, .AIC(object.name))
-    .global.BIC <<- append(.global.BIC, .BIC(object.name))
-  	.global.scale <<- append(.global.scale, .get.scale(object.name))
-    .global.UBRE <<- append(.global.UBRE, .gcv.UBRE(object.name))
-  	.global.sigma2 <<- append(.global.sigma2, .get.sigma2(object.name))
+  	  .global.N <<- append(.global.N, .number.observations(object.name))
+  	  .global.LL <<- append(.global.LL, .log.likelihood(object.name))
+  	  .global.R2 <<- append(.global.R2, .r.squared(object.name))
+  	  .global.max.R2 <<- append(.global.max.R2, .max.r.squared(object.name))
+  	  .global.adj.R2 <<- append(.global.adj.R2, .adj.r.squared(object.name))
+  	  .global.AIC <<- append(.global.AIC, .AIC(object.name))
+      .global.BIC <<- append(.global.BIC, .BIC(object.name))
+  	  .global.scale <<- append(.global.scale, .get.scale(object.name))
+      .global.UBRE <<- append(.global.UBRE, .gcv.UBRE(object.name))
+  	  .global.sigma2 <<- append(.global.sigma2, .get.sigma2(object.name))
   	
-    .global.theta <<- cbind(.global.theta, .get.theta(object.name))
-  	.global.SER <<- cbind(.global.SER, .SER(object.name))
-  	.global.F.stat <<- cbind(.global.F.stat, .F.stat(object.name))
-  	.global.chi.stat <<- cbind(.global.chi.stat, .chi.stat(object.name))
-  	.global.wald.stat <<- cbind(.global.wald.stat, .wald.stat(object.name))
-  	.global.lr.stat <<- cbind(.global.lr.stat, .lr.stat(object.name))
-  	.global.logrank.stat <<- cbind(.global.logrank.stat, .logrank.stat(object.name))
-  	.global.null.deviance <<- cbind(.global.null.deviance, .null.deviance(object.name))
-  	.global.residual.deviance <<- cbind(.global.residual.deviance, .residual.deviance(object.name))
+      .global.theta <<- cbind(.global.theta, .get.theta(object.name))
+  	  .global.SER <<- cbind(.global.SER, .SER(object.name))
+  	  .global.F.stat <<- cbind(.global.F.stat, .F.stat(object.name))
+  	  .global.chi.stat <<- cbind(.global.chi.stat, .chi.stat(object.name))
+  	  .global.wald.stat <<- cbind(.global.wald.stat, .wald.stat(object.name))
+  	  .global.lr.stat <<- cbind(.global.lr.stat, .lr.stat(object.name))
+  	  .global.logrank.stat <<- cbind(.global.logrank.stat, .logrank.stat(object.name))
+  	  .global.null.deviance <<- cbind(.global.null.deviance, .null.deviance(object.name))
+  	  .global.residual.deviance <<- cbind(.global.residual.deviance, .residual.deviance(object.name))
 
-  	max.length <- length(.global.coefficient.variables)+length(.coefficient.variables(object.name))
+  	  max.length <- length(.global.coefficient.variables)+length(.coefficient.variables(object.name))
 
-  	# add RHS variables and coefficients
-  	coef.var <- .coefficient.variables(object.name)
+  	  # add RHS variables and coefficients
+  	  coef.var <- .coefficient.variables(object.name)
 
-  	temp.gcv <- rep(NA,each=1,times=max.length)
+  	  temp.gcv <- rep(NA,each=1,times=max.length)
 
-  	temp.gcv[1:length(.global.coefficient.variables)] <- .global.coefficient.variables
+  	  temp.gcv[1:length(.global.coefficient.variables)] <- .global.coefficient.variables
 
-  	how.many.gcv <- length(.global.coefficient.variables)
+  	  how.many.gcv <- length(.global.coefficient.variables)
 
-  	position <- 0
-  	for (i in seq(1:length(coef.var))) {
+  	  position <- 0
+  	  for (i in seq(1:length(coef.var))) {
 
-  		found <- FALSE
-  		for (j in seq(1:length(.global.coefficient.variables))) {
-  				if (coef.var[i] == .global.coefficient.variables[j]) {
-  					found <- TRUE
-  					for (k in 1:how.many.gcv) {
-  						if (coef.var[i]==temp.gcv[k]) {
-  							position <- k
-  						}
-  					}
-  				}
-  		}
+  		  found <- FALSE
+  		  for (j in seq(1:length(.global.coefficient.variables))) {
+  				  if (coef.var[i] == .global.coefficient.variables[j]) {
+  					  found <- TRUE
+  					  for (k in 1:how.many.gcv) {
+  						  if (coef.var[i]==temp.gcv[k]) {
+  							  position <- k
+  						  }
+  					  }
+  				  }
+  		  }
 
-  		# If variable was found, no need to add it
-  		if (found == FALSE) {
+  		  # If variable was found, no need to add it
+  		  if (found == FALSE) {
    
-        # append new variable to list of regressors
-        while ((position < how.many.gcv) & (!(temp.gcv[position+1] %in% coef.var))) {
-          position <- position + 1
-        }
+          # append new variable to list of regressors
+          while ((position < how.many.gcv) & (!(temp.gcv[position+1] %in% coef.var))) {
+            position <- position + 1
+          }
         
-  			temp.gcv <- append(temp.gcv, coef.var[i], after=position)
-  			how.many.gcv <- how.many.gcv + 1
-  			position <- position + 1
-  		}
+  			  temp.gcv <- append(temp.gcv, coef.var[i], after=position)
+  			  how.many.gcv <- how.many.gcv + 1
+  			  position <- position + 1
+  		  }
 		
-  	}
+  	  }
   
-  	.global.coefficient.variables <<- temp.gcv[1:how.many.gcv]
+  	  .global.coefficient.variables <<- temp.gcv[1:how.many.gcv]
 
-  	# build up coefficients from scratch
-  	temp.coefficients <- temp.std.errors <- temp.t.stats <- temp.p.values <- matrix(data = NA, nrow = length(.global.coefficient.variables), ncol = ncol(.global.coefficients)+1)
-	  rownames(temp.coefficients) <- rownames(temp.std.errors) <- rownames(temp.t.stats) <- rownames(temp.p.values) <- .global.coefficient.variables
+  	  # build up coefficients from scratch
+  	  temp.coefficients <- temp.std.errors <- temp.t.stats <- temp.p.values <- matrix(data = NA, nrow = length(.global.coefficient.variables), ncol = ncol(.global.coefficients)+1)
+	    rownames(temp.coefficients) <- rownames(temp.std.errors) <- rownames(temp.t.stats) <- rownames(temp.p.values) <- .global.coefficient.variables
 
-  	# fill in from previous iteration of .global coefficients
-  	for (row in .global.coefficient.variables) {
-		  for (col in seq(1:ncol(.global.coefficients))) {
-  			if (sum(as.vector(names(.global.coefficients[,col])==row))!=0) { 
-  				if (!is.null(.global.coefficients)) { temp.coefficients[row, col] <- .global.coefficients[row, col] }
-  				if (!is.null(.global.std.errors)) { temp.std.errors[row, col] <- .global.std.errors[row, col] }
-  				if (!is.null(.global.t.stats)) { temp.t.stats[row, col] <- .global.t.stats[row, col] }
-  				if (!is.null(.global.p.values)) { temp.p.values[row, col] <- .global.p.values[row, col] }
-  			}
-  		}
+  	  # fill in from previous iteration of .global coefficients
+  	  for (row in .global.coefficient.variables) {
+		    for (col in seq(1:ncol(.global.coefficients))) {
+  			  if (sum(as.vector(names(.global.coefficients[,col])==row))!=0) { 
+  				  if (!is.null(.global.coefficients)) { temp.coefficients[row, col] <- .global.coefficients[row, col] }
+  				  if (!is.null(.global.std.errors)) { temp.std.errors[row, col] <- .global.std.errors[row, col] }
+  				  if (!is.null(.global.t.stats)) { temp.t.stats[row, col] <- .global.t.stats[row, col] }
+  				  if (!is.null(.global.p.values)) { temp.p.values[row, col] <- .global.p.values[row, col] }
+  			  }
+  		  }
       
-      feed.coef <- NA
-      # coefficients and standard errors
-  		if (!is.null(.get.coefficients(object.name, user.coef)[row])) { temp.coefficients[row, ncol(temp.coefficients)] <- feed.coef <- .get.coefficients(object.name, user.coef)[row] }
-  		if (!is.null(.get.standard.errors(object.name, user.se)[row])) { temp.std.errors[row, ncol(temp.std.errors)] <- .get.standard.errors(object.name, user.se)[row] }
+        feed.coef <- NA
+        # coefficients and standard errors
+  		  if (!is.null(.get.coefficients(object.name, user.coef, model.num=model.num)[row])) { temp.coefficients[row, ncol(temp.coefficients)] <- feed.coef <- .get.coefficients(object.name, user.coef, model.num=model.num)[row] }
+  		  if (!is.null(.get.standard.errors(object.name, user.se, model.num=model.num)[row])) { temp.std.errors[row, ncol(temp.std.errors)] <- .get.standard.errors(object.name, user.se, model.num=model.num)[row] }
       
-      # t-stats and p-values
-      if (!is.null(user.coef)) { feed.coef <- user.coef }   # feed user-defined coefficients, if available
-      if (!is.null(.get.t.stats(object.name, user.t, auto.t, feed.coef, user.se)[row])) { temp.t.stats[row, ncol(temp.std.errors)] <- .get.t.stats(object.name, user.t, auto.t, feed.coef, user.se)[row] }
-  		if (!is.null(.get.p.values(object.name, user.p, auto.p, feed.coef, user.se)[row])) { temp.p.values[row, ncol(temp.std.errors)] <- .get.p.values(object.name, user.p, auto.p, feed.coef, user.se)[row] }
-  	}
+        # t-stats and p-values
+        if (!is.null(user.coef)) { feed.coef <- user.coef }   # feed user-defined coefficients, if available
+        if (!is.null(.get.t.stats(object.name, user.t, auto.t, feed.coef, user.se, model.num=model.num)[row])) { temp.t.stats[row, ncol(temp.std.errors)] <- .get.t.stats(object.name, user.t, auto.t, feed.coef, user.se, model.num=model.num)[row] }
+  		  if (!is.null(.get.p.values(object.name, user.p, auto.p, feed.coef, user.se, model.num=model.num)[row])) { temp.p.values[row, ncol(temp.std.errors)] <- .get.p.values(object.name, user.p, auto.p, feed.coef, user.se, model.num=model.num)[row] }
+  	  }
 
-  	if (!is.null(temp.coefficients)) { .global.coefficients <<- temp.coefficients }
-  	if (!is.null(temp.std.errors)) { .global.std.errors <<- temp.std.errors }
-  	if (!is.null(temp.t.stats)) { .global.t.stats <<- temp.t.stats }
-  	if (!is.null(temp.p.values)) { .global.p.values <<- temp.p.values }
+  	  if (!is.null(temp.coefficients)) { .global.coefficients <<- temp.coefficients }
+  	  if (!is.null(temp.std.errors)) { .global.std.errors <<- temp.std.errors }
+  	  if (!is.null(temp.t.stats)) { .global.t.stats <<- temp.t.stats }
+  	  if (!is.null(temp.p.values)) { .global.p.values <<- temp.p.values }
+    
+    }
 
   }
 
@@ -120,7 +143,7 @@ function(libname, pkgname) {
 
   	model.name <- .get.model.name(object.name)
 
-  	if (!(model.name %in% c("arima", "lmer", "glmer", "nlmer"))) {
+  	if (!(model.name %in% c("arima", "lmer", "glmer", "nlmer", "Gls"))) {
   		if (!is.null(suppressMessages(.summary.object$adj.r.squared))) {
   			return(as.vector(suppressMessages(.summary.object$adj.r.squared)))
   		}
@@ -129,6 +152,13 @@ function(libname, pkgname) {
   		}
       else if (model.name %in% c("plm")) {
         return(as.vector(.summary.object$r.squared["adjrsq"]))
+      }
+      else if (model.name %in% c("ols")) {
+        n <- nobs(object.name)
+        p <- length(object.name$coefficients[names(object.name$coefficients)!="Intercept"])
+        r2 <- object.name$stats["R2"]
+        adj.r2 <- 1-(1-r2)*((n-1) / (n-p-1))
+        return(as.vector(adj.r2))
       }
   	}
   	return(NA)
@@ -139,19 +169,20 @@ function(libname, pkgname) {
     style <- tolower(what.style)
   
     if (style == "all") {
-      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*(t)", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","AIC","BIC","UBRE","residual deviance","null deviance","=!","notes")  
+      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*(t)", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","AIC","BIC","UBRE","residual deviance","null deviance","=!","notes")  
       .format.coefficient.table.parts <<- c("variable name","coefficient*","standard error","t-stat","p-value")  
     }
   
     else if (style == "all2") {
-      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*(t)", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","AIC","BIC","UBRE","residual deviance","null deviance","=!","notes")  
+      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*(t)", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","AIC","BIC","UBRE","residual deviance","null deviance","=!","notes")  
       .format.coefficient.table.parts <<- c("variable name","coefficient*","standard error")  
     }
   
     # aer = American Economic Review
     else if (style == "aer") {
-      .format.table.parts <<- c("=!","dependent variables","models","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "AIC","BIC","UBRE", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","-!","notes")
+      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "AIC","BIC","UBRE", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","-!","notes")
       .format.models.skip.if.one <<- TRUE
+      .format.dependent.variable.text.on <<- FALSE
     
       .format.until.nonzero.digit <<- FALSE
       .format.max.extra.digits <<- 0    
@@ -166,11 +197,14 @@ function(libname, pkgname) {
   
     # ajps = American Journal of Political Science
     else if (style == "ajps") {
-      .format.table.parts <<- c("-!","dependent variables","models","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
+      .format.table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
       .format.models.skip.if.one <<- TRUE
+      .format.dependent.variable.text.on <<- FALSE
       .format.digit.separator <<- ""
       .format.dependent.variables.left <<- "\\textbf{"
       .format.dependent.variables.right <<- "}"
+      .format.column.left <<- "\\textbf{"
+      .format.column.right <<- "}"
       .format.models.left <<- "\\textbf{"
       .format.models.right <<- "}"
       .format.numbers.left <<- "\\textbf{Model "
@@ -191,9 +225,10 @@ function(libname, pkgname) {
   
     # ajs = American Journal of Sociology
     else if (style == "ajs") {
-      .format.table.parts <<- c(" ","=!","dependent variables","models","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "AIC","BIC","UBRE", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","-!","notes")
+      .format.table.parts <<- c(" ","=!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "AIC","BIC","UBRE", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","-!","notes")
       .format.models.skip.if.one <<- TRUE
       .format.dependent.variables.capitalize <<- TRUE
+      .format.dependent.variable.text.on <<- FALSE
     
       .format.numbers.left <<- ""
       .format.numbers.right <<- ""
@@ -216,8 +251,10 @@ function(libname, pkgname) {
   
     # apsr = American Political Science Review
     else if (style == "apsr") {
-      .format.table.parts <<- c("-!","dependent variables","models","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
+      .format.table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
       .format.models.skip.if.one <<- TRUE
+      .format.dependent.variable.text.on <<- FALSE
+      
       .format.models.left <<- ""
       .format.models.right <<- ""
       .format.coefficient.table.parts <<- c("variable name","coefficient*","standard error")
@@ -233,11 +270,15 @@ function(libname, pkgname) {
     
     # asq = Administrative Science Quarterly
     else if (style == "asq") {
-      .format.table.parts <<- c("-!","dependent variables","models","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
+      .format.table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
       .format.models.skip.if.one <<- TRUE
+      .format.dependent.variable.text.on <<- FALSE
+      
       .format.digit.separator <<- ""
       .format.dependent.variables.left <<- "\\textbf{"
       .format.dependent.variables.right <<- "}"
+      .format.column.left <<- "\\textbf{"
+      .format.column.right <<- "}"
       .format.models.left <<- "\\textbf{"
       .format.models.right <<- "}"
       .format.numbers.left <<- "\\textbf{Model "
@@ -258,8 +299,10 @@ function(libname, pkgname) {
   
     # asr = American Sociological Review
     else if (style == "asr") {
-      .format.table.parts <<- c("-!","dependent variables","models","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
+      .format.table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
       .format.models.skip.if.one <<- TRUE
+      .format.dependent.variable.text.on <<- FALSE
+      
       .format.models.left <<- ""
       .format.models.right <<- ""
       .format.coefficient.table.parts <<- c("variable name","coefficient*")
@@ -278,8 +321,10 @@ function(libname, pkgname) {
   
     # "demography" = Demography
     else if (style == "demography") {
-      .format.table.parts <<- c("-!","dependent variables","models","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
+      .format.table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
       .format.models.skip.if.one <<- TRUE
+      .format.dependent.variable.text.on <<- FALSE
+      
       .format.models.left <<- ""
       .format.models.right <<- ""
       .format.numbers.left <<- "Model "
@@ -300,8 +345,10 @@ function(libname, pkgname) {
   
     # io = International Organization
     else if (style == "io") {
-      .format.table.parts <<- c("-!","dependent variables","models","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
+      .format.table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
       .format.models.skip.if.one <<- TRUE
+      .format.dependent.variable.text.on <<- FALSE
+      
       .format.coefficient.table.parts <<- c("variable name","coefficient*","standard error")
       .format.coefficient.variables.capitalize <<- TRUE
       .format.s.coefficient.variables.capitalize <<- TRUE
@@ -332,8 +379,10 @@ function(libname, pkgname) {
   
     # jpam = Journal of Policy Analysis and Management
     else if (style == "jpam") {
-      .format.table.parts <<- c("-!","dependent variables","models","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
+      .format.table.parts <<- c("-!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","AIC","BIC","UBRE","-!","notes")    
       .format.models.skip.if.one <<- TRUE
+      .format.dependent.variable.text.on <<- FALSE
+      
       .format.models.left <<- ""
       .format.models.right <<- ""
       .format.numbers.left <<- "Model "
@@ -354,7 +403,8 @@ function(libname, pkgname) {
   
     # "qje" = Quarterly Journal of Economics
     else if (style=="qje") {
-      .format.table.parts <<- c("=!","dependent variables","models","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "AIC","BIC","UBRE", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","=!","notes")    
+      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "AIC","BIC","UBRE", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","=!","notes")    
+      .format.dependent.variable.text.on <<- FALSE
       .format.s.stat.parts <<- c("-!","stat names","=!","statistics1","=!")
       .format.N <<- "\\textit{N}"
       .format.note <<- "\\textit{Notes:}"
@@ -363,13 +413,13 @@ function(libname, pkgname) {
   
     # find style based on journal ("default" or other)
     else if (style=="commadefault") {
-      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*", "AIC","BIC","UBRE", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","=!","notes")
+      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*", "AIC","BIC","UBRE", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","=!","notes")
       .format.digit.separator <<- " "
       .format.decimal.character <<- ","
     }
   
     else if (style=="default") {
-      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*", "AIC","BIC","UBRE", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","=!","notes")
+      .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","columns","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","sigma2","theta(se)*", "AIC","BIC","UBRE", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","=!","notes")
     }
   }
 
@@ -378,7 +428,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (model.name %in% c("lmer","glmer","nlmer", "ergm", "gls")) {
+    if (model.name %in% c("lmer","glmer","nlmer", "ergm", "gls", "Gls", "lagsarlm", "errorsarlm", "")) {
       return(as.vector(AIC(object.name)))
     }
     
@@ -400,7 +450,7 @@ function(libname, pkgname) {
       
       model.name <- .get.model.name(object.name)
       
-      if (model.name %in% c("lmer","glmer","nlmer", "ergm", "gls")) {
+      if (model.name %in% c("lmer","glmer","nlmer", "ergm", "gls", "Gls")) {
         return(as.vector(BIC(object.name)))
       }
       
@@ -424,10 +474,16 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima","lmer", "glmer", "nlmer", "normal.gam","logit.gam","probit.gam","poisson.gam","gam()"))) {
+    if (!(model.name %in% c("arima","lmer", "Gls", "glmer", "nlmer", "normal.gam","logit.gam","probit.gam","poisson.gam","gam()"))) {
       if (!is.null(.summary.object$chi)) {
         chi.value <- suppressMessages(.summary.object$chi)
         df.value <- suppressMessages(.summary.object$df) - suppressMessages(.summary.object$idf)
+        chi.p.value <- pchisq(chi.value, df.value, ncp=0, lower.tail = FALSE, log.p = FALSE)
+        chi.output <- as.vector(c(chi.value, df.value, chi.p.value))
+      }
+      else if (model.name %in% c("cph", "lrm", "ols", "psm")) {
+        chi.value <- object.name$stat["Model L.R."]
+        df.value <- object.name$stat["d.f."]
         chi.p.value <- pchisq(chi.value, df.value, ncp=0, lower.tail = FALSE, log.p = FALSE)
         chi.output <- as.vector(c(chi.value, df.value, chi.p.value))
       }
@@ -440,14 +496,6 @@ function(libname, pkgname) {
   .coefficient.table.part <-
   function(part, which.variable, variable.name=NULL) {
     
-    # decide whether to enter math mode, or not
-    if (.format.dec.mark.align==TRUE) {
-      c <- ""
-    }
-    else {
-      c <- "$"
-    }
-
   	# coefficient variable name
   	if (part=="variable name") {
     
@@ -466,37 +514,99 @@ function(libname, pkgname) {
   			if (!is.na(.global.coefficients[.global.coefficient.variables[which.variable],i])) {
 				
   				# report the coefficient
-  				cat(" & ",c, .iround(.global.coefficients[.global.coefficient.variables[which.variable],i],.format.round.digits),sep="")
-
+				  cat(" & ", .iround(.global.coefficients[.global.coefficient.variables[which.variable],i],.format.round.digits),sep="")
+          
   				# add stars to denote statistical significance
   				if (part=="coefficient*") { 
   					p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
-  					.enter.significance.stars(p.value, math.omit=TRUE) 
+  					.enter.significance.stars(p.value) 
   				}
-          cat(c)
 			
   			}
   			else {
   				cat(" & ",sep="")
   			}
+        
+        # if single-row, follow up with standard error / confidence interval
+        if ((.format.single.row == TRUE) & (("standard error" %in% .format.coefficient.table.parts) | ("standard error*" %in% .format.coefficient.table.parts))) {
+            
+            if (.format.dec.mark.align == TRUE) { space.char <- "$ $"}
+            else { space.char <- " "}
+            
+  			    if (!is.na(.global.std.errors[.global.coefficient.variables[which.variable],i])) {
+  			    
+  			      # report standard errors or confidence intervals
+  			      if (.format.ci == TRUE) {
+  			        z.value <- qnorm((1 + .format.ci.level)/2)
+  			        coef <- .global.coefficients[.global.coefficient.variables[which.variable],i]
+  			        se <- .global.std.errors[.global.coefficient.variables[which.variable],i]
+  			        ci.lower.bound <- coef - z.value * se
+  			        ci.upper.bound <- coef + z.value * se
+  			      
+  			        if (.format.dec.mark.align == TRUE) {
+  			          hyphen <- paste("$",.format.ci.separator,"$", sep="")
+  			        }
+  			        else {
+  			          hyphen <- .format.ci.separator
+  			        }
+  			      
+                cat(space.char, .format.std.errors.left, .iround(ci.lower.bound,.format.round.digits),hyphen,.iround(ci.upper.bound,.format.round.digits),.format.std.errors.right,sep="")              
+  			        
+  			      }
+  			      else { 
+  			        cat(space.char, .format.std.errors.left, .iround(.global.std.errors[.global.coefficient.variables[which.variable],i],.format.round.digits),.format.std.errors.right,sep="")
+  			      }
+  			    
+  			      # add stars to denote statistical significance
+              if ("standard error*" %in% .format.coefficient.table.parts) { 
+  			         p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
+  			        .enter.significance.stars(p.value) 
+  			      }
+  			    
+  			    }
+  		  }
   		}
   		cat(" \\\\ \n ")
   	}
 
   	# standard errors
-  	else if ((part=="standard error") | (part=="standard error*")) {
+  	else if (((part=="standard error") | (part=="standard error*")) & (.format.single.row==FALSE)) {
   		for (i in seq(1:length(.global.models))) {
   			if (!is.na(.global.std.errors[.global.coefficient.variables[which.variable],i])) {
 
-  				# report standard errors
-  				cat(" & ",c, .format.std.errors.left, .iround(.global.std.errors[.global.coefficient.variables[which.variable],i],.format.round.digits),.format.std.errors.right,sep="")
+  				# report standard errors or confidence intervals
+          if (.format.ci == TRUE) {
+            z.value <- qnorm((1 + .format.ci.level)/2)
+            coef <- .global.coefficients[.global.coefficient.variables[which.variable],i]
+            se <- .global.std.errors[.global.coefficient.variables[which.variable],i]
+            ci.lower.bound <- coef - z.value * se
+            ci.upper.bound <- coef + z.value * se
+            
+            if (.format.dec.mark.align == TRUE) {
+              hyphen <- paste("$",.format.ci.separator,"$", sep="")
+            }
+            else {
+              hyphen <- .format.ci.separator
+            }
+            
+            if (.format.dec.mark.align == TRUE) {
+              cat(" & \\multicolumn{1}{c}{", .format.std.errors.left, .iround(ci.lower.bound,.format.round.digits),hyphen,.iround(ci.upper.bound,.format.round.digits),.format.std.errors.right,"}",sep="")
+            }
+            else {
+              cat(" & ", .format.std.errors.left, .iround(ci.lower.bound,.format.round.digits),hyphen,.iround(ci.upper.bound,.format.round.digits),.format.std.errors.right,sep="")              
+            }
+
+
+          }
+          else { 
+  				  cat(" & ", .format.std.errors.left, .iround(.global.std.errors[.global.coefficient.variables[which.variable],i],.format.round.digits),.format.std.errors.right,sep="")
+          }
 
   				# add stars to denote statistical significance
   				if (part=="standard error*") { 
   					p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
-  					.enter.significance.stars(p.value, math.omit=TRUE) 
+  					.enter.significance.stars(p.value) 
   				}
-          cat(c)
 
   			}
   			else {
@@ -513,14 +623,13 @@ function(libname, pkgname) {
   			if (!is.na(.global.p.values[.global.coefficient.variables[which.variable],i])) {
 
   				# report p-values
-  				cat(" & ",c, .format.p.values.left, .iround(.global.p.values[.global.coefficient.variables[which.variable],i],.format.round.digits,round.up.positive=TRUE),.format.p.values.right,sep="")
+  				cat(" & ", .format.p.values.left, .iround(.global.p.values[.global.coefficient.variables[which.variable],i],.format.round.digits,round.up.positive=TRUE),.format.p.values.right,sep="")
 
   				# add stars to denote statistical significance
   				if (part=="p-value*") { 
   					p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
-  					.enter.significance.stars(p.value, math.omit=TRUE) 
+  					.enter.significance.stars(p.value) 
   				}
-          cat(c)
 
   			}
   			else {
@@ -535,14 +644,13 @@ function(libname, pkgname) {
   		for (i in seq(1:length(.global.models))) {
   			if (!is.na(.global.t.stats[.global.coefficient.variables[which.variable],i])) {
   				# report t-statistics
-  				cat(" & ",c, .format.t.stats.left, .iround(.global.t.stats[.global.coefficient.variables[which.variable],i],.format.round.digits),.format.t.stats.right,sep="")
+  				cat(" & ", .format.t.stats.left, .iround(.global.t.stats[.global.coefficient.variables[which.variable],i],.format.round.digits),.format.t.stats.right,sep="")
 
   				# add stars to denote statistical significance
   				if (part=="t-stat*") { 
   					p.value <- .global.p.values[.global.coefficient.variables[which.variable],i]
-  					.enter.significance.stars(p.value, math.omit=TRUE) 
+  					.enter.significance.stars(p.value) 
   				}
-          cat(c)
 
   			}
   			else {
@@ -582,9 +690,13 @@ function(libname, pkgname) {
 
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.gee", "logit.gee", "probit.gee", "poisson.gee", "normal.gam", 
   				    "logit.gam", "probit.gam", "poisson.gam", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.gee", "gamma.survey",
-  				    "exp", "weibull", "coxph", "clogit", "lognorm", "tobit", "tobit(AER)", "glm()", "svyglm()", "gee()", "survreg()", "gam()", "plm", "ivreg", "pmg", "lmrob", "gls")) {
+  				    "exp", "weibull", "coxph", "clogit", "lognorm", "tobit", "tobit(AER)", "glm()", "Glm()", "svyglm()", "gee()", "survreg()", "gam()", "plm", "ivreg", "pmg", "lmrob", 
+              "dynlm", "gls", "rq", "lagsarlm", "errorsarlm", "gmm")) {
   		return(as.vector(names(object.name$coefficients)))
   	}
+    else if (model.name %in% c("hetglm")) {
+      return(as.vector(names(object.name$coefficients$mean)))
+    }
     else if (model.name %in% c("clm")) {
       if (.format.ordered.intercepts == FALSE) { return(as.vector(names(object.name$beta))) }
       else { return(c(as.vector(names(object.name$beta)), as.vector(names(object.name$alpha)))) }
@@ -592,7 +704,7 @@ function(libname, pkgname) {
     else if (model.name %in% c("lmer", "glmer", "nlmer")) {
       return(as.vector(names(object.name@fixef)))
     }
-    else if (model.name %in% c("ergm")) {
+    else if (model.name %in% c("ergm", "rem.dyad")) {
       return(as.vector(names(object.name$coef)))
     }
     else if (model.name %in% c("betareg")) {
@@ -623,17 +735,34 @@ function(libname, pkgname) {
     else if (model.name %in% c("multinom")) {
       return(as.vector(object.name$coefnames))
     }
+  	else if (model.name %in% c("weibreg", "coxreg", "phreg", "aftreg", "bj", "cph", "Gls", "lrm", "ols", "psm", "Rq")) {
+  	  return(as.vector(names(object.name$coefficients)))
+  	}
+    
   	
   	return(NULL)
   }
 
   .dependent.variable <-
-  function(object.name) {
+  function(object.name, model.num=1) {
     
     model.name <- .get.model.name(object.name)
     
     if (model.name %in% c("lmer", "glmer", "nlmer", "gls")) {
       return(as.vector(as.character(formula(object.name))[2]))
+    }
+    if (model.name %in% c("multinom")) {
+      if (!is.null(rownames(.summary.object$coefficients))) {
+        return(as.vector(rownames(.summary.object$coefficients)[model.num]))
+      }
+    }
+    if (model.name %in% c("rem.dyad")) {
+      return(as.vector(as.character(" ")))
+    }
+    if (model.name %in% c("gmm")) {
+      formula <- object.name$call[2]
+      position <- regexpr("~", formula, fixed=T)
+      return( .trim(substr(formula, 1, position-1)) )
     }
     
     if (!is.null(object.name$call$formula)) {
@@ -676,39 +805,41 @@ function(libname, pkgname) {
   }
   
   .dependent.variable.written <-
-  function(object.name) {
+  function(object.name, model.num=1) {
 	
   	model.name <- .get.model.name(object.name)
 
-  	if (model.name %in% c("tobit","ologit","oprobit", "relogit", "coxph","exp","lognorm","weibull","survreg()","arima")) {
+  	if (model.name %in% c("tobit","ologit","oprobit", "relogit", "coxph","exp","lognorm","weibull","survreg()","arima",
+                          "aftreg", "weibreg", "coxreg", "phreg", "bj", "cph", "psm")) {
   		written.var <- .inside.bracket(.dependent.variable(object.name))[1] 
   	}
   	else if (model.name %in% c("clogit")) {
   	  written.var <- .inside.bracket(.dependent.variable(object.name))[2] 
   	}
-  	else { written.var <- .dependent.variable(object.name) }
+  	else { written.var <- .dependent.variable(object.name, model.num) }
     
     # some formatting changes
   	# remove everything before and including he last dollar sign from variable name
   	temp <- strsplit(written.var,"$",fixed=TRUE)
   	written.var <- temp[[1]][length(temp[[1]])]
   	
-  	# if underscore or ^ in variable name, then insert an escape \ before it
+  	# if underscore or ^, etc. in variable name, then insert an escape \ before it
   	written.var <- .remove.special.chars(written.var)
   	
     return(written.var)
   }
 
   .enter.significance.stars <-
-  function(p.value, math.omit) {
+  function(p.value, force.math=FALSE) {
     if ((!is.na(p.value)) & (!is.null(p.value))) {
       
-      if (math.omit==TRUE) {
-        c <- ""
+      if (.format.dec.mark.align == TRUE) {
+        c <- "" 
       }
       else {
-        c <- "$"
+        c <- "$"  
       }
+      if (force.math == TRUE) { c <- "$" }
     
       # three stars
       if (!is.na(.format.three.stars)) {
@@ -750,7 +881,7 @@ function(libname, pkgname) {
 
   	model.name <- .get.model.name(object.name)
 
-  	if (!(model.name %in% c("arima", "lmer", "glmer", "nlmer"))) {
+  	if (!(model.name %in% c("arima", "lmer", "glmer", "nlmer", "Gls"))) {
       if (model.name %in% c("plm")) {
         F.stat.value <- .summary.object$fstatistic$statistic
         df.numerator <- .summary.object$fstatistic$parameter["df1"]
@@ -778,7 +909,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima", "lmer", "glmer", "nlmer"))) {
+    if (!(model.name %in% c("arima", "lmer", "Gls", "glmer", "nlmer"))) {
       if (!is.null(object.name$gcv.ubre)) {
         return(as.vector(object.name$gcv.ubre))
       }
@@ -799,12 +930,27 @@ function(libname, pkgname) {
   }
 
   .get.p.values.1 <-
-  function(object.name, user.given=NULL, auto=TRUE, coef=NULL, se=NULL) {
+  function(object.name, user.given=NULL, auto=TRUE, coef=NULL, se=NULL, model.num=1) {
 
-    if (!is.null(user.given)) { return(user.given) }
+    if (!is.null(user.given)) {
+      
+      if (.model.identify(object.name) == "multinom") {
+        if (!is.null(nrow(user.given))) { 
+          user.given <- as.vector(user.given[model.num,]) 
+        }
+      }
+      
+      return(user.given) 
+    }
         
     if (auto == TRUE) {
       if (!is.null(se)) {
+        
+        if (.model.identify(object.name) == "multinom") {
+          coef <- as.vector(coef[model.num,])
+          se <- as.vector(se[model.num,])
+        }
+        
         t <- (coef / se)
         return( 2*pnorm(abs(t), mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE) )
       }
@@ -813,9 +959,15 @@ function(libname, pkgname) {
     model.name <- .get.model.name(object.name)
     
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.survey",
-                            "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "svyglm()", "plm", "ivreg", "lmrob")) {
+                            "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "Glm()", "svyglm()", "plm", "ivreg", "lmrob", "dynlm", "rq", "gmm")) {
   		return(.summary.object$coefficients[,4])
   	}
+    if (model.name %in% c("hetglm")) {
+      return(as.vector(.summary.object$coefficients$mean[,4]))
+    }
+    if (model.name %in% c("lagsarlm", "errorsarlm")) {
+      return(.summary.object$Coef[,4])
+    }
   	if (model.name %in% c("lmer", "glmer", "nlmer")) {
   	  Vcov <- as.matrix(vcov(object.name, useScale = FALSE))
   	  coefs <- object.name@fixef
@@ -889,8 +1041,8 @@ function(libname, pkgname) {
         se.temp <- .summary.object$standard.errors
       }
       else {
-        coef.temp <- .summary.object$coefficients[1,]
-        se.temp <- .summary.object$standard.errors[1,]
+        coef.temp <- .summary.object$coefficients[model.num,]
+        se.temp <- .summary.object$standard.errors[model.num,]
       }
       return( 2*pnorm( abs( (coef.temp) / (se.temp) ) , mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE) )
     }
@@ -904,12 +1056,26 @@ function(libname, pkgname) {
       p.temp <- 2*pnorm( abs( t.temp ) , mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE)
       return(p.temp)
     }
+    else if (model.name %in% c("weibreg", "coxreg", "phreg", "aftreg", "bj", "cph", "Gls", "lrm", "ols", "psm", "Rq")) {
+      coef.temp <- object.name$coefficients
+      se.temp <- sqrt(diag(object.name$var))
+      t.temp <- coef.temp / se.temp 
+      p.temp <- 2*pnorm( abs( t.temp ) , mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE)
+      return(p.temp)
+    }
+    else if (model.name %in% c("rem.dyad")) {
+      coef.temp <- object.name$coef
+      se.temp <- sqrt(diag(object.name$cov))
+      t.temp <- coef.temp / se.temp
+      p.temp <- 2*pnorm( abs( t.temp ) , mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE)
+      return(p.temp)
+    }
     return(NULL)
   }
   
   .get.p.values <-
-  function(object.name, user.given=NULL, auto=TRUE, coef=NULL, se=NULL) {
-      out <- .get.p.values.1(object.name, user.given, auto, coef, se)
+  function(object.name, user.given=NULL, auto=TRUE, coef=NULL, se=NULL, model.num=1) {
+      out <- .get.p.values.1(object.name, user.given, auto, coef, se, model.num)
       
       coef.vars <- .coefficient.variables(object.name)
       if (is.null(names(out))) {
@@ -931,7 +1097,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima", "lmer", "glmer", "nlmer"))) {
+    if (!(model.name %in% c("arima", "Gls", "lmer", "glmer", "nlmer"))) {
       if (!is.null(object.name$scale)) {
         if (model.name %in% c("normal.gee", "logit.gee", "poisson.gee", "probit.gee", "gamma.gee", "gee()", "exp","lognorm","weibull","tobit","survreg()","tobit(AER)")) {
           return(as.vector(object.name$scale))
@@ -946,10 +1112,12 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
     
-    if (model.name %in% c("lmer", "glmer", "nlmer")) {
+    if (model.name %in% c("arims", "Gls", "lmer", "glmer", "nlmer")) {
       return(NA)
     }
-  
+    if (model.name %in% c("lagsarlm", "errorsarlm")) {
+      return(.summary.object$s2)
+    }  
     if (!is.null(object.name$sigma2)) {
         return(as.vector(object.name$sigma2))
     }
@@ -957,16 +1125,25 @@ function(libname, pkgname) {
   }
 
   .get.standard.errors.1 <-
-  function(object.name, user.given=NULL) {
+  function(object.name, user.given=NULL, model.num=1) {
     
-    if (!is.null(user.given)) { return(user.given) }
+    if (!is.null(user.given)) { 
+      if (.model.identify(object.name) == "multinom") {
+        if (!is.null(nrow(user.given))) { user.given <- as.vector(user.given[model.num,]) }
+      }
+      
+      return(user.given) 
+    }
 
   	model.name <- .get.model.name(object.name)
 
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.survey",
-                            "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "svyglm()", "plm", "ivreg", "lmrob")) {
+                            "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "Glm()", "svyglm()", "plm", "ivreg", "lmrob", "dynlm", "gmm")) {
   		return(.summary.object$coefficients[,"Std. Error"])
   	}
+    if (model.name %in% c("hetglm")) {
+      return(as.vector(.summary.object$coefficients$mean[,2]))
+    }
   	if (model.name %in% c("lmer", "glmer", "nlmer")) {
   	  Vcov <- as.matrix(vcov(object.name, useScale = FALSE))
   	  coefs <- object.name@fixef
@@ -974,9 +1151,15 @@ function(libname, pkgname) {
       names(se) <- names(coefs)
   	  return(se)
   	}
+    if (model.name %in% c("lagsarlm", "errorsarlm")) {
+      return(.summary.object$Coef[,2])
+    }    
   	if (model.name %in% c("ergm")) {
   	  return(.summary.object$coefs[,2])
   	}
+    if (model.name %in% c("rq")) {
+      return(.summary.object$coefficients[,2])
+    }
   	if (model.name %in% c("clm")) {
   	  if (.format.ordered.intercepts == FALSE) {
   	    return(.summary.object$coefficients[(length(object.name$alpha)+1):(length(object.name$coefficients)),2])
@@ -1005,7 +1188,7 @@ function(libname, pkgname) {
       return(temp.se)
   	}
   	else if (model.name %in% c("coxph")) {
-  		return(.summary.object$coef[,"robust se"])
+  		return(.summary.object$coef[,"se(coef)"])
   	}
     else if (model.name %in% c("clogit")) {
       return(.summary.object$coef[,"se(coef)"])
@@ -1033,7 +1216,7 @@ function(libname, pkgname) {
   	    se.temp <- .summary.object$standard.errors
   	  }
   	  else {
-  	    se.temp <- .summary.object$standard.errors[1,]
+  	    se.temp <- .summary.object$standard.errors[model.num,]
   	  }
   	  return(se.temp)
   	}
@@ -1044,12 +1227,18 @@ function(libname, pkgname) {
       se.temp <- sqrt(diag(object.name$varBeta))
       return(se.temp)
     }
+    else if (model.name %in% c("weibreg", "coxreg", "phreg", "aftreg", "bj", "cph", "Gls", "lrm", "ols", "psm", "Rq")) {
+      return( sqrt(diag(object.name$var) ) )
+    }
+    else if (model.name %in% c("rem.dyad")) {
+      return( sqrt(diag(object.name$cov) ) )
+    }
     return(NULL)
   }
   
   .get.standard.errors <-
-  function(object.name, user.given=NULL) {
-      out <- .get.standard.errors.1(object.name, user.given)
+  function(object.name, user.given=NULL, model.num=1) {
+      out <- .get.standard.errors.1(object.name, user.given, model.num)
       
       coef.vars <- .coefficient.variables(object.name)
       if (is.null(names(out))) {
@@ -1066,12 +1255,27 @@ function(libname, pkgname) {
   }
 
   .get.t.stats.1 <-
-  function(object.name, user.given=NULL, auto=TRUE, coef=NULL, se=NULL) {
+  function(object.name, user.given=NULL, auto=TRUE, coef=NULL, se=NULL, model.num=1) {
     
-    if (!is.null(user.given)) { return(user.given) }
+    if (!is.null(user.given)) { 
+      
+      if (.model.identify(object.name) == "multinom") {
+        if (!is.null(nrow(user.given))) { 
+          user.given <- as.vector(user.given[model.num,]) 
+        }
+      }
+      
+      return(user.given) 
+    }
     
     if (auto == TRUE) {
       if (!is.null(se)) {
+        
+        if (.model.identify(object.name) == "multinom") {
+          coef <- as.vector(coef[model.num,])
+          se <- as.vector(se[model.num,])
+        }
+        
         return(coef / se)
       }
     }
@@ -1079,9 +1283,12 @@ function(libname, pkgname) {
   	model.name <- .get.model.name(object.name)
 
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.survey",
-      				    "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "svyglm()","plm", "ivreg", "lmrob")) {
+      				    "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "Glm()", "svyglm()","plm", "ivreg", "lmrob", "dynlm", "gmm")) {
   		return(.summary.object$coefficients[,3])
   	}
+    if (model.name %in% c("hetglm")) {
+      return(as.vector(.summary.object$coefficients$mean[,3]))
+    }
   	if (model.name %in% c("lmer", "glmer", "nlmer")) {
   	  Vcov <- as.matrix(vcov(object.name, useScale = FALSE))
   	  coefs <- object.name@fixef
@@ -1094,6 +1301,12 @@ function(libname, pkgname) {
   	if (model.name %in% c("ergm")) {
   	  return((.summary.object$coefs[,1])/(.summary.object$coefs[,2]))
   	}
+    if (model.name %in% c("lagsarlm", "errorsarlm")) {
+      return(.summary.object$Coef[,3])
+    }    
+    if (model.name %in% c("rq")) {
+      return(.summary.object$coefficients[,3])
+    }
   	if (model.name %in% c("clm")) {
   	  if (.format.ordered.intercepts == FALSE) {
   	    return(.summary.object$coefficients[(length(object.name$alpha)+1):(length(object.name$coefficients)),3])
@@ -1149,8 +1362,8 @@ function(libname, pkgname) {
   	    se.temp <- .summary.object$standard.errors
   	  }
   	  else {
-  	    coef.temp <- .summary.object$coefficients[1,]
-  	    se.temp <- .summary.object$standard.errors[1,]
+  	    coef.temp <- .summary.object$coefficients[model.num,]
+  	    se.temp <- .summary.object$standard.errors[model.num,]
   	  }
   	  return( (coef.temp) / (se.temp) )
   	}
@@ -1162,13 +1375,23 @@ function(libname, pkgname) {
       se.temp <- sqrt(diag(object.name$varBeta))
       return(coef.temp / se.temp)
     }
+    else if (model.name %in% c("weibreg", "coxreg", "phreg", "aftreg", "bj", "cph", "Gls", "lrm", "ols", "psm", "Rq")) {
+      coef.temp <- object.name$coefficients
+      se.temp <- sqrt(diag(object.name$var))
+      return(coef.temp / se.temp )
+    }
+    else if (model.name %in% c("rem.dyad")) {
+      coef.temp <- object.name$coef
+      se.temp <- sqrt(diag(object.name$cov))
+      return(coef.temp / se.temp )
+    }
   	
   	return(NULL)
   }
   
   .get.t.stats <-
-  function(object.name, user.given=NULL, auto=TRUE, coef=NULL, se=NULL) {
-    out <- .get.t.stats.1(object.name, user.given, auto, coef, se)
+  function(object.name, user.given=NULL, auto=TRUE, coef=NULL, se=NULL, model.num=1) {
+    out <- .get.t.stats.1(object.name, user.given, auto, coef, se, model.num)
 
     coef.vars <- .coefficient.variables(object.name)
     if (is.null(names(out))) {
@@ -1191,7 +1414,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima", "lmer", "glmer", "nlmer"))) {
+    if (!(model.name %in% c("arima", "Gls", "lmer", "glmer", "nlmer"))) {
       if ((!is.null(object.name$theta)) & (!is.null(object.name$SE.theta))) {
         theta.value <- object.name$theta
         theta.se.value <- object.name$SE.theta
@@ -1233,11 +1456,17 @@ function(libname, pkgname) {
 
   .iround <-
   function(x, decimal.places=0, round.up.positive=FALSE, simply.output=FALSE) {
+    
+    x.original <- x
+    first.part <- ""
+    
     if (is.na(x) | is.null(x)) { return("") }
   
     if (simply.output == TRUE) {
       if (!is.numeric(x)) { return(.remove.special.chars(x)) }
     }
+    
+    if (x.original < 0) { x <- abs(x) }
     
     if (!is.na(decimal.places)) {
     
@@ -1276,8 +1505,7 @@ function(libname, pkgname) {
         .format.digit.separator.where[i] <<- -1
       }
     }
-  
-  	first.part <- ""
+      
   	separator.count <- 1
   	length.integer.part <- nchar(split.round.result[1])
 
@@ -1306,6 +1534,16 @@ function(libname, pkgname) {
   			first.part <- ""
   		}
   	}	
+    
+    if (x.original < 0) {    # use math-mode for a better looking negative sign
+      if (.format.dec.mark.align == TRUE) {
+        first.part <- paste("-", first.part, sep="")
+      }
+      else {
+        first.part <- paste("$-$", first.part, sep="")  
+      }
+    }
+    
 
   	if (length(split.round.result)==2) {
   	  if (is.na(decimal.places)) { return(paste(first.part,.format.decimal.character,split.round.result[2],sep="")) }
@@ -1328,7 +1566,7 @@ function(libname, pkgname) {
   	}
   	else { return(NULL) }
   }
-   
+  
   is.wholenumber <-
   function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
   
@@ -1347,17 +1585,23 @@ function(libname, pkgname) {
 
   	model.name <- .get.model.name(object.name)
 
-  	if (model.name %in% c("arima", "betareg", "zeroinfl", "hurdle")) {
+  	if (model.name %in% c("arima", "betareg", "zeroinfl", "hurdle", "hetglm")) {
   		return(as.vector(object.name$loglik))
   	}
   	if (model.name %in% c("lmer", "glmer", "nlmer")) { 
   	  return(as.vector(logLik(object.name)[1]))
   	}
+  	if (model.name %in% c("lagsarlm", "errorsarlm")) {
+  	  return(as.vector(.summary.object$LL))
+  	}  	
   	if (model.name %in% c("clm", "gls")) {
   	  return(as.vector(object.name$logLik))
   	}
   	else if (model.name %in% c("coxph", "clogit", "exp", "weibull", "lognorm","tobit", "tobit(AER)", "survreg()")) {
   		return(as.vector(.summary.object$loglik[2]))
+  	}
+  	else if (model.name %in% c("weibreg", "coxreg", "phreg", "aftreg")) {
+  	  return(as.vector(object.name$loglik[2]))
   	}
   	else if (!is.null(object.name$aic)) {
   	  return(as.vector(-(0.5)*(object.name$aic-2*length(.summary.object$coefficients[,"Estimate"]))))
@@ -1371,7 +1615,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima", "lmer", "glmer", "nlmer"))) {
+    if (!(model.name %in% c("arima", "Gls", "lmer", "glmer", "nlmer"))) {
       if (!is.null(.summary.object$logtest)) {
         logrank.value <- suppressMessages(.summary.object$sctest[1])
         df.value <- suppressMessages(.summary.object$sctest[2])
@@ -1391,7 +1635,13 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
     
-    if (!(model.name %in% c("arima","lmer","glmer","nlmer"))) {
+    if (model.name %in% c("lagsarlm", "errorsarlm")) {
+      log.value <- as.vector(.summary.object$LR1$statistic)
+      df.value <- as.vector(.summary.object$LR1$parameter)
+      log.p.value <- as.vector(.summary.object$LR1$p.value)
+      log.output <- as.vector(c(log.value, df.value, log.p.value))
+    }
+    else if (!(model.name %in% c("arima","Gls","lmer","glmer","nlmer"))) {
       if (!is.null(.summary.object$logtest)) {
         log.value <- suppressMessages(.summary.object$logtest[1])
         df.value <- suppressMessages(.summary.object$logtest[2])
@@ -1399,7 +1649,7 @@ function(libname, pkgname) {
         log.output <- as.vector(c(log.value, df.value, log.p.value))
       }
       
-    }
+    }   
   
     names(log.output) <- c("statistic","df1","p-value")
     return(cbind(log.output))
@@ -1410,7 +1660,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima", "lmer", "glmer", "nlmer"))) {
+    if (!(model.name %in% c("arima", "lmer", "glmer", "nlmer", "Gls"))) {
       if (model.name %in% c("coxph", "clogit")) {
         return(as.vector(.summary.object$rsq[2]))
       }
@@ -1423,6 +1673,9 @@ function(libname, pkgname) {
     
     if (class(object.name)[1]=="ergm") {
       return("ergm")
+    }
+    if (class(object.name)[1]=="rem.dyad") {
+      return("rem.dyad")
     }
     
    if (.hasSlot(object.name,"Zt")) {
@@ -1441,7 +1694,7 @@ function(libname, pkgname) {
    if (!is.null(object.name$call)) {
     
   	if (object.name$call[1]=="lm()") { return("ls") }
-  	else if (object.name$call[1]=="glm()") {
+  	else if ((object.name$call[1]=="glm()") | (object.name$call[1]=="Glm()")) {
   		if (object.name$family$family=="gaussian") {
   			if (object.name$family$link=="identity") {
   				return("normal")
@@ -1605,8 +1858,59 @@ function(libname, pkgname) {
   	if (object.name$call[1]=="lmrob()") {
   	  return("lmrob")
   	}
+  	if (object.name$call[1]=="dynlm()") {
+  	  return("dynlm")
+  	}
+  	if (object.name$call[1]=="rq()") {
+  	  return("rq")
+  	}
+  	if (object.name$call[1]=="gmm()") {
+  	  return("gmm")
+  	}
+  	if (object.name$call[1]=="lagsarlm()") {
+  	  return("lagsarlm")
+  	}
+  	if (object.name$call[1]=="errorsarlm()") {
+  	  return("errorsarlm")
+  	}
   	if (object.name$call[1]=="rlm()") {
   	  return("rlm")
+  	}
+  	if (object.name$call[1]=="aftreg()") {
+  	  return("aftreg")
+  	}
+  	if (object.name$call[1]=="coxreg()") {
+  	  return("coxreg")
+  	}
+  	if (object.name$call[1]=="phreg()") {
+  	  return("phreg")
+  	}
+  	if (object.name$call[1]=="weibreg()") {
+  	  return("weibreg")
+  	}
+  	if (object.name$call[1]=="bj()") {
+  	  return("bj")
+  	}
+  	if (object.name$call[1]=="cph()") {
+  	  return("cph")
+  	}
+  	if (object.name$call[1]=="Gls()") {
+  	  return("Gls")
+  	}
+  	if (object.name$call[1]=="lrm()") {
+  	  return("lrm")
+  	}
+  	if (object.name$call[1]=="ols()") {
+  	  return("ols")
+  	}
+  	if (object.name$call[1]=="psm()") {
+  	  return("psm")
+  	}
+  	if (object.name$call[1]=="Rq()") {
+  	  return("Rq")
+  	}
+  	if (object.name$call[1]=="hetglm()") {
+  	  return("hetglm")
   	}
     else if (object.name$call[1]=="relogit()") {
       return("relogit")
@@ -1664,41 +1968,99 @@ function(libname, pkgname) {
   .new.table <-
   function(object.name, user.coef=NULL, user.se=NULL, user.t=NULL, user.p=NULL, auto.t=TRUE, auto.p=TRUE) {
     
-    .summary.object <<- summary(object.name)
-
-  	.global.models <<- suppressMessages(as.vector(.model.identify(object.name)))
-  	.global.dependent.variables <<- suppressMessages(.dependent.variable(object.name))
-  	.global.dependent.variables.written <<- suppressMessages(.dependent.variable.written(object.name))
-  	.global.coefficient.variables <<- suppressMessages(.coefficient.variables(object.name))
-  	.global.coefficients <<- suppressMessages(cbind(.get.coefficients(object.name, user.coef)))
-  	.global.std.errors <<- suppressMessages(cbind(.get.standard.errors(object.name, user.se)))
+    if (class(object.name)[1] == "Glm") {
+      .summary.object <<- summary.glm(object.name)
+    }
+    else if (!(.model.identify(object.name) %in% c("aftreg", "coxreg","phreg","weibreg", "bj", "cph", "Gls", "lrm", "ols", "psm", "Rq"))) {
+      .summary.object <<- summary(object.name)
+    }
+    else {
+      .summary.object <<- object.name
+    }
     
-    feed.coef <- .global.coefficients
-    if (!is.null(user.coef)) { feed.coef <- user.coef }   # feed user-defined coefficients, if available
+    if (.model.identify(object.name) == "rq") {
+      .summary.object <<- suppressMessages(summary(object.name, se=.format.rq.se))
+    }
     
-  	.global.t.stats <<- suppressMessages(cbind(.get.t.stats(object.name, user.t, auto.t, feed.coef, user.se)))
-  	.global.p.values <<- suppressMessages(cbind(.get.p.values(object.name, user.p, auto.p, feed.coef, user.se)))
+    model.num.total <- 1   # model number for multinom, etc.
+    if (.model.identify(object.name) == "multinom") {
+      if (!is.null(nrow(.summary.object$coefficients))) {
+        model.num.total <-  nrow(.summary.object$coefficients)
+      }
+    }
+    
+    # set to null
+    
+    .global.models <<- NULL
+    
+    .global.dependent.variables <<- NULL
+    .global.dependent.variables.written <<- NULL
+    
+    .global.coefficient.variables <<- NULL
+    .global.coefficients <<- NULL
+    .global.std.errors <<- NULL
+    
+    .global.t.stats <<- NULL
+    .global.p.values <<- NULL
+    
+    .global.N <<- NULL
+    .global.LL <<- NULL
+    .global.R2 <<- NULL
+    .global.max.R2 <<- NULL
+    .global.adj.R2 <<- NULL
+    .global.AIC <<- NULL
+    .global.BIC <<- NULL
+    .global.scale <<- NULL
+    .global.UBRE <<- NULL
+    .global.sigma2 <<- NULL
+    .global.theta <<- NULL
+    
+    .global.SER <<- NULL
+    .global.F.stat <<- NULL
+    .global.chi.stat <<- NULL
+    .global.wald.stat <<- NULL
+    .global.lr.stat <<- NULL
+    .global.logrank.stat <<- NULL
+    .global.null.deviance <<- NULL
+    .global.residual.deviance <<- NULL
+    
+    for (model.num in 1:model.num.total) {
+      
+      .global.models <<- c(.global.models, suppressMessages(as.vector(.model.identify(object.name))))
+    
+  	  .global.dependent.variables <<- c(.global.dependent.variables, suppressMessages(.dependent.variable(object.name, model.num)))
+  	  .global.dependent.variables.written <<- c(.global.dependent.variables.written, suppressMessages(.dependent.variable.written(object.name, model.num)))
+  	  .global.coefficient.variables <<- suppressMessages(.coefficient.variables(object.name))
+  	  .global.coefficients <<- suppressMessages(cbind(.global.coefficients,.get.coefficients(object.name, user.coef, model.num=model.num)))
+  	  .global.std.errors <<- suppressMessages(cbind(.global.std.errors,.get.standard.errors(object.name, user.se, model.num=model.num)))
+    
+      feed.coef <- .global.coefficients
+      if (!is.null(user.coef)) { feed.coef <- user.coef }   # feed user-defined coefficients, if available
+    
+  	  .global.t.stats <<- cbind(.global.t.stats, .get.t.stats(object.name, user.t, auto.t, feed.coef, user.se, model.num=model.num))
+  	  .global.p.values <<- cbind(.global.p.values, .get.p.values(object.name, user.p, auto.p, feed.coef, user.se, model.num=model.num))
 
-  	.global.N <<- suppressMessages(.number.observations(object.name))
-  	.global.LL <<- suppressMessages(.log.likelihood(object.name))
-  	.global.R2 <<- suppressMessages(.r.squared(object.name))
-  	.global.max.R2 <<- suppressMessages(.max.r.squared(object.name))
-  	.global.adj.R2 <<- suppressMessages(.adj.r.squared(object.name))
-  	.global.AIC <<- suppressMessages(.AIC(object.name))
-    .global.BIC <<- suppressMessages(.BIC(object.name))
-    .global.scale <<- suppressMessages(.get.scale(object.name))
-    .global.UBRE <<- suppressMessages(.gcv.UBRE(object.name))
-  	.global.sigma2 <<- suppressMessages(.get.sigma2(object.name))
-  	.global.theta <<- suppressMessages(.get.theta(object.name))
+  	  .global.N <<- c(.global.N, suppressMessages(.number.observations(object.name)))
+  	  .global.LL <<- c(.global.LL, suppressMessages(.log.likelihood(object.name)))
+  	  .global.R2 <<- c(.global.R2, suppressMessages(.r.squared(object.name)))
+  	  .global.max.R2 <<- c(.global.max.R2, suppressMessages(.max.r.squared(object.name)))
+  	  .global.adj.R2 <<- c(.global.adj.R2, suppressMessages(.adj.r.squared(object.name)))
+  	  .global.AIC <<- c(.global.AIC, suppressMessages(.AIC(object.name)))
+      .global.BIC <<- c(.global.BIC, suppressMessages(.BIC(object.name)))
+      .global.scale <<- c(.global.scale, suppressMessages(.get.scale(object.name)))
+      .global.UBRE <<- c(.global.UBRE, suppressMessages(.gcv.UBRE(object.name)))
+  	  .global.sigma2 <<- c(.global.sigma2, suppressMessages(.get.sigma2(object.name)))
+  	  .global.theta <<- c(.global.theta, suppressMessages(.get.theta(object.name)))
 
-  	.global.SER <<- suppressMessages(.SER(object.name))
-  	.global.F.stat <<- suppressMessages(.F.stat(object.name))
-    .global.chi.stat <<- suppressMessages(.chi.stat(object.name))
-  	.global.wald.stat <<- suppressMessages(.wald.stat(object.name))
-  	.global.lr.stat <<- suppressMessages(.lr.stat(object.name))
-  	.global.logrank.stat <<- suppressMessages(.logrank.stat(object.name))
-  	.global.null.deviance <<- suppressMessages(.null.deviance(object.name))
-  	.global.residual.deviance <<- suppressMessages(.residual.deviance(object.name))
+  	  .global.SER <<- c(.global.SER, suppressMessages(.SER(object.name)))
+  	  .global.F.stat <<- c(.global.F.stat, suppressMessages(.F.stat(object.name)))
+      .global.chi.stat <<- c(.global.chi.stat, suppressMessages(.chi.stat(object.name)))
+  	  .global.wald.stat <<- c(.global.wald.stat, suppressMessages(.wald.stat(object.name)))
+  	  .global.lr.stat <<- c(.global.lr.stat, suppressMessages(.lr.stat(object.name)))
+  	  .global.logrank.stat <<- c(.global.logrank.stat, suppressMessages(.logrank.stat(object.name)))
+  	  .global.null.deviance <<- c(.global.null.deviance, suppressMessages(.null.deviance(object.name)))
+  	  .global.residual.deviance <<- c(.global.residual.deviance, suppressMessages(.residual.deviance(object.name)))
+    }
 
   }
 
@@ -1708,7 +2070,11 @@ function(libname, pkgname) {
 
   	model.name <- .get.model.name(object.name)
 
-  	if (!(model.name %in% c("arima","lmer","glmer","nlmer", "ergm"))) {
+  	if (!(model.name %in% c("arima","Gls","lmer","glmer","nlmer", "ergm"))) {
+  	  if (model.name %in% c("rem.dyad")) {
+  	    residual.deviance.value <- object.name$residual.deviance
+  	    residual.deviance.output <- as.vector(c(residual.deviance.value, NA, NA))
+  	  }
   		if (!is.null(suppressMessages(.summary.object$null.deviance))) {
   			null.deviance.value <- suppressMessages(.summary.object$null.deviance)
   			df.value <- object.name$df.null
@@ -1735,19 +2101,22 @@ function(libname, pkgname) {
     if (model.name %in% c("ls", "normal", "logit", "probit", "relogit",
                           "poisson", "negbin", "normal.survey", "poisson.survey",
                           "probit.survey", "logit.survey", "gamma", "gamma.survey",
-                          "z.arima", "glm()", "svyglm()")) {
+                          "z.arima", "glm()", "Glm()", "svyglm()")) {
       return(as.vector(object.name$df.residual+length(object.name$coefficients)))
     }
     else if (model.name %in% c("lmer","glmer","nlmer")) {
       return(length(resid(object.name)))  
     }
-    else if (model.name %in% c("plm", "pmg", "rlm", "lmrob")) {
+    else if (model.name %in% c("gmm")) {
+      return(object.name$n)
+    }
+    else if (model.name %in% c("plm", "pmg", "rlm", "lmrob", "dynlm", "rq", "lagsarlm", "errorsarlm", "rem.dyad")) {
       return(as.vector(length(object.name$residual)))
     }
     else if (model.name %in% c("hurdle", "zeroinfl")) {
       return(as.vector(object.name$n))
     }
-    else if (model.name %in% c("ivreg","clm")) {
+    else if (model.name %in% c("ivreg","clm","hetglm")) {
       return(as.vector(object.name$nobs))
     }
     if (model.name %in% c("normal.gee", "logit.gee", "poisson.gee",
@@ -1764,6 +2133,9 @@ function(libname, pkgname) {
     }
     else if (model.name %in% c("tobit(AER)")) {
       return(as.vector(.summary.object$n["Total"]))
+    }
+    else if (model.name %in% c("weibreg", "coxreg", "phreg", "aftreg", "bj", "cph", "Gls", "lrm", "ols", "psm", "Rq")) {
+      return(as.vector(nobs(object.name)))
     }
     return(NA)
   }
@@ -1811,6 +2183,7 @@ function(libname, pkgname) {
     report.se <- FALSE
     report.tstat <- FALSE
     intelligent.df <- .format.intelligent.df
+    force.math <- FALSE
 
   	# reporting of df, p-value, significance stars, standard errors, t-stats
   	if (length(grep("(df)", part.string,fixed=TRUE))!=0) { report.df <- TRUE } 
@@ -1827,10 +2200,10 @@ function(libname, pkgname) {
   			for (i in seq(1:length(.global.models))) {
   	 			if (!is.na(.global.var.name[i])) { 
              if (.format.dec.mark.align == TRUE) {
-                cat(" & \\multicolumn{1}{c}{$",.iround(.global.var.name[i], decimal.digits),"$}", sep="")
+                cat(" & \\multicolumn{1}{c}{",.iround(.global.var.name[i], decimal.digits),"}", sep="")
              }
              else {
-               cat(" & $",.iround(.global.var.name[i], decimal.digits),"$", sep="")
+               cat(" & ",.iround(.global.var.name[i], decimal.digits), sep="")
              }
           }
   	 			else { cat(" & ", sep="") }
@@ -1889,14 +2262,15 @@ function(libname, pkgname) {
   	 			if (!is.na(.global.var.name["statistic",i])) {
              
   	 			  if (.format.dec.mark.align==TRUE) {
-  					  cat(" & \\multicolumn{1}{c}{$",.iround(.global.var.name["statistic",i], decimal.digits), sep="") 
+  					  cat(" & \\multicolumn{1}{c}{",.iround(.global.var.name["statistic",i], decimal.digits), sep="") 
+              force.math <- TRUE
   	 			  }
             else {
-              cat(" & $",.iround(.global.var.name["statistic",i], decimal.digits), sep="")
+              cat(" & ",.iround(.global.var.name["statistic",i], decimal.digits), sep="")
             }
 
   					# significance stars
-  					if ((significance.stars == TRUE) & (!is.na(.global.var.name["p-value",i]))) { .enter.significance.stars(.global.var.name["p-value",i], math.omit=TRUE) }
+  					if ((significance.stars == TRUE) & (!is.na(.global.var.name["p-value",i]))) { .enter.significance.stars(.global.var.name["p-value",i], force.math) }
 
 										
   					# degrees of freedom - only report by statistics if not in the left column already
@@ -1923,10 +2297,10 @@ function(libname, pkgname) {
   					}
             
             if (.format.dec.mark.align==TRUE) {
-              cat("$}")  
+              cat("}")  
             }
             else {
-              cat("$")
+              cat("")
             }
             
   				}
@@ -1947,15 +2321,15 @@ function(libname, pkgname) {
   	      if (!is.na(.global.var.name["statistic",i])) { 
 
             if (.format.dec.mark.align == TRUE) {
-              cat(" & \\multicolumn{1}{c}{$",.iround(.global.var.name["statistic",i], decimal.digits), sep="")  
+              cat(" & \\multicolumn{1}{c}{",.iround(.global.var.name["statistic",i], decimal.digits), sep="")  
             }
             else {
-              cat(" & $",.iround(.global.var.name["statistic",i], decimal.digits), sep="")
+              cat(" & ",.iround(.global.var.name["statistic",i], decimal.digits), sep="")
             }
   	        
 	        
   	        # significance stars
-  	        if ((significance.stars == TRUE) & (!is.na(.global.var.name["p-value",i]))) { .enter.significance.stars(.global.var.name["p-value",i], math.omit=TRUE) }
+  	        if ((significance.stars == TRUE) & (!is.na(.global.var.name["p-value",i]))) { .enter.significance.stars(.global.var.name["p-value",i], force.math) }
 	        
   	        # standard errors
   	        if ((report.se == TRUE) & (!is.na(.global.var.name["se",i]))) { cat(" ",.format.se.left,.iround(.global.var.name["se",i], decimal.digits),.format.se.right,sep="") }
@@ -1967,10 +2341,10 @@ function(libname, pkgname) {
   	        if ((report.tstat == TRUE) & (!is.na(.global.var.name["p-value",i]))) { cat(" ",.format.p.value.left,.iround(.global.var.name["p-value",i], decimal.digits),.format.p.value.right,sep="") }
             
             if (.format.dec.mark.align == TRUE) {
-              cat("$}")
+              cat("}")
             }
             else {
-              cat("$")
+              cat("")
             }
   	      }
   	      else { cat(" & ", sep="") }
@@ -2005,8 +2379,7 @@ function(libname, pkgname) {
 
   	cat("\\normalsize \n")
   	cat("\\end{tabular} \n")
-  	cat("\\end{table} \n")
-
+  	if (.format.floating == TRUE) { cat("\\end{", .format.floating.environment,"} \n", sep="") }
 	
   }
 
@@ -2017,8 +2390,10 @@ function(libname, pkgname) {
 
   	# dependent variable label line
   	if (part=="dependent variable label") {
-  		if (.format.dependent.variable.text.on == TRUE) { cat(" & \\multicolumn{",length(.global.models),"}{c}{",.format.dependent.variable.text, "} \\\\ \n", sep="")}
-  		if (.format.dependent.variable.text.underline == TRUE) { cat("\\cline{2-",length(.global.models)+1,"} \n", sep="")}
+  		if (.format.dependent.variable.text.on == TRUE) { 
+        cat(" & \\multicolumn{",length(.global.models),"}{c}{",.format.dependent.variable.text, "} \\\\ \n", sep="")
+  		  if (.format.dependent.variable.text.underline == TRUE) { cat("\\cline{2-",length(.global.models)+1,"} \n", sep="") }
+      }
   		.table.part.published[which.part.number] <<- TRUE
   	}
 
@@ -2157,6 +2532,72 @@ function(libname, pkgname) {
   		.table.part.published[which.part.number] <<- TRUE
             }
   	}
+    
+    # column labels
+    else if (part=="columns") {
+      if (!is.null(.format.column.labels)) {
+        
+        if (is.null(.format.column.separate)) { .format.column.separate <- 1 }
+        
+        # adjust column.separate to have the same number of columns as the table
+        models.in.table <- length(.global.models)
+        models.in.col <- 0   
+        for (i in seq(1:length(.format.column.separate))) {       # count up how many models in column.separate
+          models.in.col <- models.in.col + .format.column.separate[i]
+        }
+        
+        excess <- models.in.table - models.in.col
+        
+        # if too few column labels, add ones to column.separate
+        if (excess > 0) {
+          last.index <- length(.format.column.separate)
+          for (i in seq(1:excess)) {
+            .format.column.separate[last.index + i] <- 1
+          }
+        }
+        
+        # if too many column labels, then cut down
+        if (excess < 0) {
+          
+          col.total <- 0
+          new.format.column.separate <- NULL
+          
+          for(i in seq(1:length(.format.column.separate))) {
+            col.total <- col.total + .format.column.separate[i]
+            if (col.total > models.in.table) {
+              new.format.column.separate[i] <- .format.column.separate[i] - (col.total - models.in.table)
+              if (new.format.column.separate[i] == 0) { new.format.column.separate <- new.format.column.separate[-i] }
+              break
+            }
+            else {
+              new.format.column.separate[i] <- .format.column.separate[i]
+            }
+          }
+          
+          .format.column.separate <- new.format.column.separate
+          
+        }
+        
+        # output column labels
+        col.position <- 1
+        for (i in seq(1:length(.format.column.separate))) {
+          if (is.null(.format.column.labels[col.position])) { .format.column.labels[col.position] <- "" }
+          if (.format.column.separate[i]==1) {
+            if (.format.dec.mark.align==TRUE) {
+              cat(" & \\multicolumn{1}{c}{",.format.column.left,.format.column.labels[col.position],.format.column.right,"}", sep="") 
+            }
+            else {
+              cat(" & ",.format.column.left,.format.column.labels[col.position],.format.column.right, sep="") 
+            }
+          }
+          else {
+                cat(" & \\multicolumn{",.format.column.separate[i],"}{c}{",.format.column.left,.format.column.labels[col.position],.format.column.right,"}", sep="") 
+          }
+          col.position <- col.position + 1
+        }
+        cat(" \\\\ \n")  
+      }
+    }
 
   	# numbers
   	else if (part=="numbers") {
@@ -2211,7 +2652,7 @@ function(libname, pkgname) {
   		  for (i in seq(1:length(.global.models))) {
   				for (j in seq(1:length(.format.omit.regexp))) {
   					for (k in seq(1:length(.global.coefficients))) {
-  						if (length(grep(.format.omit.regexp[j], .global.coefficient.variables[k],fixed=FALSE))!=0) {
+  						if (length(grep(.format.omit.regexp[j], .global.coefficient.variables[k], perl=.format.perl, fixed=FALSE))!=0) {
   							if (!is.na(.global.coefficients[k,i])) {
   								.format.omit.table[j,i] <<- .format.omit.yes
   							}
@@ -2358,7 +2799,7 @@ function(libname, pkgname) {
 
   	model.name <- .get.model.name(object.name)
 
-  	if (!(model.name %in% c("arima", "nlmer", "glmer", "lmer"))) {
+  	if (!(model.name %in% c("arima", "nlmer", "glmer", "lmer","Gls"))) {
       if (model.name %in% c("plm")) {
         return(as.vector(.summary.object$r.squared["rsq"]))
       }
@@ -2373,6 +2814,9 @@ function(libname, pkgname) {
   		}
       else if (model.name %in% c("pmg")) {
         return(as.vector(.summary.object$rsqr))
+      }
+      else if (model.name %in% c("cph","lrm","ols","psm")) {
+        return(as.vector(object.name$stats["R2"]))
       }
   	}
   	return(NA)
@@ -2389,18 +2833,21 @@ function(libname, pkgname) {
     
     # basic special characters
     s.out <- gsub("_","\\_",s.out,fixed=TRUE)
-    s.out <- gsub("^","\\^",s.out,fixed=TRUE)
     s.out <- gsub("#","\\#",s.out,fixed=TRUE)
-    s.out <- gsub("~","\\~",s.out,fixed=TRUE)
+    s.out <- gsub("~","\\textasciitilde",s.out,fixed=TRUE)
     s.out <- gsub("{","\\{",s.out,fixed=TRUE)
     s.out <- gsub("}","\\}",s.out,fixed=TRUE)    
     s.out <- gsub("%","\\%",s.out,fixed=TRUE)
-    
+    s.out <- gsub("$","\\$",s.out,fixed=TRUE)
+        
     # pre-defined text-mode commands (add more?)
     s.out <- gsub("*","\\textasteriskcentered ",s.out,fixed=TRUE)
     s.out <- gsub("|","\\textbar ",s.out,fixed=TRUE)
     s.out <- gsub(">","\\textgreater ",s.out,fixed=TRUE)
     s.out <- gsub("<","\\textless ",s.out,fixed=TRUE)
+    
+    # more substitutions
+    s.out <- gsub("^","$\\hat{\\mkern6mu}$",s.out,fixed=TRUE)
         
     return(s.out)
   }
@@ -2412,8 +2859,12 @@ function(libname, pkgname) {
 
   	model.name <- .get.model.name(object.name)
 
-  	if (!(model.name %in% c("arima", "multinom","lmer","glmer","nlmer"))) {
-  		if (!is.null(.summary.object$deviance)) {
+  	if (!(model.name %in% c("arima", "Gls","multinom","lmer","glmer","nlmer"))) {
+      if (model.name %in% c("rem.dyad")) {
+        residual.deviance.value <- object.name$residual.deviance
+        residual.deviance.output <- as.vector(c(residual.deviance.value, NA, NA))
+      }
+  		else if (!is.null(.summary.object$deviance)) {
   			residual.deviance.value <- suppressMessages(.summary.object$deviance)
   			df.value <- object.name$df.residual
   			residual.deviance.output <- as.vector(c(residual.deviance.value, df.value, NA))
@@ -2525,7 +2976,7 @@ function(libname, pkgname) {
 
   	model.name <- .get.model.name(object.name)
 
-  	if (!(model.name %in% c("arima","lmer","glmer","nlmer","gls"))) {
+  	if (!(model.name %in% c("arima","lmer","glmer","nlmer","gls","Gls"))) {
   		if (!is.null(suppressMessages(.summary.object$sigma))) {
   			sigma.value <-suppressMessages(.summary.object$sigma)
         if (model.name %in% c("rlm")) {
@@ -2583,27 +3034,39 @@ function(libname, pkgname) {
   		}
   		suppressMessages(.publish.table())
   	}
-  }
+ } 
+  
+  .set.font.size <- 
+    function() {
+      if (!is.null(.format.font.size)) {
+        cat("\\", .format.font.size," \n", sep="")
+      }
+    }
+  
+  .floating.header <-
+    function() {
+      if (.format.floating==TRUE) {
+        cat("\\begin{", .format.floating.environment,"}[", .format.table.placement,"] \\centering \n",sep="")
+        cat("  \\caption{", .format.title, "} \n",sep="")   
+        cat("  \\label{", .format.label, "} \n",sep="")
+        .set.font.size()
+      }
+    }
   
   .data.frame.table.header <-
     function(object) {
-      cat("\\begin{table}[htb] \\centering \n",sep="")
-      cat("  \\caption{", .format.title, "} \n",sep="")   
-      cat("  \\label{", .format.label, "} \n",sep="")
-      cat("\\footnotesize \n",sep="")
-      cat("\n")
+      .floating.header()
       
-      .formatting.alignment <- "@{\\extracolsep{5pt}} "
+      .formatting.alignment <- paste("@{\\extracolsep{",.format.column.sep.width,"}} ", sep="")
       for (i in seq(1:(length(names(object))))) {
         if (.format.dec.mark.align == FALSE) {
-          .formatting.alignment <- paste(.formatting.alignment, "c ", sep="")
+          .formatting.alignment <- paste(.formatting.alignment, "c", sep="")
         }
         else {
           .formatting.alignment <- paste(.formatting.alignment, "D{", .format.decimal.character,"}{", .format.decimal.character,"}{-", .format.s.round.digits,"} ", sep="")
         }
       }
       #
-      
       
       cat("\\begin{tabular}{",.formatting.alignment,"} \n",sep="")
     }
@@ -2629,7 +3092,7 @@ function(libname, pkgname) {
       
       cat("\\normalsize \n")
       cat("\\end{tabular} \n")
-      cat("\\end{table} \n")
+      if (.format.floating == TRUE) { cat("\\end{", .format.floating.environment,"} \n", sep="") }
     }
   }
   
@@ -2648,7 +3111,7 @@ function(libname, pkgname) {
         
         if (!is.null(.format.omit.regexp)) {
           for (j in seq(1:length(.format.omit.regexp))) {
-            if (length(grep(.format.omit.regexp[j], names(object)[x], fixed=FALSE))!=0) { omitted <- TRUE  }
+            if (length(grep(.format.omit.regexp[j], names(object)[x], perl=.format.perl, fixed=FALSE))!=0) { omitted <- TRUE  }
           }
         }
         
@@ -2687,7 +3150,7 @@ function(libname, pkgname) {
           
           if (!is.null(.format.omit.regexp)) {
             for (j in seq(1:length(.format.omit.regexp))) {
-              if (length(grep(.format.omit.regexp[j], names(object)[x], fixed=FALSE))!=0) { omitted <- TRUE  }
+              if (length(grep(.format.omit.regexp[j], names(object)[x], perl=.format.perl, fixed=FALSE))!=0) { omitted <- TRUE  }
             }
           }
           
@@ -2793,7 +3256,7 @@ function(libname, pkgname) {
 
     	cat("\\normalsize \n")
     	cat("\\end{tabular} \n")
-    	cat("\\end{table} \n")
+      if (.format.floating == TRUE) { cat("\\end{", .format.floating.environment,"} \n", sep="") }
     }
   }
 
@@ -2867,25 +3330,21 @@ function(libname, pkgname) {
 
   .summ.stat.table.header <-
   function() {
-    cat("\\begin{table}[htb] \\centering \n",sep="")
-    cat("  \\caption{", .format.title, "} \n",sep="")
-    cat("  \\label{", .format.label, "} \n",sep="")
-    cat("\\footnotesize \n",sep="")
-    cat("\n")
+    .floating.header()
 
-   #
-   .formatting.alignment <- "@{\\extracolsep{5pt}}l "
-   for (i in seq(1:(length(.format.s.statistics.list)))) {
-    	if (.format.dec.mark.align == FALSE) {
-        .formatting.alignment <- paste(.formatting.alignment, "c ", sep="")
-    	}
-      else {
-        .formatting.alignment <- paste(.formatting.alignment, "D{", .format.decimal.character,"}{", .format.decimal.character,"}{-", .format.s.round.digits,"} ", sep="")
-      }
-    }
     #
-
-   cat("\\begin{tabular}{",.formatting.alignment,"} \n",sep="")
+    .formatting.alignment <- paste("@{\\extracolsep{",.format.column.sep.width,"}}l", sep="")
+    for (i in seq(1:(length(.format.s.statistics.list)))) {
+    	  if (.format.dec.mark.align == FALSE) {
+          .formatting.alignment <- paste(.formatting.alignment, "c", sep="")
+    	  }
+        else {
+          .formatting.alignment <- paste(.formatting.alignment, "D{", .format.decimal.character,"}{", .format.decimal.character,"}{-", .format.s.round.digits,"} ", sep="")
+        }
+      }
+      #
+  
+    cat("\\begin{tabular}{",.formatting.alignment,"} \n",sep="")
   }
   
   .summ.stat.table.part <-
@@ -2925,7 +3384,7 @@ function(libname, pkgname) {
         
          if (!is.null(.format.omit.regexp)) {
             for (j in seq(1:length(.format.omit.regexp))) {
-              if (length(grep(.format.omit.regexp[j], names(object)[i], fixed=FALSE))!=0) { omitted <- TRUE	}
+              if (length(grep(.format.omit.regexp[j], names(object)[i], perl=.format.perl, fixed=FALSE))!=0) { omitted <- TRUE	}
             }
           }
         
@@ -3007,11 +3466,13 @@ function(libname, pkgname) {
 
   .table.empty.line <-
   function() {
-  	cat(" ")
-  	for (i in seq(1:length(.global.models))) {
-  		cat("& ")
-  	}
-  	cat("\\\\ \n")
+    if (.format.no.space == FALSE) {
+  	  cat(" ")
+  	  for (i in seq(1:length(.global.models))) {
+  		  cat("& ")
+  	  }
+  	  cat("\\\\ \n")
+    }
   }
 
   .table.enter.coefficients <-
@@ -3027,7 +3488,7 @@ function(libname, pkgname) {
   	omitted <- FALSE
   	if (!is.null(.format.omit.regexp)) {
   		for (i in seq(1:length(.format.omit.regexp))) {
-  			if (length(grep(.format.omit.regexp[i], local.coefficient.var.name, fixed=FALSE))!=0) { omitted <- TRUE	}
+  			if (length(grep(.format.omit.regexp[i], local.coefficient.var.name, perl=.format.perl, fixed=FALSE))!=0) { omitted <- TRUE	}
   		}
   	}
 
@@ -3061,36 +3522,42 @@ function(libname, pkgname) {
 
   .table.header <-
   function() {
-    cat("\\begin{table}[htb] \\centering \n",sep="")
-    cat("  \\caption{", .format.title, "} \n",sep="")   
-    cat("  \\label{", .format.label, "} \n",sep="")
-    cat("\\footnotesize \n",sep="")
-    cat("\n")
+      .floating.header()
 
-   #
-  .formatting.alignment <- "@{\\extracolsep{5pt}}l"
-  for (i in seq(1:length(.global.models))) {
-  	if (.format.dec.mark.align==FALSE) {
-      .formatting.alignment <- paste(.formatting.alignment, "c", sep="")
-  	}
-    else {
-  	  .formatting.alignment <- paste(.formatting.alignment, "D{", .format.decimal.character,"}{", .format.decimal.character,"}{-", .format.round.digits,"} ", sep="")
-    }
-  }
-  #
+      #
+      .formatting.alignment <- paste("@{\\extracolsep{",.format.column.sep.width,"}}l", sep="")
+      for (i in seq(1:length(.global.models))) {
+  	    if (.format.dec.mark.align==FALSE) {
+          .formatting.alignment <- paste(.formatting.alignment, "c", sep="")
+  	    }
+        else {
+  	    .formatting.alignment <- paste(.formatting.alignment, "D{", .format.decimal.character,"}{", .format.decimal.character,"}{-", .format.round.digits,"} ", sep="")
+        }
+      }
+      #
 
-  cat("\\begin{tabular}{",.formatting.alignment,"} \n",sep="")
+      cat("\\begin{tabular}{",.formatting.alignment,"} \n",sep="")
   }
 
   .table.info.comment <-
   function() {
-    cat("\n")
-    cat("% Table created by ", .global.package.name, " v.", .global.package.version, " by ", .global.package.author.name, ", ", .global.package.author.affiliation, ". E-mail: ", .global.package.author.email, "\n", sep="")  
-    cat("% Date and time:", format(Sys.time(), "%a, %b %d, %Y - %X"))
-    cat("\n")
-    if (.format.dec.mark.align==TRUE) {
-      cat("% Requires \\usepackage{dcolumn} in LaTeX preamble.")
+    if (.format.header==TRUE) {
       cat("\n")
+      cat("% Table created by ", .global.package.name, " v.", .global.package.version, " by ", .global.package.author.name, ", ", .global.package.author.affiliation, ". E-mail: ", .global.package.author.email, "\n", sep="")  
+      cat("% Date and time:", format(Sys.time(), "%a, %b %d, %Y - %X"))
+      cat("\n")
+      
+      required.latex.packages <- NULL
+      if (.format.dec.mark.align==TRUE) { required.latex.packages <- c(required.latex.packages, "dcolumn") }
+      if (.format.floating.environment=="sidewaystable") { required.latex.packages <- c(required.latex.packages, "rotating") }
+      
+      if (!is.null(required.latex.packages)) {
+        cat("% Requires LaTeX packages: ")
+        for (i in 1:length(required.latex.packages)){
+          cat(required.latex.packages[i]," ", sep="")
+        }
+        cat("\n")
+      }
     }
   }
 
@@ -3108,7 +3575,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima", "ivreg","lmer","glmer","nlmer"))) {
+    if (!(model.name %in% c("arima", "Gls", "ivreg","lmer","glmer","nlmer"))) {
       if (!is.null(.summary.object$waldtest)) {
         wald.value <- suppressMessages(.summary.object$waldtest[1])
         df.value <- suppressMessages(.summary.object$waldtest[2])
@@ -3122,6 +3589,12 @@ function(libname, pkgname) {
         wald.output <- as.vector(c(wald.value, df.value, wald.p.value))
         
       }
+      else if (model.name %in% c("lagsarlm", "errorsarlm")) {
+        wald.value <- as.vector(.summary.object$Wald1$statistic)
+        df.value <- as.vector(.summary.object$Wald1$parameter)
+        wald.p.value <- as.vector(.summary.object$Wald1$p.value)
+        wald.output <- as.vector(c(wald.value, df.value, wald.p.value))
+      }
     
     }
   
@@ -3130,22 +3603,38 @@ function(libname, pkgname) {
   }
 
   .get.coefficients.1 <-
-  function(object.name, user.given=NULL) {
+  function(object.name, user.given=NULL, model.num=1) {
     
-    if (!is.null(user.given)) { return(user.given) }
+    if (!is.null(user.given)) { 
+      
+      if (.model.identify(object.name) == "multinom") {
+        if (!is.null(nrow(user.given))) { user.given <- as.vector(user.given[model.num,]) }
+      }
+        
+      return(user.given) 
+    }
 
   	model.name <- .get.model.name(object.name)
 	
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.survey",
-     				    "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "svyglm()", "plm", "ivreg", "lmrob")) {
+     				    "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "Glm()", "svyglm()", "plm", "ivreg", "lmrob", "dynlm", "gmm")) {
   		return(.summary.object$coefficients[,"Estimate"])
   	}
+    if (model.name %in% c("hetglm")) {
+      return(as.vector(.summary.object$coefficients$mean[,1]))
+    }
     if (model.name %in% c("lmer","glmer","nlmer")) {
       coefs <- object.name@fixef
       return(coefs)
     }
     if (model.name %in% c("ergm")) {
       return(.summary.object$coefs[,1])
+    }
+    if (model.name %in% c("lagsarlm", "errorsarlm")) {
+      return(.summary.object$Coef[,1])
+    }
+    if (model.name %in% c("rq")) {
+      return(.summary.object$coefficients[,1])
     }
   	if (model.name %in% c("clm")) {
   	  if (.format.ordered.intercepts == FALSE) {
@@ -3186,7 +3675,7 @@ function(libname, pkgname) {
   		if (.format.ordered.intercepts == FALSE) { return(coef.temp[seq(from=1, to=length(coef.temp)-(length(suppressMessages(.summary.object$lev))-1))]) }
   		else { return(coef.temp) }
   	}
-  	else if (model.name %in% c("arima")) {
+  	else if (model.name %in% c("arima", "rem.dyad")) {
   		return( object.name$coef )
   	}
   	else if (model.name %in% c("tobit(AER)")){
@@ -3197,7 +3686,7 @@ function(libname, pkgname) {
         coef.temp <- .summary.object$coefficients
       }
       else {
-        coef.temp <- .summary.object$coefficients[1,]
+        coef.temp <- .summary.object$coefficients[model.num,]
       }
       return(coef.temp)
     }
@@ -3208,13 +3697,16 @@ function(libname, pkgname) {
       coef.temp <- object.name$coefficients
       return(coef.temp)
     }
+    else if (model.name %in% c("weibreg", "coxreg", "phreg", "aftreg", "bj", "cph", "Gls", "lrm", "ols", "psm", "Rq")) {
+      return( object.name$coefficients )
+    }
   	else { return(NULL) }
 
   }
   
   .get.coefficients <-
-  function(object.name, user.given=NULL) {
-    out <- .get.coefficients.1(object.name, user.given)
+  function(object.name, user.given=NULL, model.num=1) {
+    out <- .get.coefficients.1(object.name, user.given, model.num)
                                
     coef.vars <- .coefficient.variables(object.name)
     if (is.null(names(out))) {
@@ -3244,15 +3736,628 @@ function(libname, pkgname) {
     return(TRUE)
   }
   
+  .get.file.extension <-
+  function (path) {
+      split <- strsplit(path, "\\.")[[1]]
+      return( tolower(split[length(split)]) )
+  }
+  
+  
+############## TEXT MODE ##############
+  
+
+  .split.line <-    # split line of a LaTeX table into constituent parts separated by &
+  function(s) {
+    # remove the "\\\\"
+    s <- gsub("\\\\", "", s, fixed=TRUE)
+    s <- paste("  ",s,"  ", sep="")
+    
+    return(.trim(strsplit(s, " &", fixed=TRUE)[[1]]))
+  }
+  
+  .remove.extra.spaces <-
+  function(s) {
+    new.s <- ""
+    space <- FALSE
+    for (i in 1:nchar(s)) {
+      s.i <- substr(s,i,i)
+      if (s.i == " ") {
+        if (space == FALSE) { 
+          space <- TRUE 
+          new.s <- paste(new.s, s.i, sep="")
+        }
+      }
+      else {
+        space <- FALSE
+        new.s <- paste(new.s, s.i, sep="")
+      }
+    }
+    return(new.s)
+  }
+  
+  strpos <-
+  function(x, s) {
+    return( regexpr(x, s, fixed=TRUE)[1] )
+  }
+  
+  is.alphanumeric <- 
+  function(s) {
+    alphanum <- FALSE
+    
+    numbers <- grepl("^[[:digit:]]+$", s) 
+    letters <- grepl("^[[:alpha:]]+$", s) 
+    both <- grepl("^[[:digit:][:alpha:]]+$", s)
+    
+    if ((numbers == TRUE) | (letters == TRUE) | (both == TRUE)) {
+      alphanum <- TRUE
+    }
+    
+    return(alphanum)
+  }
+  
+  .replace.latex.symbols <-
+  function (s) {
+    latex.replace <- NULL
+    latex.replace <- cbind(latex.replace, c("\\textbackslash","\\"), c("\\_","_"), c("\\#","#"), c("\\textasciitilde","~"), c("\\{","{"), c("\\}","}"), c("\\%","%"))
+    latex.replace <- cbind(latex.replace, c("\\textasteriskcentered","*"), c("\\textbar","|"), c("\\textgreater",">"), c("\\textless","<"), c("$\\hat{\\mkern6mu}$","^"))
+    
+    # Greek letters
+    latex.replace <- cbind(latex.replace, c("\\alpha","alpha"), c("\\beta","beta"), c("\\gamma","gamma"), c("\\delta","delta"), c("\\epsilon","epsilon"), c("\\varepsilon","epsilon"), c("\\zeta","zeta"))
+    latex.replace <- cbind(latex.replace, c("\\eta","eta"), c("\\theta","theta"), c("\\vartheta","theta"), c("\\iota","iota"), c("\\kappa","kappa"), c("\\lambda","lambda"), c("\\mu","mu"))
+    latex.replace <- cbind(latex.replace, c("\\nu","nu"), c("\\xi","xi"), c("\\pi","pi"), c("\\varpi","pi"), c("\\rho","rho"), c("\\varrho","rho"), c("\\sigma","sigma"))
+    latex.replace <- cbind(latex.replace, c("\\varsigma","sigma"), c("\\tau","tau"), c("\\upsilon","upsilon"), c("\\phi","phi"), c("\\varphi","phi"), c("\\chi","chi"), c("\\psi","psi"))
+    latex.replace <- cbind(latex.replace, c("\\omega","omega"), c("\\Gamma","gamma"), c("\\Delta","delta"), c("\\Theta","theta"), c("\\Lambda","lambda"), c("\\Xi","xi"), c("\\Pi","pi"))
+    latex.replace <- cbind(latex.replace, c("\\Sigma","??"), c("\\Upsilon","upsilon"), c("\\Phi","phi"), c("\\Psi","psi"), c("\\Omega","omega"))
+    
+    s.out <- s
+    for (item in 1:ncol(latex.replace)) {
+      symbol <- latex.replace[1, item]
+      replacement <- latex.replace[2, item]
+      
+      pos <- 1
+      while (pos <= nchar(s.out)) {
+        s.pre <- substr(s.out, 1, pos-1)
+        s.pos.char <- substr(s.out, pos, pos)
+        s.post <- substr(s.out, pos + nchar(symbol), nchar(s.out))
+        if (substr(s.out, pos, pos+nchar(symbol)-1) == symbol) {
+          if (!is.alphanumeric(substr(s.post, 1, 1))) {
+            s.out <- paste(s.pre, replacement, s.post, sep="")
+            post <- pos + nchar(replacement) - 1
+          }
+        }
+        pos <- pos + 1
+      }
+    }
+    
+    return(s.out)
+  }
+  
+  .remove.control.sequences <-
+  function (s) {
+    
+    s <- paste("  ",s, "  ", sep="")
+    
+    # replace latex symbols
+    s <- .replace.latex.symbols(s)
+    
+    # remove dollar signs  [ what about text-related starts ]
+    s <- gsub("\\$", "", s)
+    
+    # remove extra spaces
+    s <- .remove.extra.spaces(s)
+
+    # add: replace some sequences with corresponding letters
+    
+    # walk through the string
+    i <- 1
+    new.s <- ""
+    while (i <= nchar(s)) {
+      s.i <- substr(s, i, i)
+      
+      if ((s.i %in% c("\\", "_", "^")) & (!(substr(s,i-1,i-1)=="\\"))) {
+        remainder.s <- substr(s, i+1, nchar(s))
+        if ((strpos(" ", remainder.s) < strpos("{", remainder.s)) | (strpos("{", remainder.s)==-1))  {
+          i <- i + strpos(" ", remainder.s) + 1
+        }
+        else {
+          s.sub <- substr(remainder.s, strpos("{", remainder.s), nchar(remainder.s))
+          open.brackets <- 0
+          bracket.start <- bracket.end <- strpos("{", s.sub)
+          
+          for (j in 1:nchar(s.sub)) {
+            s.sub.j <- substr(s.sub, j, j)
+            if (s.sub.j == "{") { 
+              open.brackets <- open.brackets + 1
+              if (open.brackets == 1) { bracket.start <- j + 1 }
+            }
+            if (s.sub.j == "}") { 
+              open.brackets <- open.brackets - 1 
+              if (open.brackets == 0) { bracket.end <- j - 1 }
+            }
+            if (!(s.sub.j %in% c("{","}"))) {
+              if (open.brackets == 0) { break }
+            }
+          }
+          if (bracket.end < bracket.start) { 
+            examine.substring <- "" 
+          } 
+          else {
+            examine.substring <- substr(s.sub, bracket.start, bracket.end)
+          }
+          new.s <- paste(new.s, .remove.control.sequences(examine.substring), sep="")
+          i <- i + strpos("{", remainder.s) + bracket.end + 1
+            
+        }
+      }  
+      else {  # not inside a control sequence
+        new.s <- paste(new.s, s.i, sep="")
+        i <- i + 1
+      }
+      
+    } 
+    
+    return(.trim(new.s))
+    
+  }
+  
+  .text.cline <-
+  function (cline, max.length, line.char="-") {
+      for (i in 1:length(cline)) {
+        if ((cline[i]==0) & (sum(cline[i:length(cline)]) != 0)) {
+          .repeat.char(" ", rep=max.length[i]+1, new.line=FALSE)
+        }
+        else if (cline[i]>=1) {
+          underline.len <- 0
+          for (j in i:(i+cline[i]-1)) {
+            underline.len <- underline.len + max.length[j] + 1
+          }
+          underline.len <- underline.len - 1
+          .repeat.char(line.char, rep=underline.len, new.line=FALSE)
+          if ((sum(cline[i:length(cline)]) != cline[i])) { cat(" ") }
+        }
+      }
+      cat("\n")
+    }
+  
+  .text.horizontal.line <-
+  function (line.char="-", max.length) {
+    horizontal.length <- 0
+    for (i in 1:length(max.length)) {
+      horizontal.length <- horizontal.length + max.length[i] + 1
+    }
+    horizontal.length = horizontal.length - 1
+    
+    
+    .repeat.char(line.char, rep=horizontal.length, new.line=TRUE)
+  }
+  
+  .text.output <-
+  function(all.latex.code) {
+    
+    how.many.tables <- 0
+    start.lines <- NULL
+    for (i in 1:length(all.latex.code)) {
+      if (all.latex.code[i] %in% c("")) { 
+        how.many.tables <- how.many.tables + 1
+        start.lines <- c(start.lines, i)
+      }
+    }
+    
+    
+    for (table.number in 1:how.many.tables) {
+      
+      if (table.number < how.many.tables) {
+        latex.code <- all.latex.code[start.lines[table.number]:start.lines[table.number+1]]
+      }
+      else {
+        latex.code <- all.latex.code[start.lines[table.number]:length(all.latex.code)]
+      }
+    
+      how.many.columns <- .get.number.of.columns(latex.code)
+    
+      r <- 0
+    
+      t <- .text.matrix(latex.code, how.many.columns)
+      c <- .column.matrix(latex.code, how.many.columns)
+      j <- .justification.matrix(latex.code, how.many.columns)
+    
+      max.l <- .text.column.width(t, c)
+      w <- .width.matrix(c, max.l)
+    
+      cat("\n")
+
+      
+      for (row in 1:length(latex.code)) {
+        line <- latex.code[row]
+        if (substr(line, nchar(line)-2, nchar(line)) == "\\\\ ") {
+          r <- r + 1
+          .text.output.line(t, r, w, c, j)
+        }
+        else if (strpos("\\caption{", line) != -1) {
+          inside.caption <- substr(.trim(line), 10, nchar(.trim(line))-1)
+          text.title <- .trim(.remove.control.sequences(inside.caption))
+          if (text.title != "") { cat(.remove.control.sequences(inside.caption),"\n", sep="") }
+        }
+        else if (strpos("\\cline{", line) != -1) {
+          s <- paste("  ", line, "  ", sep="")
+          cline <- rep(0, times=how.many.columns)
+          while (strpos("\\cline{", s) != -1) {
+            from <- strpos("\\cline{", s) + 7
+            to <- strpos("}", s) - 1
+          
+            underline.columns <- substr(s, from, to)
+            split.columns <- strsplit(underline.columns,"-", fixed=TRUE)[[1]]
+          
+            col.underline.begin <- as.numeric(split.columns[1])
+            col.underline.number <- as.numeric(split.columns[2]) - col.underline.begin + 1
+          
+            cline[col.underline.begin] <- col.underline.number
+          
+            s <- substr(s, to+1, nchar(s))
+            .text.cline(cline, max.l)
+          }
+        }
+        else if (strpos("\\hline",line) != -1) {
+          if (!(is.na(latex.code[row+1]))) {
+            if (strpos("\\hline", latex.code[row+1]) != -1) {
+              .text.horizontal.line("=", max.l)
+            } 
+            else {
+              if (strpos("\\hline", latex.code[row-1]) == -1) {           
+              .text.horizontal.line("-", max.l) 
+              }
+            }
+          }
+          else {
+            if (strpos("\\hline", latex.code[row-1]) == -1) {           
+              .text.horizontal.line("-", max.l) 
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .text.output.line <-
+  function(text.matrix, row, width.matrix, column.matrix, justification.matrix) {
+    real.c <- 0   # "real" column position
+    for (c in 1:ncol(text.matrix)) {
+      real.c <- real.c + column.matrix[row,c]
+      justify <- justification.matrix[row, c]
+      
+      if (!(is.na(text.matrix[row,c]))) { 
+        .just.cat(text.matrix[row, c], width=width.matrix[row, c], justify=justify)
+        if (real.c < ncol(text.matrix)) { cat(" ",sep="")}
+      }
+    }
+    cat("\n")
+  }
+  
+  .width.matrix <-
+  function(column.matrix, max.length) {
+    
+    w.matrix <- matrix(NA, nrow = nrow(column.matrix), ncol = ncol(column.matrix))
+    
+    # enter single widths first
+    for (r in 1:nrow(column.matrix)) {
+      for (c in 1:ncol(column.matrix)) {
+        w.matrix[r,c] <- max.length[c]
+      }
+    }
+    
+      
+    # think about multicolumns
+    for (r in 1:nrow(column.matrix)) {
+      for (c in 1:ncol(column.matrix)) {
+        if (column.matrix[r,c] >= 2) {
+          total.width <- 0
+          for (i in c:(c+column.matrix[r,c]-1)) {
+            total.width <- total.width + max.length[i] + 1 
+            if (i > c) {
+              for (k in 1:(column.matrix[r,c]-1)) {
+                for (j in i:ncol(column.matrix)) {
+                  if ((j+1) <= ncol(column.matrix)) {
+                    w.matrix[r,j] <- w.matrix[r, j+1]
+                    w.matrix[r,j+1] <- NA
+                  }
+                  else {
+                    w.matrix[r,j] <- NA
+                  }
+                }
+              }
+            }
+          }
+          w.matrix[r,c] <- total.width - 1
+        }
+      }
+    }
+      
+    return(w.matrix)
+  }
+  
+  .text.column.width <-
+  function(text.matrix, column.matrix) {
+    
+    max.length = rep(1, times=ncol(column.matrix))
+    temp.text.matrix <- text.matrix
+    
+    # first, get the maximum width of single columns
+    for (r in 1:nrow(text.matrix)) {
+      for (c in 1:ncol(text.matrix)) {
+        real.c <- 0   # 'real' column number, adjusted for multicolumn
+        for (i in 1:c) {
+          real.c <- real.c + column.matrix[r, i]
+        }
+        if (real.c <= ncol(text.matrix)) {
+          if (column.matrix[r,c] == 1) { # only look at singles here
+            if (nchar(text.matrix[r,c]) > max.length[real.c]) { max.length[real.c] <- nchar(text.matrix[r,c]) }
+          }
+        }
+      }  
+    }
+    
+    # think about multicolumns
+    for (r in 1:nrow(text.matrix)) {
+      for (c in 1:ncol(text.matrix)) {
+        if (!is.na(column.matrix[r,c])) {
+          if (column.matrix[r,c] >= 2) {   # only look at multicolumns
+            total.width <- 0
+            for (i in c:(c+column.matrix[r,c]-1)) {
+              total.width <- total.width + max.length[i] 
+            }
+            while (total.width < nchar(text.matrix[r,c])) {  # if does not fit into single columns, widen the maxima
+              relevant.maxima <- NULL
+              for (i in c:(c+column.matrix[r,c]-1)) {
+                relevant.maxima <- c(relevant.maxima, max.length[i])
+                if (max.length[i] == min(relevant.maxima)) { 
+                  total.width <- 0
+                  for (j in c:(c+column.matrix[r,c]-1)) {
+                    total.width <- total.width + max.length[j] 
+                  }
+                  if (total.width < nchar(text.matrix[r,c])) { max.length[i] <- max.length[i] + 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return(max.length)
+  }
+  
+  .column.matrix <-
+  function(latex.code, how.many.columns) {
+    
+    rows <- .text.table.rows(latex.code)
+    c.matrix <- matrix(1, nrow = rows, ncol = how.many.columns)
+    
+    # figure out how many rows the matrix should have
+    row <- 0
+    for (i in 1:length(latex.code)) {
+      line <- latex.code[i]
+      if (substr(line, nchar(line)-2, nchar(line)) == "\\\\ ") { 
+        row <- row + 1
+        line.split <- .split.line(line)
+        
+        # add in column widths
+        line.column <- rep(1, how.many.columns)
+        for (j in 1:length(line.split)) {
+          no.of.columns <- 0
+          if (regexpr("\\multicolumn{", line.split[j], fixed=TRUE) != -1) {
+            multicolumn.no <- substr(line.split[j], regexpr("{", line.split[j], fixed=TRUE)+1, regexpr("}", line.split[j], fixed=TRUE)-1)
+            no.of.columns <- as.numeric(multicolumn.no)
+          }
+          else {
+            no.of.columns <- 1
+          }
+          line.column[j] <- no.of.columns
+        }
+        length(line.column) <- how.many.columns
+        c.matrix[row,] <- line.column
+      }
+    }
+    return(c.matrix)
+  }
+  
+  .text.table.rows <-
+  function(latex.code) {
+      
+    # figure out how many columns
+    rows <- 0
+    for (i in 1:length(latex.code)) {
+      line <- latex.code[i]
+      if (substr(line, nchar(line)-2, nchar(line)) == "\\\\ ") { 
+        rows <- rows + 1
+      }
+    }      
+    
+    return(rows)
+  }
+  
+  .get.number.of.columns <- 
+  function(latex.code) {
+    
+    formatting.string <- ""
+    
+    for (i in 1:length(latex.code)) {
+      line <- latex.code[i]
+      if ((substr(line, 1, 7) == "\\begin{") & (regexpr("}}",line,fixed=TRUE)[[1]] != -1)) {
+        formatting.string <- substr(line, regexpr("}}",line,fixed=TRUE)[[1]]+2, nchar(line)-1)
+      }
+    }
+    
+    columns <- 0
+    for (i in 1:nchar(formatting.string)) {
+      if (substring(formatting.string, i, i) %in% c("l", "c", "r", "D")) { columns <- columns + 1 }
+    }
+    return(columns)
+  }
+  
+  .text.matrix <-
+  function(latex.code, how.many.columns) {
+    
+    rows <- .text.table.rows(latex.code)
+    t.matrix <- matrix(NA, nrow = rows, ncol = how.many.columns)
+   
+    # put strings into matrix
+    row <- 0
+    for (i in 1:length(latex.code)) {
+      line <- latex.code[i]
+      if (substr(line, nchar(line)-2, nchar(line)) == "\\\\ ") { 
+        row <- row + 1
+        line.content <- .split.line(.remove.control.sequences(line))
+        length(line.content) <- how.many.columns
+        t.matrix[row,] <- line.content
+      }
+    }
+    return(t.matrix)
+  }
+  
+  .justification.matrix <-
+  function(latex.code, how.many.columns) {
+      
+      rows <- .text.table.rows(latex.code)
+      j.matrix <- matrix(NA, nrow = rows, ncol = how.many.columns)
+      
+      line.content <- rep("c", how.many.columns)
+      
+      # put strings into matrix
+      row <- 0
+      for (i in 1:length(latex.code)) {
+        line <- latex.code[i]
+        if (substr(line, nchar(line)-2, nchar(line)) == "\\\\ ") { 
+          row <- row + 1
+          line.content[1] <- "l"
+          for (i in 2:how.many.columns) {
+            line.content[i] <- "c" 
+          }
+          
+          line.split <- .split.line(line)
+          for (j in 1:length(line.split)) {
+            if (regexpr("\\multicolumn{", line.split[j], fixed=TRUE) != -1) {
+              from <- regexpr("}{", line.split[j], fixed=TRUE)+2
+              rest.of.expression <- substr(line.split[j], from, nchar(line.split[j]))
+              to <- regexpr("}", rest.of.expression, fixed=TRUE) - 1
+              justification <- substr(rest.of.expression, 1, to)
+              line.content[j] <- justification
+            }
+          }
+          
+          length(line.content) <- how.many.columns
+          j.matrix[row,] <- line.content
+        }
+      }
+      return(j.matrix)
+    }
+  
+  
+  .repeat.char <-   
+  function(ch, rep=1, new.line=FALSE) {
+    if (rep >= 1) {
+      out.str <- ""
+      for (i in 1:rep) {
+        out.str <- paste(out.str, ch, sep="")
+      }
+      if (new.line == TRUE) { out.str <- paste(out.str, "\n", sep="")}
+      cat(out.str)
+    }
+  }
+  
+  .just.cat <-         # cat that justifies string appropriately over the next couple of paragraphs
+  function(s, width, offset.char=" ", justify="c"){
+    len <- nchar(s)
+    if (width <= len) {
+      cat(s)
+    }
+    else {
+      if (justify == "c") {
+        offset <- (width - len) %/% 2
+        .repeat.char(offset.char, offset)
+        cat(s)
+        .repeat.char(offset.char, width - len - offset)
+      }
+      else if (justify == "l") {
+        cat(s)
+        .repeat.char(offset.char, width - len)
+      }
+      else if (justify == "r") {
+        .repeat.char(offset.char, width - len)
+        cat(s)
+      }
+    }
+  }
+  
+  
+  
+############## OUTPUT INTO FILE ##############
+  
+  ### !!!! - add packages
+  .output.tex <-
+  function (file.out, content) {
+    
+      header.tex <- "\\documentclass{article}\n"
+      
+      required.latex.packages <- NULL
+      if (.format.dec.mark.align==TRUE) { required.latex.packages <- c(required.latex.packages, "dcolumn") }
+      if (.format.floating.environment=="sidewaystable") { required.latex.packages <- c(required.latex.packages, "rotating") }
+      
+      if (!is.null(required.latex.packages)) {
+        for (i in 1:length(required.latex.packages)) {
+          header.tex <- paste(header.tex, "\\usepackage{", required.latex.packages[i], "}\n", sep="")
+        }
+      }
+
+      cat( 
+        header.tex,
+        "\\begin{document}",
+        paste(content, collapse="\n"),
+        "\\end{document}\n", 
+        sep="\n",
+        file = file.out
+      )
+  }
+  
+  .output.txt <-
+  function (file.out, content) {
+    cat( 
+      paste(content, collapse="\n"), 
+      sep="\n",
+      file = file.out
+    )    
+  }
+  
+  # !!! -  work on this more in a later version
+  .output.pdf <-
+  function (file.out, content) {
+      tex.temp.file <- tempfile("temp", fileext="tex")
+      .output.tex(tex.temp.file, content)                     
+      capture.output(system(paste( "pdflatex --interaction=nonstopmode", shQuote(tex.temp.file)),  show.output.on.console = FALSE ))
+    }
+  
+  .output.file <-
+  function (out, latex.code, text.out, type) {
+    for (i in 1:length(out)) {
+      if (.get.file.extension(out[i])=="tex") { .output.tex(out[i], latex.code) }
+      # else if (.get.file.extension(out[i])=="pdf") { .output.pdf(out[i], latex.code) }
+      else if (.get.file.extension(out[i])=="txt") { .output.txt(out[i], text.out) }
+      else { # if another extension, do latex or text based on 'type'
+        if (type == "latex") { .output.tex(out[i], latex.code) }
+        else if (type == "text") { .output.txt(out[i], text.out) }
+      }
+    }
+  }
 
 
 ###########################################
 
     ## invisible output
     invisible.output <- NULL
+    latex.code <- NULL
+    text.out <- NULL
     
     ## error handling
-    error.present <- NULL
+    error.present <- "\n"
     
     # get objects
     objects <- as.list(list(...))
@@ -3283,7 +4388,14 @@ function(libname, pkgname) {
         }  
       }
     }
-    
+  
+    if (!is.character(type)) { error.present <- c(error.present, "% Error: Argument 'type' must be of type 'character.'\n") }
+    if (length(type) != 1) { error.present <- c(error.present, "% Error: Argument 'type' must be of length 1.'\n") }
+    if (is.character(type)) {
+      if (!(tolower(type) %in% c("latex", "text"))) {
+        error.present <- c(error.present, "% Error: 'style' must be either 'latex' (default) or 'text.'\n")
+      }
+    }
     
     if (!is.character(title)) { error.present <- c(error.present, "% Error: Argument 'title' must be of type 'character.'\n") }
     
@@ -3297,9 +4409,20 @@ function(libname, pkgname) {
     
     if (!is.logical(summary)) { error.present <- c(error.present, "% Error: Argument 'summary' must be of type 'logical' (TRUE/FALSE) \n") }
     if ((length(summary) != 1) & (!is.null(summary))) { error.present <- c(error.present, "% Error: Argument 'summary' must be of length 1.'\n") }
+    
+    if ((!is.character(out)) & (!is.null(out))) { error.present <- c(error.present, "% Error: Argument 'out' must be NULL (default), or a vector of type 'character.'") }
   
+    if ((!is.numeric(column.separate)) & (!is.null(column.separate))) { error.present <- c(error.present, "% Error: Argument 'column.separate' must be NULL (default), a vector of type 'numeric.'\n") }
+  
+    if ((!is.character(column.labels)) & (!is.null(column.labels))) { error.present <- c(error.present, "% Error: Argument 'column.labels' must be NULL (default), or a vector of type 'character.'") }
     if ((!is.character(covariate.labels)) & (!is.null(covariate.labels))) { error.present <- c(error.present, "% Error: Argument 'covariate.labels' must be NULL (default), or a vector of type 'character.'") }
     if ((!is.character(dep.var.labels)) & (!is.null(dep.var.labels))) { error.present <- c(error.present, "% Error: Argument 'dep.var.labels' must be NULL (default), or a vector of type 'character.'") }
+    
+    if ((!is.logical(dep.var.labels.include)) & (!is.null(dep.var.labels.include))) { error.present <- c(error.present, "% Error: Argument 'dep.var.labels.include' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(dep.var.labels.include) != 1) & (!is.null(dep.var.labels.include))) { error.present <- c(error.present, "% Error: Argument 'dep.var.labels.include' must be of length 1.'\n") }
+    
+    if ((!is.character(dep.var.caption)) & (!is.null(dep.var.caption))) { error.present <- c(error.present, "% Error: Argument 'dep.var.caption must be NULL (default), or of type 'character.'") }
+    if ((length(dep.var.caption) != 1) & (!is.null(dep.var.caption))) { error.present <- c(error.present, "% Error: Argument 'dep.var.caption' must be of length 1.'\n") }  
     
     if ((!.is.list.numeric(coef)))  { error.present <- c(error.present, "% Error: Argument 'coef' must be NULL (default), or a list of numerical vectors.") }
     if ((!.is.list.numeric(se)))  { error.present <- c(error.present, "% Error: Argument 'se' must be NULL (default), or a list of numerical vectors.") }
@@ -3315,13 +4438,25 @@ function(libname, pkgname) {
     if (!is.logical(align)) { error.present <- c(error.present, "% Error: Argument 'align' must be of type 'logical' (TRUE/FALSE) \n") }
     if (length(align) != 1) { error.present <- c(error.present, "% Error: Argument 'align' must be of length 1.'\n") }
 
+    if (!is.logical(ci)) { error.present <- c(error.present, "% Error: Argument 'ci' must be of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(ci) != 1) & (!is.null(ci))) { error.present <- c(error.present, "% Error: Argument 'ci' must be of length 1.'\n") }
+  
+    if (!is.numeric(ci.level)) { error.present <- c(error.present, "% Error: Argument 'ci.level' must be of type 'numeric.' \n") }
+    if ((length(ci.level) != 1) & (!is.null(ci.level))) { error.present <- c(error.present, "% Error: Argument 'ci.level' must be of length 1.'\n") }
+  
+    if ((!is.character(ci.separator)) & (!is.null(ci.separator))) { error.present <- c(error.present, "% Error: Argument 'ci.separator' must be NULL (default), or of type 'character.'\n") }
+    if ((length(ci.separator) != 1) & (!is.null(ci.separator))) { error.present <- c(error.present, "% Error: Argument 'ci.separator' must be of length 1.'\n") }
+
+    if (!is.character(column.sep.width)) { error.present <- c(error.present, "% Error: Argument 'column.sep.width' must be of type 'character.'") }
+    if (length(column.sep.width) != 1)  { error.present <- c(error.present, "% Error: Argument 'column.sep.width' must be of length 1.'\n") }
+  
     if ((!is.character(decimal.mark)) & (!is.null(decimal.mark))) { error.present <- c(error.present, "% Error: Argument 'decimal.mark' must be NULL (default), or of type 'character.'\n") }
     if ((length(decimal.mark) != 1) & (!is.null(decimal.mark))) { error.present <- c(error.present, "% Error: Argument 'decimal.mark' must be of length 1.'\n") }
-  
-    if (!is.logical(align)) { error.present <- c(error.present, "% Error: Argument 'align' must be of type 'logical' (TRUE/FALSE) \n") }
-    if ((length(align) != 1) & (!is.null(align))) { error.present <- c(error.present, "% Error: Argument 'align' must be of length 1.'\n") }
-  
-    if ((!is.numeric(digit.separate)) & (!is.null(digit.separate))) { error.present <- c(error.present, "% Error: Argument 'digit.separate' must be NULL (default), a vector of type 'numeric,' or \"lakh\"/\"china\"/\"japan\".\n") }
+    
+    if ((!is.numeric(digit.separate)) & (!is.null(digit.separate)) & (!is.character(digit.separate))) { error.present <- c(error.present, "% Error: Argument 'digit.separate' must be NULL (default), a vector of type 'numeric,' or of type 'character.' \n") }
+    if (is.character(digit.separate)) {
+      if (!(digit.separate %in% c("lakh","japan","china"))) { error.present <- c(error.present, "% Error: If argument 'digit.separate' is of type character, it must be one of \"lakh\"/\"china\"/\"japan\".\n") }
+    }
     
     if ((!is.character(digit.separator)) & (!is.null(digit.separator))) { error.present <- c(error.present, "% Error: Argument 'digit.separator' must be NULL (default), or of type 'character.'\n") }
     if ((length(digit.separator) != 1) & (!is.null(digit.separator))) { error.present <- c(error.present, "% Error: Argument 'digit.separator' must be of length 1.'\n") }
@@ -3343,7 +4478,21 @@ function(libname, pkgname) {
     if (!is.null(digits.extra)) {
       if ((digits.extra<0) & (is.numeric(digits.extra))) { error.present <- c(error.present, "% Error: Argument 'digits.extra' must be >= 0.'\n") }
     }
-    
+  
+    if (!is.logical(float)) { error.present <- c(error.present, "% Error: Argument 'float' must be of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(float) != 1) & (!is.null(float))) { error.present <- c(error.present, "% Error: Argument 'float' must be of length 1.'\n") }
+  
+    if (!(float.env %in% c("table","table*","sidewaystable"))) { error.present <- c(error.present, "% Error: Argument 'float.env' must be one of \"table\", \"table*\" or \"sidewaystable\".\n") }  
+    if (length(float.env) != 1) { error.present <- c(error.present, "% Error: Argument 'float.env' must be of length 1.'\n") }
+
+    if (!is.null(font.size)) {
+      if (!(font.size %in% c("tiny","scriptsize","footnotesize","small","normalsize","large","Large","LARGE","huge","Huge"))) { error.present <- c(error.present, "% Error: Argument 'font.size' must be NULL (default), or one of the available font sizes. See documentation.") }  
+    }
+    if ((length(font.size) != 1) & (!is.null(font.size))) { error.present <- c(error.present, "% Error: Argument 'font.size' must be of length 1.'\n") }
+  
+    if (!is.logical(header)) { error.present <- c(error.present, "% Error: Argument 'header' must be of type 'logical' (TRUE/FALSE) \n") }
+    if (length(header) != 1) { error.present <- c(error.present, "% Error: Argument 'header' must be of length 1.'\n") }
+      
     if ((!is.logical(initial.zero)) & (!is.null(initial.zero))) { error.present <- c(error.present, "% Error: Argument 'initial.zero' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
     if ((length(initial.zero) != 1) & (!is.null(initial.zero))) { error.present <- c(error.present, "% Error: Argument 'initial.zero' must be of length 1.'\n") }
     
@@ -3352,11 +4501,14 @@ function(libname, pkgname) {
     
     if (!is.character(label)) { error.present <- c(error.present, "% Error: Argument 'label' must be of type 'character.'\n") }
   
-    if ((!is.logical(model.names)) & (!is.null(model.names))) { error.present <- c(error.present, "% Error: Argument 'model.names' must be of type 'logical' (TRUE/FALSE) \n") }
+    if ((!is.logical(model.names)) & (!is.null(model.names))) { error.present <- c(error.present, "% Error: Argument 'model.names' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
     if ((length(model.names) != 1) & (!is.null(model.names))) { error.present <- c(error.present, "% Error: Argument 'model.names' must be of length 1.'\n") }
     
-    if ((!is.logical(model.numbers)) & (!is.null(model.numbers))) { error.present <- c(error.present, "% Error: Argument 'model.numbers' must be of type 'logical' (TRUE/FALSE) \n") }
+    if ((!is.logical(model.numbers)) & (!is.null(model.numbers))) { error.present <- c(error.present, "% Error: Argument 'model.numbers' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
     if ((length(model.numbers) != 1) & (!is.null(model.numbers))) { error.present <- c(error.present, "% Error: Argument 'model.numbers' must be of length 1.'\n") }
+  
+    if ((!is.logical(no.space)) & (!is.null(no.space))) { error.present <- c(error.present, "% Error: Argument 'no.space' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(no.space) != 1) & (!is.null(no.space))) { error.present <- c(error.present, "% Error: Argument 'no.space' must be of length 1.'\n") }
     
     if ((!is.character(notes)) & (!is.null(notes))) { error.present <- c(error.present, "% Error: Argument 'notes' must be NULL (default), or a vector of type 'character.'") }
     
@@ -3364,7 +4516,10 @@ function(libname, pkgname) {
       if (!(tolower(notes.align) %in% c("l","c","r"))) { error.present <- c(error.present, "% Error: Argument 'notes.align' must be NULL (default), or \"l\"/\"c\"/\"r\".") }  
     }
     if ((length(notes.align) != 1) & (!is.null(notes.align))) { error.present <- c(error.present, "% Error: Argument 'notes.align' must be of length 1.'\n") }
-    
+  
+    if (!is.logical(notes.append)) { error.present <- c(error.present, "% Error: Argument 'notes.append' must be of type 'logical' (TRUE/FALSE) \n") }
+    if (length(notes.append) != 1) { error.present <- c(error.present, "% Error: Argument 'notes.append' must be of length 1.'\n") }
+  
     if ((!is.character(notes.label)) & (!is.null(notes.label))) { error.present <- c(error.present, "% Error: Argument 'notes.label' must be NULL (default), or of type 'character.'") }
     if ((length(notes.label) != 1) & (!is.null(notes.label))) { error.present <- c(error.present, "% Error: Argument 'notes.label' must be of length 1.'\n") }
     
@@ -3388,6 +4543,18 @@ function(libname, pkgname) {
     if (!is.logical(ord.intercepts)) { error.present <- c(error.present, "% Error: Argument 'ord.intercepts' must be of type 'logical' (TRUE/FALSE) \n") }
     if (length(ord.intercepts) != 1) { error.present <- c(error.present, "% Error: Argument 'ord.intercepts' must be of length 1.'\n") }
     
+    if (!is.logical(perl)) { error.present <- c(error.present, "% Error: Argument 'perl' must be of type 'logical' (TRUE/FALSE) \n") }
+    if (length(perl) != 1) { error.present <- c(error.present, "% Error: Argument 'perl' must be of length 1.'\n") }
+  
+    if (!is.character(rq.se)) { error.present <- c(error.present, "% Error: Argument 'rq.se' must be of type 'character.' \n") }
+    if (length(rq.se) != 1) { error.present <- c(error.present, "% Error: Argument 'rq.se' must be of length 1.'\n") }
+    if (is.character(rq.se)) {
+      if (!(rq.se %in% c("iid", "nid", "ker", "boot"))) { error.present <- c(error.present, "% Error: Argument 'rq.se' must be one of: 'iid', 'nid', 'ker' or 'boot.' \n") }
+    }
+  
+    if (!is.logical(single.row)) { error.present <- c(error.present, "% Error: Argument 'single.row' must be of type 'logical' (TRUE/FALSE) \n") }
+    if (length(single.row) != 1) { error.present <- c(error.present, "% Error: Argument 'single.row' must be of length 1.'\n") }
+  
     if ((!is.character(star.char)) & (!is.null(star.char))) { error.present <- c(error.present, "% Error: Argument 'star.char' must be NULL (default), or of type 'character.'\n") }
     if ((length(star.char) != 1) & (!is.null(star.char))) { error.present <- c(error.present, "% Error: Argument 'star.char' must be of length 1.'\n") }
     
@@ -3398,6 +4565,18 @@ function(libname, pkgname) {
       if ( !((length(star.cutoffs) >= 1) & (length(star.cutoffs) <= 3)) & (!is.null(star.cutoffs))) { error.present <- c(error.present, "% Error: Argument 'star.cutoffs' must be a vector with at least one and at most three elements.\n") }
       if (sum(star.cutoffs[!is.na(star.cutoffs)] == sort(star.cutoffs, decreasing = TRUE, na.last=NA)) != length(star.cutoffs[!is.na(star.cutoffs)])) { error.present <- c(error.present, "% Error: The elements of 'star.cutoffs' must be in weakly decreasing order.\n") }
     }
+  
+    if (!is.character(table.placement)) { error.present <- c(error.present, "% Error: Argument 'table.placement' must be of type 'character.'") }
+    if (length(table.placement) != 1)  { error.present <- c(error.present, "% Error: Argument 'table.placement' must be of length 1.'\n") }
+    if (is.character(table.placement) & (length(table.placement)==1)) {   # test if table.placement only contains allowed letters
+      tp.error <- FALSE
+      for (i in 1:nchar(table.placement)) {
+        ch <- substring(table.placement,i,i)
+        if (!(ch %in% c("h","t","b","p","!","H"))) (tp.error <- TRUE)
+      }
+      if (tp.error) { error.present <- c(error.present, "% Error: Argument 'table.placement' can only consist of \"h\",\"t\",\"b\",\"p\",\"!\",\"H\".\n") }
+    }
+  
   
     if (!is.logical(zero.component)) { error.present <- c(error.present, "% Error: Argument 'zero.component' must be of type 'logical' (TRUE/FALSE) \n") }
     if ((length(zero.component) != 1) & (!is.null(zero.component))) { error.present <- c(error.present, "% Error: Argument 'zero.component' must be of length 1.'\n") }
@@ -3438,8 +4617,8 @@ function(libname, pkgname) {
     .global.summary <- TRUE
 
     # info about the package and author
-    .global.package.name <- "StarGazer"
-    .global.package.version <- "3.0.1"
+    .global.package.name <- "stargazer"
+    .global.package.version <- "4.0"
     .global.package.author.name <- "Marek Hlavac"
     .global.package.author.affiliation <- "Harvard University"
     .global.package.author.email <- "hlavac at fas.harvard.edu"
@@ -3476,7 +4655,7 @@ function(libname, pkgname) {
     .global.residual.deviance <- NULL
     
     # intercept strings
-    .global.intercept.strings <- c("(Intercept)", "(intercept)")
+    .global.intercept.strings <- c("(Intercept)", "(intercept)","Intercept")
     
     # .formatting: Default
     .format.space.size <- "-1.8ex"
@@ -3495,6 +4674,10 @@ function(libname, pkgname) {
     .format.dependent.variables.capitalize <- FALSE
     
     .format.ordered.intercepts <- TRUE
+  
+    # column labels
+    .format.column.left <- ""
+    .format.column.right <- ""
     
     # model numbers
     .format.model.numbers <- TRUE
@@ -3505,12 +4688,14 @@ function(libname, pkgname) {
     .format.model.names <- cbind(c("aov","ANOVA",""), c("arima","ARIMA",""), c("blogit","bivariate","logistic"))
     .format.model.names <- cbind(.format.model.names, c("bprobit","bivariate","probit"), c("betareg", "beta",""), c("chopit","compound hierarchical","ordered probit"))
     .format.model.names <- cbind(.format.model.names, c("clm","cumulative","link"), c("cloglog.net","network compl.","log log"), c("clogit","conditional","logistic"), c("coxph","Cox","prop. hazards"))
+    .format.model.names <- cbind(.format.model.names, c("dynlm","dynamic","linear"), c("lagsarlm","spatial","autoregressive"), c("errorsarlm","spatial","error"))
     .format.model.names <- cbind(.format.model.names, c("ei.dynamic","Quinn dynamic","ecological inference"), c("ei.hier","$2 \times 2$ hierarchical","ecological inference"))
     .format.model.names <- cbind(.format.model.names, c("ei.RxC","hierarchical multinominal-Dirichlet","ecological inference"), c("exp","exponential",""), c("ergm","exponential family","random graph"))
     .format.model.names <- cbind(.format.model.names, c("factor.bayes","Bayesian","factor analysis"), c("factor.mix","mixed data","factor analysis"))
     .format.model.names <- cbind(.format.model.names, c("factor.ord","ordinal data","factor analysis"), c("gamma","gamma",""))
     .format.model.names <- cbind(.format.model.names, c("gamma.gee","gamma generalized","estimating equation"), c("gamma.mixed","mixed effects","gamma"))
     .format.model.names <- cbind(.format.model.names, c("gamma.net","network","gamma"), c("gamma.survey","survey-weighted","gamma"), c("gls","generalized","least squares"))
+    .format.model.names <- cbind(.format.model.names, c("gmm","GMM",""), c("rem.dyad", "relational", "event (dyadic)"))
     .format.model.names <- cbind(.format.model.names, c("irt1d","IRT","(1-dim.)"), c("irtkd","IRT","(k-dim.)"))
     .format.model.names <- cbind(.format.model.names, c("logit","logistic",""), c("logit.bayes","Bayesian","logistic"))
     .format.model.names <- cbind(.format.model.names, c("logit.gam","GAM","(logistic)"), c("logit.gee","logistic generalized","estimating equation"))
@@ -3532,11 +4717,17 @@ function(libname, pkgname) {
     .format.model.names <- cbind(.format.model.names, c("probit.gam","GAM","(probit)"), c("probit.gee","probit generalized","estimating equation"))
     .format.model.names <- cbind(.format.model.names, c("probit.mixed","mixed effects","probit"), c("probit.net","network","probit"))
     .format.model.names <- cbind(.format.model.names, c("probit.survey","survey-weighted","probit"), c("relogit","rare events","logistic"))
+    .format.model.names <- cbind(.format.model.names, c("rq","quantile","regression"))
     .format.model.names <- cbind(.format.model.names, c("rlm","robust","linear"), c("sur","SUR",""), c("threesls","3SLS",""))
     .format.model.names <- cbind(.format.model.names, c("tobit","Tobit",""), c("tobit(AER)","Tobit",""), c("tobit.bayes","Bayesian","Tobit"))
     .format.model.names <- cbind(.format.model.names, c("twosls","2SLS",""), c("weibull","Weibull",""))
     .format.model.names <- cbind(.format.model.names, c("zeroinfl","zero-inflated","count data"), c("hurdle","hurdle",""))
     .format.model.names <- cbind(.format.model.names, c("plm","panel","linear"), c("ivreg","instrumental","variable"))
+    .format.model.names <- cbind(.format.model.names, c("coxreg","Cox",""), c("mlreg","ML","prop. hazards"), c("weibreg","Weibull",""))
+    .format.model.names <- cbind(.format.model.names, c("aftreg","accelerated"," failure time"), c("phreg","parametric","prop. hazards"))
+    .format.model.names <- cbind(.format.model.names, c("bj","Buckley-James",""), c("cph","Cox",""), c("Gls","generalized","least squares"), c("lrm","logistic",""))
+    .format.model.names <- cbind(.format.model.names, c("ols","OLS",""), c("psm","parametric","survival"), c("Rq","quantile","regression"))
+    .format.model.names <- cbind(.format.model.names, c("hetglm","heteroskedastic","GLM"))
   
     # if you use, say, glm() that does not correspond to one of the pre-defined models, put this as family and link
     .format.model.function <- TRUE
@@ -3590,12 +4781,13 @@ function(libname, pkgname) {
     
     .format.digit.separator.where <- c(3)    # how 'often' to separate digits (e.g., thousands separator = 3)
     .format.digit.separator <- ","
+    .format.ci.separator <- ", "
     .format.round.digits <- 3
     # for decimal comma use: .format.decimal.character <- "{,}"
     .format.decimal.character <- "."
     .format.dec.mark.align <- FALSE
     
-    .format.table.parts <- c("=!","dependent variable label","dependent variables","models","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","scale","sigma2","theta(se)*", "AIC","BIC","UBRE", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","null deviance(df)","residual deviance(df)","=!","notes")
+    .format.table.parts <- c("=!","dependent variable label","dependent variables","models","colums","numbers","-","coefficients","-","omit","-","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","scale","sigma2","theta(se)*", "AIC","BIC","UBRE", "SER(df)","F statistic(df)*(p)","chi2(df)*(p)","Wald(df)*(p)","LR(df)*(p)","logrank(df)*(p)","null deviance(df)","residual deviance(df)","=!","notes")
     
     .format.omit.regexp <- NULL
     .format.omit.labels <- NULL
@@ -3603,7 +4795,7 @@ function(libname, pkgname) {
     .format.omit.no <- "No"
     
     .format.N <- "Observations"
-    .format.LL <- "Log likelihood"
+    .format.LL <- "Log Likelihood"
     .format.R2 <- "R$^{2}$"
     .format.max.R2 <- "Max. Possible R$^{2}$"
     .format.adj.R2 <- "Adjusted R$^{2}$"
@@ -3615,7 +4807,7 @@ function(libname, pkgname) {
     .format.theta <- "$\\theta$"
     
     .format.SER <- "Residual Std. Error"
-    .format.F.stat <- "F statistic"
+    .format.F.stat <- "F Statistic"
     .format.chi.stat <- "$\\chi^{2}$"
     .format.wald.stat <- "Wald Test"
     .format.lr.stat <- "LR Test"
@@ -3670,19 +4862,57 @@ function(libname, pkgname) {
     .adjust.settings.style(style)
     
     # continue only if no errors
-    if (is.null(error.present)) {
+    if (length(error.present) == 1) {
       
       # summary statistic table or regular table of data frame contents
       if (!is.null(.global.summary)) { .global.summary <- summary }
       
       ## use formatting arguments
       
+      # header with name, version, etc.
+      .format.header <- header
+      
+      # no empty lines? single row for coefficient and std.error/CI?
+      .format.single.row <- single.row
+      if (.format.single.row == TRUE) { .format.no.space <- TRUE }
+      else { .format.no.space <- FALSE }
+      if (!is.null(no.space)) { .format.no.space <- no.space }
+      
+      # font size
+      .format.font.size <- font.size
+      
+      # floating, floating environment, etc.
+      .format.floating <- float
+      .format.floating.environment <- float.env
+      .format.table.placement <- table.placement
+      .format.column.sep.width <- column.sep.width
+      
       # if not case-sensitive, transfer to lower case
       if (!is.null(digit.separate)) { digit.separate <- tolower(digit.separate) }
       
       # column, dependent variable and covariate labels
+      .format.column.labels <- column.labels
+      .format.column.separate <- column.separate
       .format.covariate.labels <- covariate.labels
       .format.dep.var.labels <- dep.var.labels
+      
+      if (dep.var.labels.include == FALSE) {
+        .format.table.parts <- .format.table.parts[.format.table.parts!="dependent variables"] 
+      }
+      
+      if (!is.null(dep.var.caption)) {
+        if (dep.var.caption == "") {
+          .format.table.parts <- .format.table.parts[.format.table.parts!="dependent variable label"]
+        }
+        else {
+          .format.dependent.variable.text <- dep.var.caption
+        }
+      }
+      
+      # confidence intervals
+      .format.ci <- ci
+      .format.ci.level <- ci.level
+      if (!is.null(ci.separator)) { .format.ci.separator <- ci.separator }
       
       # omit
       .format.omit.regexp <- omit
@@ -3783,13 +5013,20 @@ function(libname, pkgname) {
       }
       
       if (!is.null(notes)) { 
-        .format.note.content <- notes
-        .format.s.note.content <- notes
+        if (notes.append == TRUE) {
+          .format.note.content <- c(.format.note.content, notes)
+          .format.s.note.content <- c(.format.s.note.content, notes)
+        }
+        else {
+          .format.note.content <- notes
+          .format.s.note.content <- notes
+        }
       }
       if (!is.null(notes.align)) { 
         .format.note.alignment <- notes.align 
         .format.s.note.alignment <- notes.align
       }
+      
       if (!is.null(notes.label)) { 
         .format.note <- notes.label 
         .format.s.note <- notes.label
@@ -3797,6 +5034,12 @@ function(libname, pkgname) {
       
       # ordered probit/logit, etc. - report intercepts?
       .format.ordered.intercepts <- ord.intercepts
+      
+      # perl-compatible regular expressions?
+      .format.perl <- perl
+      
+      # standard error for quantile regression
+      .format.rq.se <- rq.se
       
       # report logical variables in summary statistics tables?
       .format.summ.logical <- summary.logical
@@ -3824,8 +5067,13 @@ function(libname, pkgname) {
             if (!is.na(label[number.of.table])) { .format.label <- label[number.of.table] }
             else { .format.label <- label[length(label)] }
             
-            do.call(.stargazer.reg.table, as.list(objects[regression.table.objects]))
-            invisible.output <- c(invisible.output, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
+            if (type == "latex") {
+              do.call(.stargazer.reg.table, as.list(objects[regression.table.objects]))  
+              invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
+            }
+            else if (type == "text") {
+              latex.code <- c(latex.code, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
+            }
           }
           
           number.of.table <- number.of.table + 1
@@ -3836,12 +5084,22 @@ function(libname, pkgname) {
           else { .format.label <- label[length(label)] }
           
           if (.global.summary==TRUE) {
-            .stargazer.summ.stat.table(objects[[i]])
-            invisible.output <- c(invisible.output, invisible(capture.output(.stargazer.summ.stat.table(objects[[i]]),file=NULL)) )
+            if (type == "latex") {
+              .stargazer.summ.stat.table(objects[[i]])
+              invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(.stargazer.summ.stat.table(objects[[i]]),file=NULL)) )
+            }
+            else if (type == "text") {
+              latex.code <- c(latex.code, invisible(capture.output(.stargazer.summ.stat.table(objects[[i]]),file=NULL)) )
+            }
           }
           else {
-            .stargazer.data.frame.table(objects[[i]])
-            invisible.output <- c(invisible.output, invisible(capture.output(.stargazer.data.frame.table(objects[[i]]),file=NULL)) )
+            if (type == "latex") {
+              .stargazer.data.frame.table(objects[[i]])
+              invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(.stargazer.data.frame.table(objects[[i]]),file=NULL)) )
+            }
+            else if (type == "text") {
+              latex.code <- c(latex.code, invisible(capture.output(.stargazer.data.frame.table(objects[[i]]),file=NULL)) )
+            }
           }
           regression.table.objects <- NULL
         }
@@ -3858,14 +5116,37 @@ function(libname, pkgname) {
         if (!is.na(label[number.of.table])) { .format.label <- label[number.of.table] }
         else { .format.label <- label[length(label)] }
         
-        do.call(.stargazer.reg.table, as.list(objects[regression.table.objects]))  
-        invisible.output <- c(invisible.output, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
+        if (type == "latex") {
+          do.call(.stargazer.reg.table, as.list(objects[regression.table.objects]))  
+          invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
+        }
+        else if (type == "text") {
+          latex.code <- c(latex.code, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
+        }
+      }
+      
+      # don't do text output or file outputs if there are errors
+      if (type == "text") {
+        .text.output(latex.code)
+        invisible.output <- invisible(capture.output(.text.output(latex.code)))
+      }
+      
+      if (length(out) >= 1) { 
+        text.out <- invisible(capture.output(.text.output(latex.code)))
+        .output.file(out, latex.code, text.out, type) 
       }
     }
     else { 
-      cat(error.present, sep="")
-      invisible.output <- error.present 
+      if (suppress.errors == FALSE) {
+        cat(error.present, sep="")
+        invisible.output <- latex.code <- error.present
+      }
+      else {
+        invisible.output <- latex.code <- ""
+      }
     }
+  
+    options(warn=warn)
     return(invisible(invisible.output))
 }
 

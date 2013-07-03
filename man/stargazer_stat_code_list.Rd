@@ -2,7 +2,7 @@
 \alias{list of statistic codes}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{List of statistic codes for \code{\link{stargazer}}
+\title{stargazer: list of statistic codes
 %%  ~~function to do ... ~~
 }
 \description{
