@@ -10,6 +10,31 @@ This page summarizes the models, features, and bug fixes that were introduced in
 }
 
 \section{What's new?}{
+v. 4.5: \cr
+\cr
+- New models: \cr
+-- binaryChoice (sampleSelection) \cr
+-- brglm (brglm) \cr
+-- coeftest (lmtest) \cr
+-- heckit (sampleSelection) \cr
+-- maBina (erer) \cr
+-- mclogit (mclogit) \cr
+-- mlogit (mlogit) \cr
+-- selection (sampleSelection) \cr
+\cr
+- New features: \cr
+-- explanatory variables can be ordered in customizable ways (argument \code{order}) \cr
+-- custom functions can now be applied to coefficients (argument \code{apply.coef}), standard errors (argument \code{apply.se}), test statistics (argument \code{apply.t}), p-values (argument \code{apply.p}), and confidence intervals (argument \code{apply.ci}) \cr
+-- keep explanatory variables and statistics based on regular expressions (argument \code{keep} and \code{keep.stat}) \cr
+-- users can customize confidence intervals (argument \code{custom.ci}) \cr
+-- ability to have both standard errors and confidence intervals in the same table (argument \code{ci} is now a logical vector) \cr
+-- different confidence levels for each individual column (argument \code{ci.level} is now a vector) \cr
+-- ability to omit and keep variables based on their position in the table\cr
+\cr
+- Bug fixes: \cr
+-- citation and change log updates \cr
+-- minor formatting changes \cr
+\cr
 v. 4.0: \cr
 \cr
 - New models: \cr

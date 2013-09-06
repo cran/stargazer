@@ -14,25 +14,28 @@ The following character strings can be used in the \code{omit.stat} argument of 
 
 \tabular{ll}{
   \code{"all"} \tab all statistics \cr
-  \code{"n"} \tab number of observations \cr
-  \code{"rsq"} \tab R-squared \cr
   \code{"adj.rsq"} \tab adjusted R-squared \cr
-  \code{"max.rsq"} \tab maximum R-squared \cr
-  \code{"ll"} \tab log-likelihood \cr
   \code{"aic"} \tab Akaike Information Criterion \cr
   \code{"bic"} \tab Bayesian Information Criterion \cr
-  \code{"scale"} \tab scale \cr
-  \code{"ubre"} \tab Un-Biased Risk Estimator \cr
-  \code{"sigma2"} \tab sigma squared \cr
-  \code{"ser"} \tab standard error of the regression (i.e., residual standard error) \cr
-  \code{"f"} \tab F statistic \cr
-  \code{"theta"} \tab theta \cr
   \code{"chi2"} \tab chi-squared \cr
-  \code{"wald"} \tab Wald test \cr
-  \code{"lr"} \tab likelihood ratio (LR) test \cr
+  \code{"f"} \tab F statistic \cr
+  \code{"ll"} \tab log-likelihood \cr
   \code{"logrank"} \tab score (logrank) test \cr
+  \code{"lr"} \tab likelihood ratio (LR) test \cr
+  \code{"max.rsq"} \tab maximum R-squared \cr
+  \code{"n"} \tab number of observations \cr
   \code{"null.dev"} \tab null deviance \cr
+  \code{"Mills"} \tab Inverse Mills Ratio \cr
   \code{"res.dev"} \tab residual deviance \cr
+  \code{"rho"} \tab rho \cr
+  \code{"rsq"} \tab R-squared \cr
+  \code{"scale"} \tab scale \cr
+  \code{"theta"} \tab theta \cr
+  \code{"ser"} \tab standard error of the regression (i.e., residual standard error) \cr
+  \code{"sigma2"} \tab sigma squared \cr
+  \code{"ubre"} \tab Un-Biased Risk Estimator \cr
+  \code{"wald"} \tab Wald test \cr
+  
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

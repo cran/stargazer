@@ -8,7 +8,7 @@
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-The \code{stargazer} command produces LaTeX code and ASCII text for well-formatted tables that hold regression analysis results from several models side-by-side. It can also output summary statistics and data frame content. \code{stargazer} supports model objects from \code{aftreg} (eha), \code{betareg} (betareg), \code{bj} (rms), \code{coxph} (survival), \code{coxreg} (eha), \code{clm} (ordinal), \code{clogit} (survival), \code{cph} (rms), \code{dynlm} (dynlm), \code{ergm} (ergm), \code{errorsarlm} (spdep), \code{gam} (mgcv), \code{gee} (gee), \code{glm} (stats), \code{Glm} (rms), \code{glmer} (lme4), \code{gls} (nlme), \code{Gls} (rms), \code{gmm} (gmm), \code{hurdle} (pscl),  \code{ivreg} (AER), \code{lagarlm} (spdep), \code{lm} (stats), \code{lmer} (lme4), \code{lmrob} (robustbase), \code{lrm} (rms), \code{mlreg} (eha), \code{multinom} (nnet), \code{nlmer} (lme4), \code{ols} (rms), \code{phreg} (eha), \code{plm} (plm), \code{pmg} (plm), \code{polr} (MASS), \code{psm} (rms), \code{rem.dyad} (relevent), \code{rlm} (MASS), \code{rq} (quantreg), \code{Rq} (rms), \code{svyglm} (survey), \code{survreg} (survival), \code{tobit} (AER), \code{weibreg} (eha), \code{zeroinfl} (pscl), as well as from the implementation of these in \code{zelig}. It also supports the following \code{zelig} models: \code{"relogit"}, \code{"cloglog.net"}, \code{"gamma.net"}, \code{"probit.net"} and \code{"logit.net"}.
+The \code{stargazer} command produces LaTeX code and ASCII text for well-formatted tables that hold regression analysis results from several models side-by-side. It can also output summary statistics and data frame content. \code{stargazer} supports model objects from \code{aftreg} (eha), \code{betareg} (betareg), \code{binaryChoice} (sampleSelection), \code{bj} (rms), \code{brglm} (brglm), \code{coeftest} (lmtest), \code{coxph} (survival), \code{coxreg} (eha), \code{clm} (ordinal), \code{clogit} (survival), \code{cph} (rms), \code{dynlm} (dynlm), \code{ergm} (ergm), \code{errorsarlm} (spdep), \code{gam} (mgcv), \code{gee} (gee), \code{glm} (stats), \code{Glm} (rms), \code{glmer} (lme4), \code{gls} (nlme), \code{Gls} (rms), \code{gmm} (gmm), \code{heckit} (sampleSelection), \code{hurdle} (pscl),  \code{ivreg} (AER), \code{lagarlm} (spdep), \code{lm} (stats), \code{lmer} (lme4), \code{lmrob} (robustbase), \code{lrm} (rms), \code{maBina} (erer), \code{mclogit} (mclogit), \code{mlogit} (mlogit), \code{mlreg} (eha), \code{multinom} (nnet), \code{nlmer} (lme4), \code{ols} (rms), \code{phreg} (eha), \code{plm} (plm), \code{pmg} (plm), \code{polr} (MASS), \code{psm} (rms), \code{rem.dyad} (relevent), \code{rlm} (MASS), \code{rq} (quantreg), \code{Rq} (rms), \code{probit} (sampleSelection), \code{selection} (sampleSelection), \code{svyglm} (survey), \code{survreg} (survival), \code{tobit} (AER), \code{weibreg} (eha), \code{zeroinfl} (pscl), as well as from the implementation of these in \code{zelig}. It also supports the following \code{zelig} models: \code{"relogit"}, \code{"cloglog.net"}, \code{"gamma.net"}, \code{"probit.net"} and \code{"logit.net"}.
 }
 \usage{
 stargazer(  ..., 
@@ -20,22 +20,28 @@ stargazer(  ...,
             align = FALSE, 
             coef = NULL, se = NULL, t = NULL, p = NULL,
             t.auto = TRUE, p.auto = TRUE,
-            ci = FALSE, ci.level = 0.95, ci.separator = NULL,
+            ci = FALSE, ci.custom = NULL,
+            ci.level = 0.95, ci.separator = NULL,
+            apply.coef = NULL, apply.se = NULL, 
+            apply.t = NULL, apply.p = NULL, apply.ci = NULL,
             column.sep.width = "5pt",
             decimal.mark = NULL, digit.separate = NULL, 
             digit.separator = NULL,
             digits = NULL, digits.extra = NULL,
             float = TRUE, float.env="table",
             font.size = NULL, header = TRUE,
-            initial.zero = NULL, intercept.top = NULL, 
+            initial.zero = NULL, 
+            intercept.bottom = TRUE, intercept.top = FALSE, 
+            keep = NULL, keep.stat = NULL,
             label = "", model.names = NULL, model.numbers = NULL,
             no.space = NULL,
             notes = NULL, notes.align = NULL, 
             notes.append = TRUE, notes.label = NULL, 
             omit = NULL, omit.labels = NULL, 
             omit.stat = NULL, omit.yes.no = c("Yes", "No"), 
-            ord.intercepts = FALSE, perl = FALSE, 
-            rq.se = "nid", single.row = FALSE,
+            order = NULL, ord.intercepts = FALSE, perl = FALSE, 
+            rq.se = "nid", selection.equation = FALSE, 
+            single.row = FALSE,
             star.char = NULL, star.cutoffs = NULL, 
             suppress.errors = FALSE, table.placement = "!htbp",
             zero.component = FALSE, summary.logical = TRUE,
@@ -63,7 +69,7 @@ stargazer(  ...,
 
 \item{column.labels}{a character vector of labels for columns in regression tables. Their layout, in terms of the number of columns associated with each label, is given by the argument \code{column.separate}.}
 
-\item{column.separate}{a numerical vector that specifies how \code{column.labels} should be laid out across regression table columns. A value of \code{c(2, 1, 3)}, for instance, will apply the first label to the two first columns, the second label to the third column, and the third label will apply to the following three columns (i.e., columns number four, five and six). If the argument's value is \code{NULL} or the regression table contains more columns than are referred to in \code{column.separate}, a value of 1 is assumed for each "excess" column label.}
+\item{column.separate}{a numeric vector that specifies how \code{column.labels} should be laid out across regression table columns. A value of \code{c(2, 1, 3)}, for instance, will apply the first label to the two first columns, the second label to the third column, and the third label will apply to the following three columns (i.e., columns number four, five and six). If the argument's value is \code{NULL} or the regression table contains more columns than are referred to in \code{column.separate}, a value of 1 is assumed for each "excess" column label.}
 
 \item{covariate.labels}{a character vector of labels for covariates in regression tables. A value of \code{NA} for any element means that \code{stargazer} will print the corresponding variable name. In the default case of \code{NULL}, variable names are printed.%%     ~~Describe \code{covariate.labels} here~~
 }
@@ -77,31 +83,39 @@ stargazer(  ...,
 
 \item{dep.var.labels.include}{a logical value that toggles whether dependent variable labels will be included in the regression table.}
 
-  \item{align}{a logical value indicating whether numerical values in the same column should be aligned at the decimal mark in LaTeX output. Requires \code{\\usepackage{dcolumn}} in LaTeX preamble.}
+  \item{align}{a logical value indicating whether numeric values in the same column should be aligned at the decimal mark in LaTeX output. Requires \code{\\usepackage{dcolumn}} in LaTeX preamble.}
   
-    \item{coef}{a list of numerical vectors that will replace the default coefficient values for each model. Element names will be used to match coefficients to individual covariates, and should therefore match covariate names. A \code{NULL} vector indicates that, for a given model, the default set of coefficients should be used. By contrast, an \code{NA} vector means that all of the model's coefficients should be left blank.}
+    \item{coef}{a list of numeric vectors that will replace the default coefficient values for each model. Element names will be used to match coefficients to individual covariates, and should therefore match covariate names. A \code{NULL} vector indicates that, for a given model, the default set of coefficients should be used. By contrast, an \code{NA} vector means that all of the model's coefficients should be left blank.}
     
-    \item{se}{a list of numerical vectors that will replace the default coefficient values for each model. Behaves exactly like the argument \code{coef}.}
+    \item{se}{a list of numeric vectors that will replace the default coefficient values for each model. Behaves exactly like the argument \code{coef}.}
     
-    \item{t}{a list of numerical vectors that will replace the default test statistics (e.g., t-scores, or z-scores) for each model. Like \code{coef} and \code{se}, test statistics are matched to covariates by their element names.}
+    \item{t}{a list of numeric vectors that will replace the default test statistics (e.g., t-scores, or z-scores) for each model. Like \code{coef} and \code{se}, test statistics are matched to covariates by their element names.}
     
-    \item{p}{a list of numerical vectors that will replace the default p-values for each model. Matched by element names. These will form the basis of decisions about significance stars.}
+    \item{p}{a list of numeric vectors that will replace the default p-values for each model. Matched by element names. These will form the basis of decisions about significance stars.}
     
-  \item{t.auto}{a logical value that indicates whether \code{stargazer} should calculate the test statistics (i.e., the z-scores) automatically if standard errors are supplied by the user (from argument \code{se}). If \code{FALSE}, the package will use model's default values if \code{t} is \code{NULL}. }
+  \item{t.auto}{a logical value that indicates whether \code{stargazer} should calculate the test statistics (i.e., the z-scores) automatically if coefficients or standard errors are supplied by the user (from arguments \code{coef} and \code{se}) or modified by a function (from arguments \code{apply.coef} or \code{apply.se}). If \code{FALSE}, the package will use model's default values if \code{t} is \code{NULL}. }
  
-  \item{p.auto}{a logical value that indicates whether \code{stargazer} should calculate the p-values, using the standard normal distribution, standard errors are supplied by the user (from argument \code{se}). If \code{FALSE}, the package will use model's default values if \code{p} is \code{NULL}. }
+  \item{p.auto}{a logical value that indicates whether \code{stargazer} should calculate the p-values, using the standard normal distribution, if coefficients or standard errors are supplied by the user (from arguments \code{coef} and \code{se}) or modified by a function (from arguments \code{apply.coef} or \code{apply.se}). If \code{FALSE}, the package will use model's default values if \code{p} is \code{NULL}. }
   
-  \item{ci}{a logical value that indicates whether \code{stargazer} should, in regression tables, replace standard errors by confidence intervals.}
+  \item{ci}{a logical vector that indicates, for each column, whether \code{stargazer} should, in regression tables, replace standard errors by confidence intervals. If the value is \code{NA} or unspecified, then the value from the last preceding specified column is used.}
+  
+    \item{ci.custom}{a list of two-column numeric matrices that will replace the default confidence intervals for each model. The first and second columns represent the lower and the upper bounds, respectively. Matched by element names.}
     
-  \item{ci.level}{a numerical value that specifies the confidence level to be used in regression tables when argument \code{ci} is set to \code{TRUE}. By default, \code{stargazer} will report 95 percent confidence intervals. }
+  \item{ci.level}{a numeric vector that specifies, for each column, the confidence level to be used in regression tables when argument \code{ci} is set to \code{TRUE}. By default, \code{stargazer} will report 95 percent confidence intervals. If the value is \code{NA} or unspecified, then the value from the last preceding specified column is used.}
     
   \item{ci.separator}{a character string that will serve as the separator between the lower and upper bounds of reported confidence intervals.}
+  
+  \item{apply.coef}{a function that will be applied to the coefficients.}
+  \item{apply.se}{a function that will be applied to the standard errors.}
+  \item{apply.t}{a function that will be applied to the test statistics.}
+  \item{apply.p}{a function that will be applied to the p-values.}
+  \item{apply.ci}{a function that will be applied to the lower and upper bounds of the confidence intervals.}
   
   \item{column.sep.width}{a character string that specifies, in LaTeX code, the width of the space that separates columns in LaTeX tables. The default value is \code{"5pt"}.}
   
   \item{decimal.mark}{a character string that will serve as the decimal mark. For instance, the string \code{","} will represent decimal commas, while \code{"."} means tables will use decimal points.}
 
-  \item{digit.separate}{a numerical vector that indicates where digit separators should be placed. The first element of the vector indicates the number of digits (counted from the decimal mark to the left) that will be separated. The second element indicates the number of digits that will be separated from that 'first' separator, and so on. A value of \code{3} corresponds to a thousands separator, while a value of \code{0} indicates no separation. Alternatively, \code{digit.separate} can be one of the following character strings: \code{"lakh"} (equivalent to \code{c(4,3)}), \code{"china"} or \code{"japan"} (both equivalent to a value of \code{4}).
+  \item{digit.separate}{a numeric vector that indicates where digit separators should be placed. The first element of the vector indicates the number of digits (counted from the decimal mark to the left) that will be separated. The second element indicates the number of digits that will be separated from that 'first' separator, and so on. A value of \code{3} corresponds to a thousands separator, while a value of \code{0} indicates no separation. Alternatively, \code{digit.separate} can be one of the following character strings: \code{"lakh"} (equivalent to \code{c(4,3)}), \code{"china"} or \code{"japan"} (both equivalent to a value of \code{4}).
 %%     ~~Describe \code{digit.separate} here~~
 }
   \item{digit.separator}{a character string that will serve as the digit (e.g., thousands) separator. Commonly used strings include \code{","} for a comma separator, \code{" "} for a single space separator, and \code{""} for no separation.
@@ -127,9 +141,17 @@ stargazer(  ...,
   \item{initial.zero}{a logical value indicating whether an initial zero should be printed before the decimal mark if a number is between 0 and 1. 
 %%     ~~Describe \code{initial.zero} here~~
 }
-  \item{intercept.top}{a logical value indicating whether the intercept (or constant) coefficients should be on top, rather than on the bottom, of the table.
+  \item{intercept.bottom}{a logical value indicating whether the intercept (or constant) coefficients should be on the bottom of the table.
 %%     ~~Describe \code{intercept.top} here~~
 }
+  \item{intercept.top}{a logical value indicating whether the intercept (or constant) coefficients should be on the top of the table.
+%%     ~~Describe \code{intercept.top} here~~
+}
+  \item{keep}{a vector of regular expressions that specifies which of the explanatory variables should be kept in the table. Alternatively, this argument can be a numeric vector whose elements indicate which variables (from top to bottom, or left to right) should be kept. The default value of \code{NULL} means that all variables will be kept.
+%%     ~~Describe \code{omit} here~~
+}
+  \item{keep.stat}{a character vector that specifies which statistics should be kept in the regression table output. For instance \code{keep.stat = c("n","ll")} will produce a table that only includes statistics for the number of observations and log likelihood. See the \link{list of statistic codes}. This argument is not case-sensitive.%%     ~~Describe \code{omit.stat} here~~
+} 
   \item{label}{a character string containing the \code{\\label{}} TeX markers for the tables.
 %%     ~~Describe \code{intercept.top} here~~
 }
@@ -144,7 +166,7 @@ stargazer(  ...,
 %%     ~~Describe \code{no.space} here~~
 }
 
-  \item{notes}{a character vector containing notes to be included below the table. The character strings can include special substrings that will be replaced by the corresponding cutoffs for statistical significance 'stars': \code{[*]}, \code{[**]}, and \code{[***]} will be replaced by the cutoffs, in percentage terms, for one, two and three 'stars,' respectively (e.g., 10, 5, and 1). Similarly, \code{[0.*]}, \code{[0.**]} and \code{[0.***]} will be replaced by the numerical value of cutoffs for one, two and three 'stars' (e.g., 0.1, 0.05, and 0.01). \code{[.*]}, \code{[.**]} and \code{[.***]} will omit the leading zeros (e.g., .1, .05, .01).
+  \item{notes}{a character vector containing notes to be included below the table. The character strings can include special substrings that will be replaced by the corresponding cutoffs for statistical significance 'stars': \code{[*]}, \code{[**]}, and \code{[***]} will be replaced by the cutoffs, in percentage terms, for one, two and three 'stars,' respectively (e.g., 10, 5, and 1). Similarly, \code{[0.*]}, \code{[0.**]} and \code{[0.***]} will be replaced by the numeric value of cutoffs for one, two and three 'stars' (e.g., 0.1, 0.05, and 0.01). \code{[.*]}, \code{[.**]} and \code{[.***]} will omit the leading zeros (e.g., .1, .05, .01).
 %%     ~~Describe \code{notes} here~~
 }
 
@@ -156,15 +178,18 @@ stargazer(  ...,
   \item{notes.label}{a character string containing a label for the notes section of the table.
 %%     ~~Describe \code{notes.label} here~~
 }
-  \item{omit}{a vector of regular expressions that specifies which of the explanatory variables should be omitted from presentation in the table. This argument might be used, for instance, to exclude fixed effects dummies from being presented. The default value of \code{NULL} means that no variables will be excluded.
+  \item{omit}{a vector of regular expressions that specifies which of the explanatory variables should be omitted from presentation in the table. Alternatively, this argument can be a numeric vector whose elements indicate which variables (from top to bottom, or left to right) should be omitted. This argument might be used, for instance, to exclude fixed effects dummies from being presented. The default value of \code{NULL} means that no variables will be excluded.
 %%     ~~Describe \code{omit} here~~
 }
   \item{omit.labels}{a character vector of labels that correspond to each of the regular expressions in \code{omit}, and that will be used in a sub-table that indicates whether variables have been omitted from a given model. \code{omit} and \code{omit.labels} must be equal in length.%%     ~~Describe \code{omit.labels} here~~
 }
-  \item{omit.stat}{a character vector that specifies which statistics should be omitted from regression table output. For instance \code{omit = c("ll","rsq")} will omit the log-likelihood and the R-squared statistics. See the \link{list of statistic codes}. This argument is not case-sensitive.%%     ~~Describe \code{omit.stat} here~~
+  \item{omit.stat}{a character vector that specifies which statistics should be omitted from regression table output. For instance \code{omit.stat = c("ll","rsq")} will omit the log-likelihood and the R-squared statistics. See the \link{list of statistic codes}. This argument is not case-sensitive.%%     ~~Describe \code{omit.stat} here~~
 } 
   \item{omit.yes.no}{a character vector of length 2 that contains the 'yes' and 'no' strings to indicate whether, in any specific model, variables were omitted from the table, as specified by \code{"omit"}.
 %%     ~~Describe \code{omit.yes.no} here~~
+}
+ \item{order}{a vector of regular expressions (or of numerical indexes) that indicates the order in which variables will appear in the output.
+%%     ~~Describe \code{order} here~~
 }
  \item{ord.intercepts}{a logical value indicating whether intercepts for models with ordered dependent variables (such as ordered probit, or ordered logit) are included in the table.
 %%     ~~Describe \code{ord.intercepts} here~~
@@ -176,6 +201,8 @@ stargazer(  ...,
   
     \item{single.row}{a logical value that indicates whether regression and standard errors (or confidence intervals) should be reported on the same row. For convenience in formatting the resulting table, argument \code{no.space} is automatically set to \code{TRUE} when \code{single.row} is \code{TRUE}. }
   
+    \item{selection.equation}{a logical value that indicates whether the selection equation (when argument is set to \code{TRUE}) or the outcome equation (default) will be reported for \code{heckit} and \code{selection} models from the package sampleSelection.}
+    
   \item{star.char}{a character string to be used as the 'star' to denote statistical significance.
 %%     ~~Describe \code{star.char} here~~
 }
@@ -221,13 +248,13 @@ See \link{stargazer news} for a list of new models and features in each release 
 
 \section{Please cite as:}{
 Hlavac, Marek (2013). stargazer: LaTeX code and ASCII text for well-formatted regression and summary statistics tables.\cr
- R package version 4.0. http://CRAN.R-project.org/package=stargazer 
+ R package version 4.5. http://CRAN.R-project.org/package=stargazer 
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \examples{
-## create summary statistics table based for 'attitude' data frame
+## create summary statistics table for 'attitude' data frame
 stargazer(attitude)
 
 ## list the content of the data frame 'attitude'
@@ -254,6 +281,26 @@ stargazer(linear.1, linear.2, probit.model, title="Regression Results")
 stargazer(linear.1, linear.2, probit.model, type="text",
           title="Regression Results", single.row=TRUE,
           ci=TRUE, ci.level=0.9, omit.stat=c("f", "ser"))
+          
+### re-order the models and only keep explanatory
+### variables that contain "complaints", "learning", 
+### "raises" and "critical"; report these with standard
+### errors, and put "learning" and "raises" before
+### the other explanatory variables; of the summary
+### statistics, only keep the number of observations
+
+stargazer(probit.model, linear.1, linear.2, type="text",
+          keep=c("complaints","learning","raises","critical"),
+          keep.stat="n", order=c("learning", "raises"))
+
+### apply a function to the coefficients and standard errors
+### that will multiply them by ten; you can think of this
+### as a change in units
+
+multiply.by.10 <- function(x) (x * 10)
+
+stargazer(probit.model, linear.1, linear.2,
+          apply.coef=multiply.by.10, apply.se=multiply.by.10)
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

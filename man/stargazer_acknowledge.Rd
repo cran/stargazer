@@ -18,9 +18,11 @@ Julian Chan, Boston University, USA\cr
 Volha Charnych, Harvard University, USA\cr
 John Coglianese, Harvard University, USA\cr
 Brandon de la Cuesta, Princeton University, USA\cr
+Sebastian Daza, University of Wisconsin-Madison, USA\cr
 Bryan Dettrey, Pennsylvania State University, USA \cr
 Stefan Dimitriadis, Harvard University, USA\cr
 Gregory Eady, University of Toronto, Canada\cr
+Andrey Fradkin, Stanford University, USA\cr
 Bernard Fraga, Harvard University, USA\cr
 Tal Galili, Tel Aviv University, Israel\cr
 Cheng Gao, Harvard University, USA\cr
@@ -44,6 +46,7 @@ Tamim Mohammad, University of Massachussetts-Boston, USA\cr
 Christoph Nguyen, Northwestern University, USA\cr
 Stephen Pettigrew, Harvard University, USA\cr
 Giuseppe Ragusa, Luiss University, Rome, Italy\cr
+Christoph Riedl, Northeastern University, USA\cr
 Francesco Sarracino, STATEC, Luxembourg\cr
 Jason Sclar, Harvard University, USA\cr
 Jennifer Sheehy-Skeffington, Harvard University, USA\cr
