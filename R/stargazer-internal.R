@@ -2,7 +2,7 @@
 function(libname, pkgname) {
   packageStartupMessage("\nPlease cite as: \n")
   packageStartupMessage(" Hlavac, Marek (2013). stargazer: LaTeX code and ASCII text for well-formatted regression and summary statistics tables.")
-  packageStartupMessage(" R package version 4.5. http://CRAN.R-project.org/package=stargazer \n")
+  packageStartupMessage(" R package version 4.5.1. http://CRAN.R-project.org/package=stargazer \n")
 }
 
 .stargazer.wrap <-
@@ -138,8 +138,8 @@ function(libname, pkgname) {
 		    if (!is.null(.get.ci.rb(object.name, user.ci.rb, model.num=model.num)[row])) { temp.ci.rb[row, ncol(temp.ci.rb)] <- .get.ci.rb(object.name, user.ci.rb, model.num=model.num)[row] }
       
         # t-stats and p-values
-        if (!is.null(user.coef)) { feed.coef <- user.coef }   # feed user-defined coefficients, if available
-		    if (!is.null(user.se)) { feed.se <- user.se }   # feed user-defined std errors, if available
+        #if (!is.null(user.coef)) { feed.coef <- user.coef }   # feed user-defined coefficients, if available - check that this does not mess up multinom
+		    #if (!is.null(user.se)) { feed.se <- user.se }   # feed user-defined std errors, if available
         if (!is.null(.get.t.stats(object.name, user.t, auto.t, feed.coef, feed.se, user.coef, user.se, model.num=model.num)[row])) { temp.t.stats[row, ncol(temp.std.errors)] <- .get.t.stats(object.name, user.t, auto.t, feed.coef, feed.se, user.coef, user.se, model.num=model.num)[row] }
   		  if (!is.null(.get.p.values(object.name, user.p, auto.p, feed.coef, feed.se, user.coef, user.se, model.num=model.num)[row])) { temp.p.values[row, ncol(temp.std.errors)] <- .get.p.values(object.name, user.p, auto.p, feed.coef, feed.se, user.coef, user.se, model.num=model.num)[row] }
   	  }
@@ -1108,6 +1108,7 @@ function(libname, pkgname) {
       
       return(user.given) 
     }
+    
         
     if (auto == TRUE) {
       if ((!is.null(user.coef)) | (!is.null(user.se))) {
@@ -1117,14 +1118,16 @@ function(libname, pkgname) {
         #  f.se <- as.vector(f.se[model.num,])
         #}
         
-        f.coef <- as.vector(f.coef); f.se <- as.vector(f.se)
         
         # set the lengths of the vectors to be equal to each other
         coef.div <- .fill.NA(f.coef, f.se)
         se.div <- .fill.NA(f.se, f.coef)
         
         t.out <- (coef.div / se.div)
-        return( 2*pnorm(abs(t.out), mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE) )
+        
+        auto.return <- 2*pnorm(abs(t.out), mean = 0, sd = 1, lower.tail = FALSE, log.p = FALSE)
+        names(auto.return) <- names(f.coef)
+        return( auto.return  )
       }
     }
 
@@ -1641,13 +1644,14 @@ function(libname, pkgname) {
         #  f.se <- as.vector(f.se[model.num,])
         #}
         
-        f.coef <- as.vector(f.coef); f.se <- as.vector(f.se)
-        
         # set the lengths of the vectors to be equal to each other
         coef.div <- .fill.NA(f.coef, f.se)
-        se.div <- .fill.NA(f.se, f.coef)
+        se.div <- .fill.NA(f.se, f.coef) 
         
-        return(coef.div / se.div)
+        auto.return <- coef.div / se.div
+        names(auto.return) <- names(f.coef)
+        
+        return(auto.return)
       }
     }
 
@@ -5166,28 +5170,31 @@ function(libname, pkgname) {
     
     ## check if argument input is ok
     if (how.many.objects < 1) { error.present <- c(error.present, "% Error: At least one object is required.\n") }
-  
-    # identify objects
-    for (i in seq(1:how.many.objects)) {
-      if (!is.data.frame(objects[[i]])) {
+    else {
+      
+      # identify objects
+      for (i in seq(1:how.many.objects)) {
+        if (!is.data.frame(objects[[i]])) {
         
-        # if zelig$result relevant, identify this automatically
-        if (.hasSlot(objects[[i]],"Zt") | (class(objects[[i]])=="coeftest")) {  # use this to eliminate lmer, glmer, nlmer
-          if (.model.identify(objects[[i]])=="unknown") { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
-        }
-        else {
-          if (!is.null(objects[[i]]$zelig.call)) {
-            if (!is.null(objects[[i]]$formula)) { formula <- objects[[i]]$formula }
-            objects[[i]] <- objects[[i]]$result          
-            if (!is.null(formula)) { objects[[i]]$formula2 <- formula }
+          # if zelig$result relevant, identify this automatically
+          if (.hasSlot(objects[[i]],"Zt") | (class(objects[[i]])=="coeftest")) {  # use this to eliminate lmer, glmer, nlmer
+            if (.model.identify(objects[[i]])=="unknown") { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
           }
+          else {
+            if (!is.null(objects[[i]]$zelig.call)) {
+              if (!is.null(objects[[i]]$formula)) { formula <- objects[[i]]$formula }
+              objects[[i]] <- objects[[i]]$result          
+              if (!is.null(formula)) { objects[[i]]$formula2 <- formula }
+            }
         
-          ###
-          if (is.atomic(objects[[i]])) { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
-          else if (.model.identify(objects[[i]])=="unknown") { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
-          else if (.model.identify(objects[[i]])=="unsupported zelig") { error.present <- c(error.present, "% Error: Unsupported 'zelig' model.\n") }
-        }  
+            ###
+            if (is.atomic(objects[[i]])) { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
+            else if (.model.identify(objects[[i]])=="unknown") { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
+            else if (.model.identify(objects[[i]])=="unsupported zelig") { error.present <- c(error.present, "% Error: Unsupported 'zelig' model.\n") }
+          }  
+        }
       }
+    
     }
   
     if (!is.character(type)) { error.present <- c(error.present, "% Error: Argument 'type' must be of type 'character.'\n") }
@@ -5456,7 +5463,7 @@ function(libname, pkgname) {
 
     # info about the package and author
     .global.package.name <- "stargazer"
-    .global.package.version <- "4.5"
+    .global.package.version <- "4.5.1"
     .global.package.author.name <- "Marek Hlavac"
     .global.package.author.affiliation <- "Harvard University"
     .global.package.author.email <- "hlavac at fas.harvard.edu"

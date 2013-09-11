@@ -13,6 +13,7 @@ I would like to thank everyone who has tested this package, or provided useful s
 Ross Ahmed, Newcastle University, UK\cr
 Liviu Andronic, University of Toulouse, France\cr
 Erin Baggott, Harvard University, USA\cr
+Eva Bernauer, University of Mannheim, Germany\cr
 Ruben de Bliek, Erasmus University Rotterdam, Netherlands\cr
 Julian Chan, Boston University, USA\cr
 Volha Charnych, Harvard University, USA\cr

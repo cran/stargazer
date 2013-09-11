@@ -10,6 +10,11 @@ This page summarizes the models, features, and bug fixes that were introduced in
 }
 
 \section{What's new?}{
+v. 4.5.1: \cr
+\cr
+- Bug fixes: \cr
+-- fixed a bug involving the calculation of t-statistics from user-given coefficients and standard errors \cr
+\cr
 v. 4.5: \cr
 \cr
 - New models: \cr

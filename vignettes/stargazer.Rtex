@@ -214,7 +214,7 @@ the proportion of the city's population that is female (\emph{female}).
 \verb|sales <- 2 + temp * 3| \newline
 \verb|| \newline
 \verb|for (i in 1:length(sales)) {| \newline
-\verb|	if (temp[i]<75 || temp[i]>95) sales[i] <- sales[i] + rnorm(1, 0, 25)| \newline
+\verb|	if (temp[i]<75 ||\verb| temp[i]>95) sales[i] <- sales[i] + rnorm(1, 0, 25)| \newline
 \verb|	else sales[i] <- sales[i] + rnorm(1, 0, 8)| \newline
 \verb|}| \newline
 \verb|| \newline
@@ -232,15 +232,16 @@ standard errors:
 \verb|cov <- vcovHC(reg.model, type = "HC") | \newline
 \verb|robust.se <- sqrt(diag(cov)) | \newline
 
-\newpage{}We can now use stargazer to create a regression table with
-the default and heteroskedasticity-robust standard errors in two columns,
-side by side:
+\newpage{}We can now use \emph{stargazer} to create a regression
+table with the default and heteroskedasticity-robust standard errors
+in two columns, side by side:
 
 \noindent \newline
-\verb|stargazer(reg.model, reg.model, se=list(NULL, robust.se))| \newline
+\verb|stargazer(reg.model, reg.model, se=list(NULL, robust.se),| \newline
+\verb|column.labels=c("default","robust"), align=TRUE)| \newline
 
 
-\noindent \begin{table}[!htbp] \centering    \caption{}    \label{}  \begin{tabular}{@{\extracolsep{5pt}}lcc}  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{2}{c}{\textit{Dependent variable:}} \\  \cline{2-3}  \\[-1.8ex] & \multicolumn{2}{c}{sales} \\  \\[-1.8ex] & (1) & (2)\\  \hline \\[-1.8ex]   temp & 2.972$^{***}$ & 2.972$^{***}$ \\    & (0.067) & (0.084) \\    & & \\   female & $-$37.819 & $-$37.819 \\    & (81.064) & (78.926) \\    & & \\   Constant & 23.916 & 23.916 \\    & (41.187) & (40.408) \\    & & \\  \hline \\[-1.8ex]  Observations & 500 & 500 \\  R$^{2}$ & 0.799 & 0.799 \\  Adjusted R$^{2}$ & 0.798 & 0.798 \\  Residual Std. Error (df = 497) & 18.068 & 18.068 \\  F Statistic (df = 2; 497) & 984.916$^{***}$ & 984.916$^{***}$ \\  \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table}
+\noindent \begin{table}[!htbp] \centering    \caption{}    \label{}  \begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} }  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{2}{c}{\textit{Dependent variable:}} \\  \cline{2-3}  \\[-1.8ex] & \multicolumn{2}{c}{sales} \\   & \multicolumn{1}{c}{default} & \multicolumn{1}{c}{robust} \\  \\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)}\\  \hline \\[-1.8ex]   temp & 2.972^{***} & 2.972^{***} \\    & (0.067) & (0.084) \\    & & \\   female & -37.819 & -37.819 \\    & (81.064) & (78.926) \\    & & \\   Constant & 23.916 & 23.916 \\    & (41.187) & (40.408) \\    & & \\  \hline \\[-1.8ex]  Observations & \multicolumn{1}{c}{500} & \multicolumn{1}{c}{500} \\  R$^{2}$ & \multicolumn{1}{c}{0.799} & \multicolumn{1}{c}{0.799} \\  Adjusted R$^{2}$ & \multicolumn{1}{c}{0.798} & \multicolumn{1}{c}{0.798} \\  Residual Std. Error (df = 497) & \multicolumn{1}{c}{18.068} & \multicolumn{1}{c}{18.068} \\  F Statistic (df = 2; 497) & \multicolumn{1}{c}{984.916$^{***}$} & \multicolumn{1}{c}{984.916$^{***}$} \\  \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table} 
 
 
 \subsection{Many supported models}
@@ -302,7 +303,7 @@ please remember to include the following citation:\\
 
 \noindent \texttt{Hlavac, Marek (2013). stargazer: LaTeX code and
 ASCII text for well-formatted regression and summary statistics tables. R
-package version 4.5.}~\\
+package version 4.5.1.}~\\
 \texttt{http://CRAN.R-project.org/package=stargazer}~\\
 \texttt{}~\\
 \texttt{}~\\
