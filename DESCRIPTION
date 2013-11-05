@@ -2,17 +2,15 @@ Package: stargazer
 Type: Package
 Title: LaTeX code and ASCII text for well-formatted regression and
         summary statistics tables
-Version: 4.5.1
-Date: 2013-09-11
+Version: 4.5.2
+Date: 2013-11-05
 Author: Marek Hlavac <hlavac@fas.harvard.edu>
 Maintainer: Marek Hlavac <hlavac@fas.harvard.edu>
 Description: Produces LaTeX code and ASCII text for well-formatted tables that hold 
     regression analysis results from several models side-by-side, as well as summary
     statistics.
 License: GPL (>= 2)
-LazyLoad: yes
-Collate: 'stargazer-internal.R' 'stargazer.R'
-Packaged: 2013-09-11 20:44:20 UTC; Marek Hlavac
+Packaged: 2013-11-06 02:29:47 UTC; Marek Hlavac
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2013-09-12 08:23:32
+Date/Publication: 2013-11-06 07:14:49

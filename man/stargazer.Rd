@@ -56,7 +56,7 @@ stargazer(  ...,
   \item{type}{a character vector that specifies what type of output the command should produce. The two possible values are \code{"latex"} (default) for LaTeX code and \code{"text"} for ASCII text output. 
 %%     ~~Describe \code{type} here~~
 }
-  \item{title}{a character vector with titles for the tables.
+  \item{title}{a character vector with titles (captions) for the tables.
 %%     ~~Describe \code{title} here~~
 }
   \item{style}{a character string that specifies what style, typically designed to resemble an existing academic journal, should be used in producing the tables. This argument is not case-sensitive. See \link{list of supported styles}. 
@@ -248,7 +248,7 @@ See \link{stargazer news} for a list of new models and features in each release 
 
 \section{Please cite as:}{
 Hlavac, Marek (2013). stargazer: LaTeX code and ASCII text for well-formatted regression and summary statistics tables.\cr
- R package version 4.5.1. http://CRAN.R-project.org/package=stargazer 
+ R package version 4.5.2. http://CRAN.R-project.org/package=stargazer 
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

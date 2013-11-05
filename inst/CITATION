@@ -5,9 +5,9 @@ citEntry(
   title = "stargazer: LaTeX code and ASCII text for well-formatted regression and summary statistics tables",
   author = as.person("Marek Hlavac"),
   year = "2013",
-  note = "R package version 4.5",
+  note = "R package version 4.5.2",
   organization = "Harvard University",
   address = "Cambridge, USA",
-  textVersion = "Hlavac, Marek (2013). stargazer: LaTeX code and ASCII text for well-formatted regression and summary statistics tables. R package version 4.5. http://CRAN.R-project.org/package=stargazer",
+  textVersion = "Hlavac, Marek (2013). stargazer: LaTeX code and ASCII text for well-formatted regression and summary statistics tables. R package version 4.5.2. http://CRAN.R-project.org/package=stargazer",
   url = "http://CRAN.R-project.org/package=stargazer"
 )

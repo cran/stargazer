@@ -10,6 +10,14 @@ This page summarizes the models, features, and bug fixes that were introduced in
 }
 
 \section{What's new?}{
+v. 4.5.2: \cr
+\cr
+- Bug fixes: \cr
+-- much faster output  \cr
+-- now compatible with the updated lme4 package \cr
+-- corrected a bug that prevented users from including multiple models with a single covariate + intercept \cr
+-- underscores now print correctly in ASCII text output \cr
+\cr
 v. 4.5.1: \cr
 \cr
 - Bug fixes: \cr

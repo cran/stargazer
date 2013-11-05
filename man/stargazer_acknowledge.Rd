@@ -31,6 +31,7 @@ Charlie Gibbons, University of California-Berkeley, USA\cr
 Rebecca Goldstein, Harvard University, USA\cr
 Josiah Grover, Ball State University, USA\cr
 Rasmus Hertzum, Glostrup University Hospital, Denmark\cr
+Gregor Hochschild, Germany \cr
 Connor Huff, Harvard University, USA\cr
 Melissa Kline, Massachussetts Institute of Technology, USA\cr
 Maxim Kovalenko, University of Antwerp, Belgium\cr
@@ -45,10 +46,12 @@ Christopher Lucas, Harvard University, USA\cr
 Richard Martin, University of Victoria, Canada \cr
 Tamim Mohammad, University of Massachussetts-Boston, USA\cr
 Christoph Nguyen, Northwestern University, USA\cr
+Dominic Nyhuis, University of Mannheim, Germany \cr
 Stephen Pettigrew, Harvard University, USA\cr
 Giuseppe Ragusa, Luiss University, Rome, Italy\cr
 Christoph Riedl, Northeastern University, USA\cr
 Francesco Sarracino, STATEC, Luxembourg\cr
+Martijn Schoonvelde, University of Exeter, United Kingdom \cr
 Jason Sclar, Harvard University, USA\cr
 Jennifer Sheehy-Skeffington, Harvard University, USA\cr
 Boris Shor, University of Chicago, USA\cr

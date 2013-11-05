@@ -2,7 +2,7 @@
 function(libname, pkgname) {
   packageStartupMessage("\nPlease cite as: \n")
   packageStartupMessage(" Hlavac, Marek (2013). stargazer: LaTeX code and ASCII text for well-formatted regression and summary statistics tables.")
-  packageStartupMessage(" R package version 4.5.1. http://CRAN.R-project.org/package=stargazer \n")
+  packageStartupMessage(" R package version 4.5.2. http://CRAN.R-project.org/package=stargazer \n")
 }
 
 .stargazer.wrap <-
@@ -839,7 +839,7 @@ function(libname, pkgname) {
       else { return(c(as.vector(names(object.name$beta)), as.vector(names(object.name$alpha)))) }
     }
     else if (model.name %in% c("lmer", "glmer", "nlmer")) {
-      return(as.vector(names(object.name@fixef)))
+      return(as.vector(names(.summary.object$coefficients[,1])))
     }
     else if (model.name %in% c("ergm", "rem.dyad")) {
       return(as.vector(names(object.name$coef)))
@@ -1166,7 +1166,7 @@ function(libname, pkgname) {
     }
   	if (model.name %in% c("lmer", "glmer", "nlmer")) {
   	  Vcov <- as.matrix(vcov(object.name, useScale = FALSE))
-  	  coefs <- object.name@fixef
+  	  coefs <- .summary.object$coefficients[,1]
   	  se <- sqrt(diag(Vcov))
   	  tstat <- coefs / se
   	  pval <- 2 * pnorm(abs(tstat), lower.tail = FALSE)
@@ -1415,7 +1415,7 @@ function(libname, pkgname) {
     }
   	if (model.name %in% c("lmer", "glmer", "nlmer")) {
   	  Vcov <- as.matrix(vcov(object.name, useScale = FALSE))
-  	  coefs <- object.name@fixef
+  	  coefs <- .summary.object$coefficients[,1]
   	  se <- sqrt(diag(Vcov))
       names(se) <- names(coefs)
   	  return(se)
@@ -1687,7 +1687,7 @@ function(libname, pkgname) {
     }
   	if (model.name %in% c("lmer", "glmer", "nlmer")) {
   	  Vcov <- as.matrix(vcov(object.name, useScale = FALSE))
-  	  coefs <- object.name@fixef
+  	  coefs <- .summary.object$coefficients[,1]
   	  se <- sqrt(diag(Vcov))
   	  tstat <- coefs / se
   	  names(tstat) <- names(coefs)
@@ -2113,19 +2113,15 @@ function(libname, pkgname) {
     if (class(object.name)[1]=="rem.dyad") {
       return("rem.dyad")
     }
-    
-   if (.hasSlot(object.name,"Zt")) {
-     if (object.name@call[1]=="lmer()") {
-       return("lmer")
-     }
-     if (object.name@call[1]=="glmer()") {
-       return("glmer")
-     }
-     if (object.name@call[1]=="nlmer()") {
-       return("nlmer")
-     }     
-     return("unknown")
-   }
+    if (class(object.name)[1]=="lmerMod") {
+      return("lmer")
+    }
+    if (class(object.name)[1]=="glmerMod") {
+      return("glmer")
+    }
+    if (class(object.name)[1]=="nlmerMod") {
+      return("nlmer")
+    }
        
    if (!is.null(object.name$call)) {
     
@@ -2627,121 +2623,131 @@ function(libname, pkgname) {
     return(NA)
   }
   
-  .order.reg.table <- 
-  function(order) {
-    
-    # first, find the position of the intercept and rename the variable to be the intercept string
-    intercept.position <- NULL
-    for (i in seq(1:length(.global.coefficient.variables))) {
-      if (.global.coefficient.variables[i] %in% .global.intercept.strings) { 
-        intercept.position <- i 
-        
-        .global.coefficient.variables[i] <<- .format.intercept.name
-        rownames(.global.coefficients)[i] <<- .format.intercept.name
-        rownames(.global.std.errors)[i] <<- .format.intercept.name
-        rownames(.global.ci.lb)[i] <<- .format.intercept.name
-        rownames(.global.ci.rb)[i] <<- .format.intercept.name
-        rownames(.global.t.stats)[i] <<- .format.intercept.name
-        rownames(.global.p.values)[i] <<- .format.intercept.name
-      }
+  # make sure everything is flipped correctly
+  .prepare <- 
+  function(x) {
+    if (is.null(rownames(x))) {
+      return(cbind(x))
+    } else {
+      return(x)
     }
-    
-    # put intercept on bottom if necessary
-    if (!is.null(intercept.position)) {
-      # hold contents of last row in placeholder variables
-      placehold.coefficient.variables <- .global.coefficient.variables[-intercept.position]
-      placehold.coefficients <- cbind(.global.coefficients[-intercept.position,])
-      placehold.std.errors <- cbind(.global.std.errors[-intercept.position,])
-      placehold.ci.lb <- cbind(.global.ci.lb[-intercept.position,])
-      placehold.ci.rb <- cbind(.global.ci.rb[-intercept.position,])
-      placehold.t.stats <- cbind(.global.t.stats[-intercept.position,])
-      placehold.p.values <- cbind(.global.p.values[-intercept.position,])
+  }
+  
+  .order.reg.table <- 
+    function(order) {
       
-      placehold.rownames <- rownames(.global.coefficients)[-intercept.position]
-      if (is.null(placehold.rownames)) { placehold.rownames <- names(.global.coefficients)[-intercept.position] }
-      rownames(placehold.coefficients) <- placehold.rownames
-      rownames(placehold.std.errors) <- placehold.rownames
-      rownames(placehold.ci.lb) <- placehold.rownames
-      rownames(placehold.ci.rb) <- placehold.rownames
-      rownames(placehold.t.stats) <- placehold.rownames
-      rownames(placehold.p.values) <- placehold.rownames
-      
-      intercept.coefficient.variables <- .global.coefficient.variables[intercept.position]
-      intercept.coefficients <- rbind(.global.coefficients[intercept.position,])
-      intercept.std.errors <- rbind(.global.std.errors[intercept.position,])
-      intercept.ci.lb <- rbind(.global.ci.lb[intercept.position,])
-      intercept.ci.rb <- rbind(.global.ci.rb[intercept.position,])
-      intercept.t.stats <- rbind(.global.t.stats[intercept.position,])
-      intercept.p.values <- rbind(.global.p.values[intercept.position,])
-      
-      rownames(intercept.coefficients) <- .format.intercept.name
-      rownames(intercept.std.errors) <- .format.intercept.name
-      rownames(intercept.ci.lb) <- .format.intercept.name
-      rownames(intercept.ci.rb)  <- .format.intercept.name
-      rownames(intercept.t.stats) <- .format.intercept.name
-      rownames(intercept.p.values) <- .format.intercept.name
-      
-      if (.format.intercept.bottom) {
-        .global.coefficient.variables <<- c(placehold.coefficient.variables, intercept.coefficient.variables)
-        .global.coefficients <<- rbind(placehold.coefficients, intercept.coefficients)
-        .global.std.errors <<- rbind(placehold.std.errors, intercept.std.errors)
-        .global.ci.lb <<- rbind(placehold.ci.lb, intercept.ci.lb)
-        .global.ci.rb <<- rbind(placehold.ci.rb, intercept.ci.rb)
-        .global.t.stats <<- rbind(placehold.t.stats, intercept.t.stats)
-        .global.p.values <<- rbind(placehold.p.values, intercept.p.values)
-      }
-      
-      if (.format.intercept.top) {
-        .global.coefficient.variables <<- c(intercept.coefficient.variables, placehold.coefficient.variables)
-        .global.coefficients <<- rbind(intercept.coefficients, placehold.coefficients)
-        .global.std.errors <<- rbind(intercept.std.errors, placehold.std.errors)
-        .global.ci.lb <<- rbind(intercept.ci.lb, placehold.ci.lb)
-        .global.ci.rb <<- rbind(intercept.ci.rb, placehold.ci.rb)
-        .global.t.stats <<- rbind(intercept.t.stats, placehold.t.stats)
-        .global.p.values <<- rbind(intercept.p.values, placehold.p.values)
-      }
-    } 
-    
-   
-    # order according to user's wishes
-    old.order <- 1:length(.global.coefficient.variables)
-    new.order <- NULL; add.these <- NULL
-    
-    if (!is.null(order)) {
-      # if order is regular expression...
-      if (is.character(order)) {
-        not.ordered.yet <- .global.coefficient.variables
-    
-        for (i in 1:length(order)) {
-          add.these <- grep(order[i], not.ordered.yet, perl=.format.perl, fixed=FALSE)
-          not.ordered.yet[add.these] <- NA
-          if (length(add.these) != 0) {
-            new.order <- c(new.order, add.these)
-          }
+      # first, find the position of the intercept and rename the variable to be the intercept string
+      intercept.position <- NULL
+      for (i in seq(1:length(.global.coefficient.variables))) {
+        if (.global.coefficient.variables[i] %in% .global.intercept.strings) { 
+          intercept.position <- i 
+          
+          .global.coefficient.variables[i] <<- .format.intercept.name
+          rownames(.global.coefficients)[i] <<- .format.intercept.name
+          rownames(.global.std.errors)[i] <<- .format.intercept.name
+          rownames(.global.ci.lb)[i] <<- .format.intercept.name
+          rownames(.global.ci.rb)[i] <<- .format.intercept.name
+          rownames(.global.t.stats)[i] <<- .format.intercept.name
+          rownames(.global.p.values)[i] <<- .format.intercept.name
         }
       }
-      else if (is.numeric(order)) { # if order contains indices
-        order <- unique(order)
-        order <- order[order <= max(old.order)]
-        new.order <- old.order[order]
+      
+      # put intercept on bottom if necessary
+      if (!is.null(intercept.position)) {
+        # hold contents of last row in placeholder variables
+        placehold.coefficient.variables <- .global.coefficient.variables[-intercept.position]
+        placehold.coefficients <- .prepare(.global.coefficients[-intercept.position,,drop=F])
+        placehold.std.errors <- .prepare(.global.std.errors[-intercept.position,,drop=F])
+        placehold.ci.lb <- .prepare(.global.ci.lb[-intercept.position,,drop=F])
+        placehold.ci.rb <- .prepare(.global.ci.rb[-intercept.position,,drop=F])
+        placehold.t.stats <- .prepare(.global.t.stats[-intercept.position,,drop=F])
+        placehold.p.values <- .prepare(.global.p.values[-intercept.position,,drop=F])
+        
+        placehold.rownames <- rownames(.global.coefficients)[-intercept.position]
+        if (is.null(placehold.rownames)) { placehold.rownames <- names(.global.coefficients)[-intercept.position] }
+        rownames(placehold.coefficients) <- placehold.rownames
+        rownames(placehold.std.errors) <- placehold.rownames
+        rownames(placehold.ci.lb) <- placehold.rownames
+        rownames(placehold.ci.rb) <- placehold.rownames
+        rownames(placehold.t.stats) <- placehold.rownames
+        rownames(placehold.p.values) <- placehold.rownames
+        
+        intercept.coefficient.variables <- .global.coefficient.variables[intercept.position]
+        intercept.coefficients <- rbind(.global.coefficients[intercept.position,])
+        intercept.std.errors <- rbind(.global.std.errors[intercept.position,])
+        intercept.ci.lb <- rbind(.global.ci.lb[intercept.position,])
+        intercept.ci.rb <- rbind(.global.ci.rb[intercept.position,])
+        intercept.t.stats <- rbind(.global.t.stats[intercept.position,])
+        intercept.p.values <- rbind(.global.p.values[intercept.position,])
+        
+        rownames(intercept.coefficients) <- .format.intercept.name
+        rownames(intercept.std.errors) <- .format.intercept.name
+        rownames(intercept.ci.lb) <- .format.intercept.name
+        rownames(intercept.ci.rb)  <- .format.intercept.name
+        rownames(intercept.t.stats) <- .format.intercept.name
+        rownames(intercept.p.values) <- .format.intercept.name
+        
+        if (.format.intercept.bottom) {
+          .global.coefficient.variables <<- c(placehold.coefficient.variables, intercept.coefficient.variables)
+          .global.coefficients <<- rbind(placehold.coefficients, intercept.coefficients)
+          .global.std.errors <<- rbind(placehold.std.errors, intercept.std.errors)
+          .global.ci.lb <<- rbind(placehold.ci.lb, intercept.ci.lb)
+          .global.ci.rb <<- rbind(placehold.ci.rb, intercept.ci.rb)
+          .global.t.stats <<- rbind(placehold.t.stats, intercept.t.stats)
+          .global.p.values <<- rbind(placehold.p.values, intercept.p.values)
+        }
+        
+        if (.format.intercept.top) {
+          .global.coefficient.variables <<- c(intercept.coefficient.variables, placehold.coefficient.variables)
+          .global.coefficients <<- rbind(intercept.coefficients, placehold.coefficients)
+          .global.std.errors <<- rbind(intercept.std.errors, placehold.std.errors)
+          .global.ci.lb <<- rbind(intercept.ci.lb, placehold.ci.lb)
+          .global.ci.rb <<- rbind(intercept.ci.rb, placehold.ci.rb)
+          .global.t.stats <<- rbind(intercept.t.stats, placehold.t.stats)
+          .global.p.values <<- rbind(intercept.p.values, placehold.p.values)
+        }
+      } 
+      
+      
+      # order according to user's wishes
+      old.order <- 1:length(.global.coefficient.variables)
+      new.order <- NULL; add.these <- NULL
+      
+      if (!is.null(order)) {
+        # if order is regular expression...
+        if (is.character(order)) {
+          not.ordered.yet <- .global.coefficient.variables
+          
+          for (i in 1:length(order)) {
+            add.these <- grep(order[i], not.ordered.yet, perl=.format.perl, fixed=FALSE)
+            not.ordered.yet[add.these] <- NA
+            if (length(add.these) != 0) {
+              new.order <- c(new.order, add.these)
+            }
+          }
+        }
+        else if (is.numeric(order)) { # if order contains indices
+          order <- unique(order)
+          order <- order[order <= max(old.order)]
+          new.order <- old.order[order]
+        }
       }
+      
+      if (!is.null(new.order)) {
+        remainder <- old.order[-new.order]
+        new.order <- c(new.order, remainder)
+      }
+      else { new.order <- old.order }
+      
+      # set all vectors to the right order
+      .global.coefficient.variables[old.order] <<- .global.coefficient.variables[new.order]
+      .global.coefficients[old.order,] <<- .global.coefficients[new.order,]
+      .global.std.errors[old.order,] <<- .global.std.errors[new.order,]
+      .global.ci.lb[old.order,] <<- .global.ci.lb[new.order,]
+      .global.ci.rb[old.order,] <<- .global.ci.rb[new.order,]
+      .global.t.stats[old.order,] <<- .global.t.stats[new.order,]
+      .global.p.values[old.order,] <<- .global.p.values[new.order,]
     }
-    
-    if (!is.null(new.order)) {
-      remainder <- old.order[-new.order]
-      new.order <- c(new.order, remainder)
-    }
-    else { new.order <- old.order }
-    
-    # set all vectors to the right order
-    .global.coefficient.variables[old.order] <<- .global.coefficient.variables[new.order]
-    .global.coefficients[old.order,] <<- .global.coefficients[new.order,]
-    .global.std.errors[old.order,] <<- .global.std.errors[new.order,]
-    .global.ci.lb[old.order,] <<- .global.ci.lb[new.order,]
-    .global.ci.rb[old.order,] <<- .global.ci.rb[new.order,]
-    .global.t.stats[old.order,] <<- .global.t.stats[new.order,]
-    .global.p.values[old.order,] <<- .global.p.values[new.order,]
-  }
   
   .order.data.frame <- 
     function(d, order) {
@@ -4385,7 +4391,7 @@ function(libname, pkgname) {
       return(as.vector(.summary.object$coefficients$mean[,1]))
     }
     if (model.name %in% c("lmer","glmer","nlmer")) {
-      coefs <- object.name@fixef
+      coefs <- .summary.object$coefficients[,1]
       return(coefs)
     }
     if (model.name %in% c("ergm")) {
@@ -4600,110 +4606,130 @@ function(libname, pkgname) {
   }
   
   .replace.latex.symbols <-
-  function (s) {
-    latex.replace <- NULL
-    latex.replace <- cbind(latex.replace, c("\\textbackslash","\\"), c("\\_","_"), c("\\#","#"), c("\\textasciitilde","~"), c("\\{","{"), c("\\}","}"), c("\\%","%"))
-    latex.replace <- cbind(latex.replace, c("\\textasteriskcentered","*"), c("\\textbar","|"), c("\\textgreater",">"), c("\\textless","<"), c("$\\hat{\\mkern6mu}$","^"))
-    
-    # Greek letters
-    latex.replace <- cbind(latex.replace, c("\\alpha","alpha"), c("\\beta","beta"), c("\\gamma","gamma"), c("\\delta","delta"), c("\\epsilon","epsilon"), c("\\varepsilon","epsilon"), c("\\zeta","zeta"))
-    latex.replace <- cbind(latex.replace, c("\\eta","eta"), c("\\theta","theta"), c("\\vartheta","theta"), c("\\iota","iota"), c("\\kappa","kappa"), c("\\lambda","lambda"), c("\\mu","mu"))
-    latex.replace <- cbind(latex.replace, c("\\nu","nu"), c("\\xi","xi"), c("\\pi","pi"), c("\\varpi","pi"), c("\\rho","rho"), c("\\varrho","rho"), c("\\sigma","sigma"))
-    latex.replace <- cbind(latex.replace, c("\\varsigma","sigma"), c("\\tau","tau"), c("\\upsilon","upsilon"), c("\\phi","phi"), c("\\varphi","phi"), c("\\chi","chi"), c("\\psi","psi"))
-    latex.replace <- cbind(latex.replace, c("\\omega","omega"), c("\\Gamma","gamma"), c("\\Delta","delta"), c("\\Theta","theta"), c("\\Lambda","lambda"), c("\\Xi","xi"), c("\\Pi","pi"))
-    latex.replace <- cbind(latex.replace, c("\\Sigma","??"), c("\\Upsilon","upsilon"), c("\\Phi","phi"), c("\\Psi","psi"), c("\\Omega","omega"))
-    
-    s.out <- s
-    s.out <- gsub("\\_","_", s.out, fixed=TRUE)
-    for (item in 1:ncol(latex.replace)) {
-      symbol <- latex.replace[1, item]
-      replacement <- latex.replace[2, item]
+    function (s) {
+      latex.replace <- NULL
+      latex.replace <- cbind(latex.replace, c("\\textbackslash","\\"), c("\\#","#"), c("\\textasciitilde","~"), c("\\{","{"), c("\\}","}"), c("\\%","%"))
+      latex.replace <- cbind(latex.replace, c("\\textasteriskcentered","*"), c("\\textbar","|"), c("\\textgreater",">"), c("\\textless","<"), c("$\\hat{\\mkern6mu}$","^"))
       
-      pos <- 1
-      while (pos <= nchar(s.out)) {
-        s.pre <- substr(s.out, 1, pos-1)
-        s.pos.char <- substr(s.out, pos, pos)
-        s.post <- substr(s.out, pos + nchar(symbol), nchar(s.out))
-        if (substr(s.out, pos, pos+nchar(symbol)-1) == symbol) {
-          if (!is.alphanumeric(substr(s.post, 1, 1))) {
-            s.out <- paste(s.pre, replacement, s.post, sep="")
-            post <- pos + nchar(replacement) - 1
+      # Greek letters
+      latex.replace <- cbind(latex.replace, c("\\alpha","alpha"), c("\\beta","beta"), c("\\gamma","gamma"), c("\\delta","delta"), c("\\epsilon","epsilon"), c("\\varepsilon","epsilon"), c("\\zeta","zeta"))
+      latex.replace <- cbind(latex.replace, c("\\eta","eta"), c("\\theta","theta"), c("\\vartheta","theta"), c("\\iota","iota"), c("\\kappa","kappa"), c("\\lambda","lambda"), c("\\mu","mu"))
+      latex.replace <- cbind(latex.replace, c("\\nu","nu"), c("\\xi","xi"), c("\\pi","pi"), c("\\varpi","pi"), c("\\rho","rho"), c("\\varrho","rho"), c("\\sigma","sigma"))
+      latex.replace <- cbind(latex.replace, c("\\varsigma","sigma"), c("\\tau","tau"), c("\\upsilon","upsilon"), c("\\phi","phi"), c("\\varphi","phi"), c("\\chi","chi"), c("\\psi","psi"))
+      latex.replace <- cbind(latex.replace, c("\\omega","omega"), c("\\Gamma","gamma"), c("\\Delta","delta"), c("\\Theta","theta"), c("\\Lambda","lambda"), c("\\Xi","xi"), c("\\Pi","pi"))
+      latex.replace <- cbind(latex.replace, c("\\Sigma","sigma"), c("\\Upsilon","upsilon"), c("\\Phi","phi"), c("\\Psi","psi"), c("\\Omega","omega"))
+      
+      s.out <- s
+      for (item in 1:ncol(latex.replace)) {
+        symbol <- latex.replace[1, item]
+        replacement <- latex.replace[2, item]
+        
+        # quick check if any latex characters
+        symbol.regexp <- gsub("\\","\\\\",symbol,fixed=TRUE)
+        symbol.regexp <- gsub("{","\\{",symbol.regexp,fixed=TRUE)
+        symbol.regexp <- gsub("}","\\}",symbol.regexp,fixed=TRUE)
+        symbol.regexp <- gsub("$","\\$",symbol.regexp,fixed=TRUE)
+        symbol.regexp <- paste(symbol.regexp, "[^[:alnum:]_]+", sep="")
+        
+        pos <- 1
+        while (pos <= nchar(s.out)) {
+          
+          if (length(grep(symbol.regexp, s.out))==0) { break }
+          
+          s.pre <- substr(s.out, 1, pos-1)
+          s.pos.char <- substr(s.out, pos, pos)
+          s.post <- substr(s.out, pos + nchar(symbol), nchar(s.out))
+          if (substr(s.out, pos, pos+nchar(symbol)-1) == symbol) {
+            if (!is.alphanumeric(substr(s.post, 1, 1))) {
+              s.out <- paste(s.pre, replacement, s.post, sep="")
+              post <- pos + nchar(replacement) - 1
+            }
           }
+          pos <- pos + 1
         }
-        pos <- pos + 1
       }
+      
+      return(s.out)
     }
-    
-    return(s.out)
-  }
   
   .remove.control.sequences <-
-  function (s) {
-    
-    s <- paste("  ",s, "  ", sep="")
-    
-    # replace latex symbols
-    s <- .replace.latex.symbols(s)
-    
-    # remove dollar signs  [ what about text-related starts ]
-    s <- gsub("\\$", "", s)
-    
-    # remove extra spaces
-    s <- .remove.extra.spaces(s)
-
-    # add: replace some sequences with corresponding letters
-    
-    # walk through the string
-    i <- 1
-    new.s <- ""
-    while (i <= nchar(s)) {
-      s.i <- substr(s, i, i)
+    function (s) {
       
-      if ((s.i %in% c("\\", "_", "^")) & (!(substr(s,i-1,i-1)=="\\"))) {
-        remainder.s <- substr(s, i+1, nchar(s))
-        if ((strpos(" ", remainder.s) < strpos("{", remainder.s)) | (strpos("{", remainder.s)==-1))  {
-          i <- i + strpos(" ", remainder.s) + 1
-        }
-        else {
-          s.sub <- substr(remainder.s, strpos("{", remainder.s), nchar(remainder.s))
-          open.brackets <- 0
-          bracket.start <- bracket.end <- strpos("{", s.sub)
-          
-          for (j in 1:nchar(s.sub)) {
-            s.sub.j <- substr(s.sub, j, j)
-            if (s.sub.j == "{") { 
-              open.brackets <- open.brackets + 1
-              if (open.brackets == 1) { bracket.start <- j + 1 }
-            }
-            if (s.sub.j == "}") { 
-              open.brackets <- open.brackets - 1 
-              if (open.brackets == 0) { bracket.end <- j - 1 }
-            }
-            if (!(s.sub.j %in% c("{","}"))) {
-              if (open.brackets == 0) { break }
-            }
+      s <- paste("  ",s, "  ", sep="")
+      
+      # replace latex symbols
+      s <- .replace.latex.symbols(s)
+      
+      # remove dollar signs and underscores  [ what about text-related starts ]
+      s <- gsub("\\$", "", s)
+      
+      # remove extra spaces
+      s <- .remove.extra.spaces(s)
+      
+      # add: replace some sequences with corresponding letters
+      
+      # walk through the string
+      i <- 1
+      new.s <- ""
+      control.sequence <- ""
+      while (i <= nchar(s)) {
+        s.i0 <- substr(s, i-1, i)
+        s.i <- substr(s, i, i)
+        s.i2 <- substr(s, i, i+1)
+        
+        if ((s.i %in% c("\\", "_", "^")) & (!(s.i2 %in% c("\\_","\\^"))) & (!(s.i0 %in% c("\\_","\\^"))) ) {
+          remainder.s <- substr(s, i+1, nchar(s))     # if control character not followed by curly brace
+          if ((strpos(" ", remainder.s) < strpos("{", remainder.s)) | (strpos("{", remainder.s)==-1))  {
+            i <- i + strpos(" ", remainder.s) + 1
           }
-          if (bracket.end < bracket.start) { 
-            examine.substring <- "" 
-          } 
-          else {
-            examine.substring <- substr(s.sub, bracket.start, bracket.end)
-          }
-          new.s <- paste(new.s, .remove.control.sequences(examine.substring), sep="")
-          i <- i + strpos("{", remainder.s) + bracket.end + 1
+          else {   # control character followed by curly brace
+            control.sequence <- substr(s, i, i+strpos("{", remainder.s)-1)
+                        
+            s.sub <- substr(remainder.s, strpos("{", remainder.s), nchar(remainder.s))
+            open.brackets <- 0
+            bracket.start <- bracket.end <- strpos("{", s.sub)
             
+            for (j in 1:nchar(s.sub)) {
+              s.sub.j <- substr(s.sub, j, j)
+              if (s.sub.j == "{") { 
+                open.brackets <- open.brackets + 1
+                if (open.brackets == 1) { bracket.start <- j + 1 }
+              }
+              if (s.sub.j == "}") { 
+                open.brackets <- open.brackets - 1 
+                if (open.brackets == 0) { bracket.end <- j - 1 }
+              }
+              if (!(s.sub.j %in% c("{","}"))) {
+                if (open.brackets == 0) { break }
+              }
+            }
+            if (bracket.end < bracket.start) { 
+              examine.substring <- "" 
+            } 
+            else {
+              examine.substring <- substr(s.sub, bracket.start, bracket.end)
+            }
+            new.s <- paste(new.s, .remove.control.sequences(examine.substring), sep="")
+            
+            i <- i + strpos("{", remainder.s) + bracket.end + 1
+            
+          }
+        }  
+        else {  # not inside a control sequence
+          new.s <- paste(new.s, s.i, sep="")
+          i <- i + 1
         }
-      }  
-      else {  # not inside a control sequence
-        new.s <- paste(new.s, s.i, sep="")
-        i <- i + 1
+        
       }
       
-    } 
-    
-    return(.trim(new.s))
-    
-  }
+      # replace underscores, etc.
+      new.s <- gsub("\\_", "_", new.s, fixed=T)
+      new.s <- gsub("\\^", "^", new.s, fixed=T)
+      
+      return(.trim(new.s))
+      
+    }
+
   
   .text.cline <-
   function (cline, max.length, line.char="-") {
@@ -5177,7 +5203,7 @@ function(libname, pkgname) {
         if (!is.data.frame(objects[[i]])) {
         
           # if zelig$result relevant, identify this automatically
-          if (.hasSlot(objects[[i]],"Zt") | (class(objects[[i]])=="coeftest")) {  # use this to eliminate lmer, glmer, nlmer
+          if (class(objects[[i]]) %in% c("coeftest","lmerMod","glmerMod","nlmerMod")) {  # use this to eliminate lmer, glmer, nlmer
             if (.model.identify(objects[[i]])=="unknown") { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
           }
           else {
@@ -5463,7 +5489,7 @@ function(libname, pkgname) {
 
     # info about the package and author
     .global.package.name <- "stargazer"
-    .global.package.version <- "4.5.1"
+    .global.package.version <- "4.5.2"
     .global.package.author.name <- "Marek Hlavac"
     .global.package.author.affiliation <- "Harvard University"
     .global.package.author.email <- "hlavac at fas.harvard.edu"
