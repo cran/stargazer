@@ -10,6 +10,17 @@ This page summarizes the models, features, and bug fixes that were introduced in
 }
 
 \section{What's new?}{
+v. 4.5.3: \cr
+\cr
+- New features: \cr
+-- user can now feed stargazer objects in a list \cr
+\cr
+- Bug fixes: \cr
+-- fixed problem with printing negative numbers in data frame and summary statistics tables \cr
+-- corrected formatting of column widths in ASCII text output \cr
+-- minor bug with lme4 covariate names corrected \cr
+\cr
+
 v. 4.5.2: \cr
 \cr
 - Bug fixes: \cr

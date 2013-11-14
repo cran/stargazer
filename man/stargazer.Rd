@@ -50,7 +50,7 @@ stargazer(  ...,
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{\dots}{one or more model objects (for regression analysis tables) or data frames (for summary statistics, or direct output of content).
+  \item{\dots}{one or more model objects (for regression analysis tables) or data frames (for summary statistics, or direct output of content). The can also be included as lists (or even lists within lists).
 %%     ~~Describe \code{\dots} here~~
 }
   \item{type}{a character vector that specifies what type of output the command should produce. The two possible values are \code{"latex"} (default) for LaTeX code and \code{"text"} for ASCII text output. 
@@ -248,7 +248,7 @@ See \link{stargazer news} for a list of new models and features in each release 
 
 \section{Please cite as:}{
 Hlavac, Marek (2013). stargazer: LaTeX code and ASCII text for well-formatted regression and summary statistics tables.\cr
- R package version 4.5.2. http://CRAN.R-project.org/package=stargazer 
+ R package version 4.5.3. http://CRAN.R-project.org/package=stargazer 
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

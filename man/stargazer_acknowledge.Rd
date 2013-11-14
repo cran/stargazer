@@ -32,6 +32,7 @@ Rebecca Goldstein, Harvard University, USA\cr
 Josiah Grover, Ball State University, USA\cr
 Rasmus Hertzum, Glostrup University Hospital, Denmark\cr
 Gregor Hochschild, Germany \cr
+Christian Horea, University of Heidelberg, Germany \cr
 Connor Huff, Harvard University, USA\cr
 Melissa Kline, Massachussetts Institute of Technology, USA\cr
 Maxim Kovalenko, University of Antwerp, Belgium\cr

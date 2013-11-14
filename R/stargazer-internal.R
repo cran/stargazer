@@ -2,7 +2,7 @@
 function(libname, pkgname) {
   packageStartupMessage("\nPlease cite as: \n")
   packageStartupMessage(" Hlavac, Marek (2013). stargazer: LaTeX code and ASCII text for well-formatted regression and summary statistics tables.")
-  packageStartupMessage(" R package version 4.5.2. http://CRAN.R-project.org/package=stargazer \n")
+  packageStartupMessage(" R package version 4.5.3. http://CRAN.R-project.org/package=stargazer \n")
 }
 
 .stargazer.wrap <-
@@ -839,7 +839,7 @@ function(libname, pkgname) {
       else { return(c(as.vector(names(object.name$beta)), as.vector(names(object.name$alpha)))) }
     }
     else if (model.name %in% c("lmer", "glmer", "nlmer")) {
-      return(as.vector(names(.summary.object$coefficients[,1])))
+      return(as.vector(rownames(.summary.object$coefficients)))
     }
     else if (model.name %in% c("ergm", "rem.dyad")) {
       return(as.vector(names(object.name$coef)))
@@ -1928,20 +1928,6 @@ function(libname, pkgname) {
   		first.part <- paste(substr(split.round.result[1],i,i),first.part,sep="")
   		digits.in.separated.unit <- digits.in.separated.unit + 1
 
-  	}
-
-  	# now deal with the decimal part
-    if (!is.na(decimal.places)) {
-  	  if (decimal.places <= 0) {
-  	  	return(first.part) 
-  	  }
-    }
-
-  	# remove initial zero, if that is requested
-  	if (.format.initial.zero==FALSE) {
-  		if ((round.result >= 0) & (round.result < 1)) {
-  			first.part <- ""
-  		}
   	}	
     
     if (x.original < 0) {    # use math-mode for a better looking negative sign
@@ -1953,6 +1939,19 @@ function(libname, pkgname) {
       }
     }
     
+    # now deal with the decimal part
+    if (!is.na(decimal.places)) {
+      if (decimal.places <= 0) {
+        return(first.part) 
+      }
+    }
+    
+    # remove initial zero, if that is requested
+    if (.format.initial.zero==FALSE) {
+      if ((round.result >= 0) & (round.result < 1)) {
+        first.part <- ""
+      }
+    }
 
   	if (length(split.round.result)==2) {
   	  if (is.na(decimal.places)) { return(paste(first.part,.format.decimal.character,split.round.result[2],sep="")) }
@@ -4791,6 +4790,8 @@ function(libname, pkgname) {
       t <- .text.matrix(latex.code, how.many.columns)
       c <- .column.matrix(latex.code, how.many.columns)
       j <- .justification.matrix(latex.code, how.many.columns)
+      
+
     
       max.l <- .text.column.width(t, c)
       w <- .width.matrix(c, max.l)
@@ -4879,12 +4880,17 @@ function(libname, pkgname) {
       
     # think about multicolumns
     for (r in 1:nrow(column.matrix)) {
+      from.c <- 0   # from which column do I start hoovering up widths?
       for (c in 1:ncol(column.matrix)) {
+        
+        from.c <- from.c+1
+
         if (column.matrix[r,c] >= 2) {
           total.width <- 0
-          for (i in c:(c+column.matrix[r,c]-1)) {
+          for (i in from.c:(from.c+column.matrix[r,c]-1)) {
+            
             total.width <- total.width + max.length[i] + 1 
-            if (i > c) {
+            if (i > from.c) {
               for (k in 1:(column.matrix[r,c]-1)) {
                 for (j in i:ncol(column.matrix)) {
                   if ((j+1) <= ncol(column.matrix)) {
@@ -4899,7 +4905,9 @@ function(libname, pkgname) {
             }
           }
           w.matrix[r,c] <- total.width - 1
+          from.c <- from.c + column.matrix[r,c] - 1
         }
+        
       }
     }
       
@@ -5178,7 +5186,25 @@ function(libname, pkgname) {
       }
     }
   }
-
+  
+###########################################
+  
+  .get.objects <- 
+    function(list.of.objects) {
+      
+      objects <- list()
+      for (i in 1:length(list.of.objects)) {
+        current.object <- list.of.objects[[i]]
+        if (class(current.object)[1] == "list") {
+          objects <- append(objects, .get.objects(current.object))
+        }
+        else {
+          objects <- append(objects, list(current.object))
+        }
+      }
+      
+      return(objects)
+    }  
 
 ###########################################
 
@@ -5189,9 +5215,10 @@ function(libname, pkgname) {
     
     ## error handling
     error.present <- "\n"
-    
+  
     # get objects
-    objects <- as.list(list(...))
+    list.of.objects <- list(...)
+    objects <- as.list(.get.objects(list.of.objects))
     how.many.objects <- length(objects)
     
     ## check if argument input is ok
@@ -5204,7 +5231,7 @@ function(libname, pkgname) {
         
           # if zelig$result relevant, identify this automatically
           if (class(objects[[i]]) %in% c("coeftest","lmerMod","glmerMod","nlmerMod")) {  # use this to eliminate lmer, glmer, nlmer
-            if (.model.identify(objects[[i]])=="unknown") { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
+            if (.model.identify(objects[[i]])=="unknown") { error.present <- c(error.present, "% Error: TEST Unrecognized object type.\n",i) }
           }
           else {
             if (!is.null(objects[[i]]$zelig.call)) {
@@ -5489,7 +5516,7 @@ function(libname, pkgname) {
 
     # info about the package and author
     .global.package.name <- "stargazer"
-    .global.package.version <- "4.5.2"
+    .global.package.version <- "4.5.3"
     .global.package.author.name <- "Marek Hlavac"
     .global.package.author.affiliation <- "Harvard University"
     .global.package.author.email <- "hlavac at fas.harvard.edu"
