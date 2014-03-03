@@ -23,7 +23,7 @@
 \begin{document}
 
 \title{stargazer: \\
-beautiful \LaTeX{} and ASCII tables from R statistical output}
+beautiful \LaTeX{}, HTML and ASCII tables from R statistical output}
 
 
 \author{Marek Hlavac%
@@ -35,10 +35,9 @@ Harvard University}
 
 \section{Introduction}
 
-\emph{stargazer} is an R package that creates \LaTeX{} code and ASCII
+\emph{stargazer} is an R package that creates \LaTeX{} code, HTML code and ASCII
 text for well-formatted regression tables, with multiple models side-by-side,
-as well as for summary statistics tables. It can also output the content
-of data frames directly into \LaTeX{}.
+as well as for summary statistics tables, data frames, vectors and matrices.
 
 
 \section{Why Should I Use \emph{stargazer}?}
@@ -182,8 +181,10 @@ labels. In particular, we would like \emph{learning} and \emph{privileges}
 to come before all the other covariates. In addition, of the summary
 statistics reported, let us keep only the number of observations (using
 the argument \emph{keep.stat}). Instead of reporting ASCII text, we'll
-go back to producing \LaTeX{} tables by returning the type argument
-to its default value of ``latex''. \emph{Table 6} is our result.
+go back to producing \LaTeX{} tables by returning the \textit{type} argument
+to its default value of \textit{``latex''}. \emph{Table 6} is our result. Please note
+that users can also set the \textit{type} argument to \textit{``html''} to obtain
+HTML code.
 
 \noindent \newline
 \verb|stargazer(linear.1, linear.2, title="Regression Results",| \newline
@@ -192,6 +193,31 @@ to its default value of ``latex''. \emph{Table 6} is our result.
 \verb|keep.stat="n", ci=TRUE, ci.level=0.90, single.row=TRUE)| \newline
 
 \noindent \begin{table}[!htbp] \centering    \caption{Regression Results}    \label{}  \begin{tabular}{@{\extracolsep{5pt}}lcc}  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{2}{c}{\textit{Dependent variable:}} \\  \cline{2-3}  \\[-1.8ex] & \multicolumn{2}{c}{Overall Rating} \\  \\[-1.8ex] & (1) & (2)\\  \hline \\[-1.8ex]   learning & 0.692$^{***}$ (0.447, 0.937) & 0.682$^{***}$ (0.470, 0.894) \\    privileges & $-$0.104 ($-$0.325, 0.118) & $-$0.103 ($-$0.316, 0.109) \\    complaints & 0.249 ($-$0.013, 0.512) & 0.238$^{*}$ (0.009, 0.467) \\    raises & $-$0.033 ($-$0.366, 0.299) &  \\    critical & 0.015 ($-$0.227, 0.258) &  \\    Constant & 11.011 ($-$8.240, 30.262) & 11.258 ($-$0.779, 23.296) \\   \hline \\[-1.8ex]  Observations & 30 & 30 \\  \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table} 
+
+
+\emph{stargazer} can also report the content of vectors and matrices. Let us create a table 
+that contains the correlation matrix for the \emph{rating}, \emph{complaints} and \emph{privileges} variables 
+in the \emph{`attitude'} data frame:
+
+\noindent \newline
+\verb|correlation.matrix <- cor(attitude[,c("rating","complaints","privileges")])| \newline
+\verb|stargazer(correlation.matrix, title="Correlation Matrix")| \newline
+
+\noindent \begin{table}[!htbp] \centering 
+  \caption{Correlation Matrix} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}} cccc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & rating & complaints & privileges \\ 
+rating & $1$ & $0.825$ & $0.426$ \\ 
+complaints & $0.825$ & $1$ & $0.558$ \\ 
+privileges & $0.426$ & $0.558$ & $1$ \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table} 
+
+
 
 \newpage{}
 
@@ -243,7 +269,6 @@ in two columns, side by side:
 
 \noindent \begin{table}[!htbp] \centering    \caption{}    \label{}  \begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} }  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{2}{c}{\textit{Dependent variable:}} \\  \cline{2-3}  \\[-1.8ex] & \multicolumn{2}{c}{sales} \\   & \multicolumn{1}{c}{default} & \multicolumn{1}{c}{robust} \\  \\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)}\\  \hline \\[-1.8ex]   temp & 2.972^{***} & 2.972^{***} \\    & (0.067) & (0.084) \\    & & \\   female & -37.819 & -37.819 \\    & (81.064) & (78.926) \\    & & \\   Constant & 23.916 & 23.916 \\    & (41.187) & (40.408) \\    & & \\  \hline \\[-1.8ex]  Observations & \multicolumn{1}{c}{500} & \multicolumn{1}{c}{500} \\  R$^{2}$ & \multicolumn{1}{c}{0.799} & \multicolumn{1}{c}{0.799} \\  Adjusted R$^{2}$ & \multicolumn{1}{c}{0.798} & \multicolumn{1}{c}{0.798} \\  Residual Std. Error (df = 497) & \multicolumn{1}{c}{18.068} & \multicolumn{1}{c}{18.068} \\  F Statistic (df = 2; 497) & \multicolumn{1}{c}{984.916$^{***}$} & \multicolumn{1}{c}{984.916$^{***}$} \\  \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table} 
 
-
 \subsection{Many supported models}
 
 \emph{stargazer} supports objects from the most widely used statistical
@@ -252,11 +277,11 @@ objects from \emph{aftreg }(eha)\emph{, betareg} (betareg), \emph{binaryChoice
 }(sampleSelection)\emph{, bj }(rms)\emph{, brglm }(brglm)\emph{, coeftest
 }(lmtest)\emph{, coxph }(survival), \emph{coxreg }(eha)\emph{, clm
 }(ordinal), \emph{clogit }(survival), \textit{cph} (rms), \textit{dynlm}
-(dynlm), \emph{ergm }(ergm), \textit{errorsarlm} (spdev), \emph{gam
+(dynlm), \emph{ergm }(ergm), \textit{errorsarlm} (spdev), \emph{felm} (lfe), \emph{gam
 }(mgcv),\emph{ gee }(gee),\emph{ glm }(stats), \textit{Glm} (rms),\emph{
 glmer }(lme4), \emph{gls} (nlme), \textit{Gls} (rms), \textit{gmm}
 (gmm), \emph{heckit} (sampleSelection), \emph{hurdle }(pscl), \emph{ivreg}
-(AER), \textit{lagarlm} (spdep), \emph{lm }(stats), \emph{lmer} (lme4),
+(AER), \textit{lagarlm} (spdep), \emph{lm}(stats), \emph{lmer} (lme4),
 \emph{lmrob} (robustbase), \textit{lrm} (rms), \textit{maBina}\textit{\emph{
 (erer)}}\textit{, mclogit }\textit{\emph{(mclogit)}}\textit{, mlogit
 }\textit{\emph{(mlogit)}}\textit{, mlreg} (eha), \emph{multinom} (nnet),
@@ -301,9 +326,9 @@ If you use the \emph{stargazer} package in your research publications,
 please remember to include the following citation:\\
 
 
-\noindent \texttt{Hlavac, Marek (2013). stargazer: LaTeX code and
+\noindent \texttt{Hlavac, Marek (2014). stargazer: LaTeX/HTML code and
 ASCII text for well-formatted regression and summary statistics tables. R
-package version 4.5.3.}~\\
+package version 5.0.}~\\
 \texttt{http://CRAN.R-project.org/package=stargazer}~\\
 \texttt{}~\\
 \texttt{}~\\

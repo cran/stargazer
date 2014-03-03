@@ -7,7 +7,7 @@
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-The following character strings can be used in the \code{omit.stat} argument of the \code{\link{stargazer}} command. 
+The following character strings can be used in the \code{keep.stat} and \code{omit.stat} arguments of the \code{\link{stargazer}} command. 
 }
 
 \section{}{

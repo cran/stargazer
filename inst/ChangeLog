@@ -5,19 +5,48 @@ This page summarizes the models, features, and bug fixes that were introduced in
 Please note that I am always looking for comments and suggestions. 
 Do not hesitate to contact me at hlavac [at] fas.harvard.edu
 
+v. 5.0:
+
+- New models: 
+-- felm (lfe) 
+
+- New features:
+-- ability to produce HTML/CSS output (argument \code{type}) 
+-- vector and matrix objects are now acceptable (argument \code{...}) 
+-- additional lines can be included in the tables (argument \code{add.lines})
+-- table layout is now fully customizable (arguments \code{table.layout} and \code{omit.table.layout}) 
+-- choice over which summary statistics should be reported (arguments \code{summary.stat} and \code{omit.summary.stat}) 
+-- users can choose whether and the order in which to report coefficients, standard errors, confidence intervals, test statistics and p-values (argument \code{report})
+-- object names can be reported above each column (argument \code{object.names}) 
+-- option to toggle the reporting of dependent variables and model names across several columns (argument \code{multicolumn}) 
+-- reporting of model statistics' degrees of freedom can now be suppressed (argument \code{df}) 
+-- users can now include more than three statistical significance cutoffs (argument \code{star.cutoffs}) 
+-- regression, summary statistic and data frame table can now be flipped (argument \code{flip}) 
+-- colnames and rownames can be included in, or excluded from, data frame content tables (arguments \code{colnames} and \code{rownames}) 
+-- argument \code{summary} can now have a different value for each table within a single \code{stargazer()} call 
+-- if arguments \code{coef}, \code{se}, \code{t}, \code{p}, \code{ci.custom} and \code{add.lines} only contain a single vector, they will be accepted as though they were a list containing the same vector 
+
+- Bug fixes: 
+-- fixed bug that caused the number of observations to be misreported in complicated models 
+-- fixed bug that led to the omission of coefficients from output when multiple models had a single regressor
+-- \code{notes} now working well for summary statistics and data frame tables 
+-- font size can now be change even if floating environment is not used 
+-- fixed compatability issues with latest version of Zelig
+-- minor formatting changes 
+
 v. 4.5.3: 
 
 - New features: 
--- user can now feed stargazer objects in a list 
+-- model objects can now be passed to stargazer in a list (argument \code{...}) 
 
-- Bug fixes: 
--- fixed problem with printing negative numbers in data frame and summary statistics tables 
+- Fixed bugs: 
+-- fixed problem with printing negative numbers in data frame and summary statistics tables
 -- corrected formatting of column widths in ASCII text output
 -- minor bug with lme4 covariate names corrected 
 
-v. 4.5.2:
+v. 4.5.2: 
 
-- Bug fixes:
+- Fixed bugs: 
 -- much faster output 
 -- now compatible with the updated lme4 package 
 -- corrected a bug that prevented users from including multiple models with a single covariate + intercept 
@@ -25,7 +54,7 @@ v. 4.5.2:
 
 v. 4.5.1:
 
-- Bug fixes: 
+- Fixed bugs:  
 -- fixed a bug involving the calculation of t-statistics from user-given coefficients and standard errors 
 
 v. 4.5: 
@@ -49,7 +78,7 @@ v. 4.5:
 -- different confidence levels for each individual column (argument ci.level is now a vector) 
 -- ability to omit and keep variables based on their position in the table
 
-- Bug fixes: 
+- Fixed bugs:  
 -- citation and change log updates 
 -- minor formatting changes 
 
