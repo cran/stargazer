@@ -2,17 +2,21 @@ Package: stargazer
 Type: Package
 Title: LaTeX/HTML code and ASCII text for well-formatted regression and
         summary statistics tables
-Version: 5.0
-Date: 2014-03-03
+Version: 5.1
+Date: 2014-05-29
 Author: Marek Hlavac <hlavac@fas.harvard.edu>
 Maintainer: Marek Hlavac <hlavac@fas.harvard.edu>
 Description: Produces LaTeX code, HTML/CSS code and ASCII text for well-formatted tables that hold 
     regression analysis results from several models side-by-side, as well as summary
     statistics.
 License: GPL (>= 2)
+Enhances: AER, betareg, brglm, dynlm, eha, erer, ergm, gee, glmx, gmm,
+        lfe, lme4, lmtest, MASS, mclogit, mgcv, mlogit, nlme, nnet,
+        ordinal, plm, pscl, quantreg, rms, relevent, robustbase,
+        sampleSelection, spdep, stats, survey, survival, Zelig
 LazyLoad: yes
 Collate: 'stargazer-internal.R' 'stargazer.R'
-Packaged: 2014-03-03 02:10:31 UTC; Marek Hlavac
+Packaged: 2014-05-29 03:45:17 UTC; Marek Hlavac
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2014-03-03 07:43:56
+Date/Publication: 2014-05-29 10:17:19

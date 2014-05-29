@@ -2,7 +2,7 @@
 function(libname, pkgname) {
   packageStartupMessage("\nPlease cite as: \n")
   packageStartupMessage(" Hlavac, Marek (2014). stargazer: LaTeX code and ASCII text for well-formatted regression and summary statistics tables.")
-  packageStartupMessage(" R package version 5.0. http://CRAN.R-project.org/package=stargazer \n")
+  packageStartupMessage(" R package version 5.1. http://CRAN.R-project.org/package=stargazer \n")
 }
 
 .stargazer.wrap <-
@@ -255,7 +255,7 @@ function(libname, pkgname) {
       .format.note <<- ""
       .format.note.content <<- c("$^{***}$p $<$ [.***]; $^{**}$p $<$ [.**]; $^{*}$p $<$ [.*]")
       .format.note.alignment <<- "l"
-      .format.s.stat.parts <<- c("-!","stat names","-!","statistics1","-!","notes")
+      .format.s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
     }  
   
     # ajs = American Journal of Sociology
@@ -298,7 +298,7 @@ function(libname, pkgname) {
       .format.note <<- ""
       .format.note.content <<- c("$^{*}$p $<$ [.*]; $^{**}$p $<$ [.**]; $^{***}$p $<$ [.***]")
       .format.note.alignment <<- "l"
-      .format.s.stat.parts <<- c("-!","stat names","-!","statistics1","-!","notes")
+      .format.s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
     }
     
     # asq = Administrative Science Quarterly
@@ -326,7 +326,7 @@ function(libname, pkgname) {
       .format.note <<- ""
       .format.note.content <<- c("$^{\\bullet}$p $<$ [.*]; $^{\\bullet\\bullet}$p $<$ [.**]; $^{\\bullet\\bullet\\bullet}$p $<$ [.***]")
       .format.note.alignment <<- "l"
-      .format.s.stat.parts <<- c("-!","stat names","-!","statistics1","-!","notes")
+      .format.s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
       .format.stars <<- "\\bullet"
     }  
   
@@ -347,7 +347,7 @@ function(libname, pkgname) {
       .format.note.content <<- c("$^{*}$p $<$ [.*]; $^{**}$p $<$ [.**]; $^{***}$p $<$ [.***]")
       .format.cutoffs <<- c(0.05, 0.01, 0.001)
       .format.note.alignment <<- "l"
-      .format.s.stat.parts <<- c("-!","stat names","-!","statistics1","-!","notes")
+      .format.s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
     }
   
     # "demography" = Demography
@@ -369,7 +369,7 @@ function(libname, pkgname) {
       .format.note.content <<- c("$^{*}$p $<$ [.*]; $^{**}$p $<$ [.**]; $^{***}$p $<$ [.***]")
       .format.cutoffs <<- c(0.05, 0.01, 0.001)
       .format.note.alignment <<- "l"
-      .format.s.stat.parts <<- c("-!","stat names","-!","statistics1","-!","notes")
+      .format.s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
     }
   
     # io = International Organization
@@ -402,7 +402,7 @@ function(libname, pkgname) {
       .format.note <<- "\\textit{Notes:}"
       .format.note.content <<- c("$^{***}$p $<$ [.***]; $^{**}$p $<$ [.**]; $^{*}$p $<$ [.*]")
       .format.note.alignment <<- "l"
-      .format.s.stat.parts <<- c("-!","stat names","-!","statistics1","-!","notes")
+      .format.s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
     }
   
   
@@ -426,7 +426,7 @@ function(libname, pkgname) {
       .format.note <<- "\\textit{Note:}"
       .format.note.content <<- c("$^{***}$p $<$ [.***]; $^{**}$p $<$ [.**]; $^{*}$p $<$ [.*]")
       .format.note.alignment <<- "l"
-      .format.s.stat.parts <<- c("-!","stat names","-!","statistics1","-!","notes")
+      .format.s.stat.parts <<- c("-!","stat names","-","statistics1","-!","notes")
       .format.s.statistics.names <<- cbind(c("n","N"), c("nmiss","missing"), c("mean","Mean"), c("sd","SD"), c("median","Median"), c("min","Minimum"), c("max","Maximum"), c("mad","Median Abs. Dev."), c("p","Percentile(!)"))
       
     }
@@ -435,7 +435,7 @@ function(libname, pkgname) {
     else if (style=="qje") {
       .format.table.parts <<- c("=!","dependent variable label","dependent variables","models","columns","numbers","objects","-","coefficients","omit","additional","N","R-squared","adjusted R-squared","max R-squared","log likelihood","theta(se)*", "AIC","BIC","UBRE","rho(se)*","Mills(se)*", "SER(df)","F statistic(df)*","chi2(df)*","Wald(df)*","LR(df)*","logrank(df)*","=!","notes")    
       .format.dependent.variable.text.on <<- FALSE
-      .format.s.stat.parts <<- c("-!","stat names","=!","statistics1","=!","notes")
+      .format.s.stat.parts <<- c("-!","stat names","=","statistics1","=!","notes")
       .format.N <<- "\\textit{N}"
       .format.note <<- "\\textit{Notes:}"
       .format.note.content <<- c("$^{***}$Significant at the [***] percent level.", "$^{**}$Significant at the [**] percent level.", "$^{*}$Significant at the [*] percent level.") 
@@ -3291,10 +3291,11 @@ function(libname, pkgname) {
   		  for (i in seq(1:length(.global.models))) {
   				for (j in seq(1:length(.format.omit.regexp))) {
   					for (k in seq(1:length(.global.coefficients))) {
-  						if (length(grep(.format.omit.regexp[j], .global.coefficient.variables[k], perl=.format.perl, fixed=FALSE))!=0) {
-  							if (!is.na(.global.coefficients[k,i])) {
-  								.format.omit.table[j,i] <<- .format.omit.yes
-  							}
+  					  relevant.coef.var <- .global.coefficient.variables[k]
+  						if (length(grep(.format.omit.regexp[j], relevant.coef.var, perl=.format.perl, fixed=FALSE))!=0) {
+  						  if (!is.na(.global.coefficients[relevant.coef.var,i])) {
+  						   .format.omit.table[j,i] <<- .format.omit.yes
+  						  }
   						}
   					}
   				}
@@ -3755,8 +3756,16 @@ function(libname, pkgname) {
       .data.frame.table.header(object)
       .table.insert.space()
       
-      for (i in seq(1:length(.format.s.stat.parts))) {
-        .data.frame.table.part(object,.format.s.stat.parts[i])
+      .table.part.published <<- as.vector(rep(NA, times=length(.format.s.stat.parts)))    # to keep track what has been published (to deal intelligently with horizontal lines)
+      .publish.horizontal.line <<- TRUE   # should non-compulsory horizontal lines be published? (yes, if something else published since the previous line)
+      
+      if (length(.format.s.stat.parts)>=1) {
+        for (i in seq(1:length(.format.s.stat.parts))) {
+          .data.frame.table.part(object,.format.s.stat.parts[i], which.part.number = i)
+          
+          if (.table.part.published[i]==TRUE) { .publish.horizontal.line <<- TRUE }
+          if ((.format.s.stat.parts[i]=="-") | (.format.s.stat.parts[i]=="-!") | (.format.s.stat.parts[i]=="=") | (.format.s.stat.parts[i]=="=!")) { .publish.horizontal.line <<- FALSE }
+        }
       }
       
       cat("\\end{tabular} \n")
@@ -3768,7 +3777,10 @@ function(libname, pkgname) {
   }
   
   .data.frame.table.part <-
-  function(object, part) {
+  function(object, part, which.part.number) {
+    
+    .table.part.published[which.part.number] <<- FALSE
+    
     if ((part=="stat names") & (.format.colnames==TRUE)) {
       
       x.which <- 0
@@ -3829,7 +3841,9 @@ function(libname, pkgname) {
         }
         
       }
+      
       cat(" \\\\ \n")
+      .table.part.published[which.part.number] <<- TRUE
     }
     
     if (substr(part,1,10)=="statistics") {
@@ -3908,7 +3922,7 @@ function(libname, pkgname) {
           cat(" \\\\ \n") 
         }
       }
-    
+      .table.part.published[which.part.number] <<- TRUE
     }
         
     
@@ -3919,11 +3933,13 @@ function(libname, pkgname) {
         if (.format.s.note == "") { cat("\\multicolumn{",length(names(object)),"}{",.format.s.note.alignment,"}{",.format.s.note.content[i],"} \\\\ \n", sep="") }
         else { cat(" & \\multicolumn{",length(names(object)),"}{",.format.s.note.alignment,"}{",.format.s.note.content[i],"} \\\\ \n", sep="") }
       }
+      .table.part.published[which.part.number] <<- TRUE
     }	
     
     # empty line
     else if (part==" ") {
       .table.empty.line()
+      .table.part.published[which.part.number] <<- TRUE
     }
     
     # horizontal line
@@ -3931,6 +3947,16 @@ function(libname, pkgname) {
       cat("\\hline ")
       .table.insert.space()
       cat(" \n")
+      .table.part.published[which.part.number] <<- TRUE
+    }
+    
+    else if (part=="-") {
+      if (.publish.horizontal.line==TRUE) {
+        cat("\\hline ")
+        .table.insert.space()
+        cat(" \n")
+        .table.part.published[which.part.number] <<- TRUE
+      }
     }
     
     # double horizontal line
@@ -3939,6 +3965,17 @@ function(libname, pkgname) {
       cat("\\hline ")
       .table.insert.space()
       cat(" \n")
+      .table.part.published[which.part.number] <<- TRUE
+    }
+    
+    else if (part=="=") {
+      if (.publish.horizontal.line==TRUE) {
+        cat("\\hline \n") 
+        cat("\\hline ")
+        .table.insert.space()
+        cat(" \n")
+        .table.part.published[which.part.number] <<- TRUE
+      }
     }
     
   }
@@ -4121,6 +4158,9 @@ function(libname, pkgname) {
   function(object, part) {
     
     included <- .summ.stat.included(object)
+    
+    # with summary statistics, always publish horizontal line
+    .publish.horizontal.line <<- TRUE
 
   	if (part=="stat names") {
   		cat(.format.s.statistics.names.label, sep="")
@@ -4276,6 +4316,14 @@ function(libname, pkgname) {
   		.table.insert.space()
   		cat(" \n")
   	}
+    
+    else if (part=="-") {
+      if (.publish.horizontal.line==TRUE) {
+        cat("\\hline ")
+        .table.insert.space()
+        cat(" \n")
+      }
+    }
 
   	# double horizontal line
   	else if (part=="=!") {
@@ -4284,6 +4332,15 @@ function(libname, pkgname) {
   		.table.insert.space()
   		cat(" \n")
   	}
+    
+    else if (part=="=") {
+      if (.publish.horizontal.line==TRUE) {
+        cat("\\hline \n") 
+        cat("\\hline ")
+        .table.insert.space()
+        cat(" \n")
+      }
+    }
   }
 
   .table.empty.line <-
@@ -4384,8 +4441,8 @@ function(libname, pkgname) {
 
   .table.info.comment <-
   function() {
+    cat("\n")
     if (.format.header==TRUE) {
-      cat("\n")
       cat("% Table created by ", .global.package.name, " v.", .global.package.version, " by ", .global.package.author.name, ", ", .global.package.author.affiliation, ". E-mail: ", .global.package.author.email, "\n", sep="")  
       cat("% Date and time:", format(Sys.time(), "%a, %b %d, %Y - %X"))
       cat("\n")
@@ -6049,7 +6106,7 @@ function(libname, pkgname) {
 
     # info about the package and author
     .global.package.name <- "stargazer"
-    .global.package.version <- "5.0"
+    .global.package.version <- "5.1"
     .global.package.author.name <- "Marek Hlavac"
     .global.package.author.affiliation <- "Harvard University"
     .global.package.author.email <- "hlavac at fas.harvard.edu"
@@ -6599,25 +6656,25 @@ function(libname, pkgname) {
       # report logical variables in summary statistics tables?
       .format.summ.logical <- summary.logical
       
-      # keep summary statistics
-      if (!is.null(summary.stat)) {
-        .lower.keep.summary.stat <- tolower(summary.stat)    # make it all lower-case
-        .format.s.statistics.list <- .lower.keep.summary.stat
-      }
-      
-      # remove omitted statistics from table parts
-      if (!is.null(omit.summary.stat)) {
-        .lower.omit.summary.stat <- tolower(omit.summary.stat)    # make it all lower-case
-        .format.s.statistics.list <- .format.s.statistics.list[!(.format.s.statistics.list %in% .lower.omit.summary.stat)]
-      }
-      
-      # summary statistics - what statistics to report
+      # summary statistics - what statistics to report - !!! this needs to come before summary.stat and omit.summary.stat
       if (!nobs) { .format.s.statistics.list <- .format.s.statistics.list[.format.s.statistics.list!="n"] }
       if (!mean.sd) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="mean")&(.format.s.statistics.list!="sd")]}
       if (!min.max) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="min")&(.format.s.statistics.list!="max")]}
       if (!median) { .format.s.statistics.list <- .format.s.statistics.list[.format.s.statistics.list!="median"] }
       if (!iqr) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="p25")&(.format.s.statistics.list!="p75")]}
       
+      # keep summary statistics
+      if (!is.null(summary.stat)) {
+        .lower.keep.summary.stat <- tolower(summary.stat)    # make it all lower-case
+        .format.s.statistics.list <- .lower.keep.summary.stat
+     } 
+      
+      # remove omitted statistics from table parts
+      if (!is.null(omit.summary.stat)) {
+        .lower.omit.summary.stat <- tolower(omit.summary.stat)    # make it all lower-case
+        .format.s.statistics.list <- .format.s.statistics.list[!(.format.s.statistics.list %in% .lower.omit.summary.stat)]
+      }
+
       # table layout
       .format.table.parts.nonstat <- c("=","-","-!","=!","dependent variable label",
                                        "dependent variables","models","columns","numbers",
@@ -6708,7 +6765,7 @@ function(libname, pkgname) {
               do.call(.stargazer.reg.table, as.list(objects[regression.table.objects]))  
               invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
             }
-            else if ((type == "text") | (type == "html") | (type == "mmd")) {
+            else if ((type == "text") | (type == "html") | (type == "mmd") ) {
               latex.code <- c(latex.code, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
             }
           }

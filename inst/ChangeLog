@@ -5,31 +5,42 @@ This page summarizes the models, features, and bug fixes that were introduced in
 Please note that I am always looking for comments and suggestions. 
 Do not hesitate to contact me at hlavac [at] fas.harvard.edu
 
+v. 5.1:
+
+- New features:
+-- the CRAN description now lists packages whose usefulness is enhanced by stargazer
+
+- Fixed bugs
+-- labels that indicate whether variables have been omitted from the model are now correctly assigned (argument omit.labels)
+-- argument summary.stat now functions properly
+-- out.header and header can both be set to false at the same time
+-- minor formatting changes
+
 v. 5.0:
 
 - New models: 
 -- felm (lfe) 
 
 - New features:
--- ability to produce HTML/CSS output (argument \code{type}) 
--- vector and matrix objects are now acceptable (argument \code{...}) 
--- additional lines can be included in the tables (argument \code{add.lines})
--- table layout is now fully customizable (arguments \code{table.layout} and \code{omit.table.layout}) 
--- choice over which summary statistics should be reported (arguments \code{summary.stat} and \code{omit.summary.stat}) 
--- users can choose whether and the order in which to report coefficients, standard errors, confidence intervals, test statistics and p-values (argument \code{report})
--- object names can be reported above each column (argument \code{object.names}) 
--- option to toggle the reporting of dependent variables and model names across several columns (argument \code{multicolumn}) 
--- reporting of model statistics' degrees of freedom can now be suppressed (argument \code{df}) 
--- users can now include more than three statistical significance cutoffs (argument \code{star.cutoffs}) 
--- regression, summary statistic and data frame table can now be flipped (argument \code{flip}) 
--- colnames and rownames can be included in, or excluded from, data frame content tables (arguments \code{colnames} and \code{rownames}) 
--- argument \code{summary} can now have a different value for each table within a single \code{stargazer()} call 
--- if arguments \code{coef}, \code{se}, \code{t}, \code{p}, \code{ci.custom} and \code{add.lines} only contain a single vector, they will be accepted as though they were a list containing the same vector 
+-- ability to produce HTML/CSS output (argument type) 
+-- vector and matrix objects are now acceptable (argument ...) 
+-- additional lines can be included in the tables (argument add.lines)
+-- table layout is now fully customizable (arguments table.layout and omit.table.layout) 
+-- choice over which summary statistics should be reported (arguments summary.stat and omit.summary.stat) 
+-- users can choose whether and the order in which to report coefficients, standard errors, confidence intervals, test statistics and p-values (argument report)
+-- object names can be reported above each column (argument object.names) 
+-- option to toggle the reporting of dependent variables and model names across several columns (argument multicolumn) 
+-- reporting of model statistics' degrees of freedom can now be suppressed (argument df) 
+-- users can now include more than three statistical significance cutoffs (argument star.cutoffs) 
+-- regression, summary statistic and data frame table can now be flipped (argument flip) 
+-- colnames and rownames can be included in, or excluded from, data frame content tables (arguments colnames and rownames) 
+-- argument summary can now have a different value for each table within a single stargazer() call 
+-- if arguments coef, se, t, p, ci.custom and add.lines only contain a single vector, they will be accepted as though they were a list containing the same vector 
 
-- Bug fixes: 
+- Fixed bugs: 
 -- fixed bug that caused the number of observations to be misreported in complicated models 
 -- fixed bug that led to the omission of coefficients from output when multiple models had a single regressor
--- \code{notes} now working well for summary statistics and data frame tables 
+-- notes now working well for summary statistics and data frame tables 
 -- font size can now be change even if floating environment is not used 
 -- fixed compatability issues with latest version of Zelig
 -- minor formatting changes 
@@ -37,7 +48,7 @@ v. 5.0:
 v. 4.5.3: 
 
 - New features: 
--- model objects can now be passed to stargazer in a list (argument \code{...}) 
+-- model objects can now be passed to stargazer in a list (argument ...) 
 
 - Fixed bugs: 
 -- fixed problem with printing negative numbers in data frame and summary statistics tables
@@ -189,6 +200,6 @@ v. 2.0:
 
 - Fixed bugs: 
 -- argument \digits now works properly 
--- \code{stargazer} updated to reflect, and work properly with, recent changes to Zelig
+-- stargazer updated to reflect, and work properly with, recent changes to Zelig
 -- variable names can now contain dollar signs and underscores 
 -- some minor formatting fixes 

@@ -280,7 +280,7 @@ objects from \emph{aftreg }(eha)\emph{, betareg} (betareg), \emph{binaryChoice
 (dynlm), \emph{ergm }(ergm), \textit{errorsarlm} (spdev), \emph{felm} (lfe), \emph{gam
 }(mgcv),\emph{ gee }(gee),\emph{ glm }(stats), \textit{Glm} (rms),\emph{
 glmer }(lme4), \emph{gls} (nlme), \textit{Gls} (rms), \textit{gmm}
-(gmm), \emph{heckit} (sampleSelection), \emph{hurdle }(pscl), \emph{ivreg}
+(gmm), \emph{heckit} (sampleSelection), \emph{hetglm} (glmx), \emph{hurdle }(pscl), \emph{ivreg}
 (AER), \textit{lagarlm} (spdep), \emph{lm}(stats), \emph{lmer} (lme4),
 \emph{lmrob} (robustbase), \textit{lrm} (rms), \textit{maBina}\textit{\emph{
 (erer)}}\textit{, mclogit }\textit{\emph{(mclogit)}}\textit{, mlogit
@@ -328,7 +328,7 @@ please remember to include the following citation:\\
 
 \noindent \texttt{Hlavac, Marek (2014). stargazer: LaTeX/HTML code and
 ASCII text for well-formatted regression and summary statistics tables. R
-package version 5.0.}~\\
+package version 5.1.}~\\
 \texttt{http://CRAN.R-project.org/package=stargazer}~\\
 \texttt{}~\\
 \texttt{}~\\

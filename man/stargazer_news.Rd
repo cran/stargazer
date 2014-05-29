@@ -10,6 +10,17 @@ This page summarizes the models, features, and bug fixes that were introduced in
 }
 
 \section{What's new?}{
+v. 5.1:\cr
+\cr
+- New features:\cr
+-- the CRAN description now lists packages whose usefulness is enhanced by \code{stargazer}\cr
+\cr
+- Fixed bugs\cr
+-- labels that indicate whether variables have been omitted from the model are now correctly assigned (argument \code{omit.labels})\cr
+-- argument \code{summary.stat} now functions properly\cr
+-- \code{out.header} and \code{header} can both be set to false at the same time\cr
+-- minor formatting changes\cr
+\cr
 v. 5.0: \cr
 \cr
 - New models: \cr

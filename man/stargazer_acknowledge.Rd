@@ -30,9 +30,11 @@ Andrey Fradkin, Stanford University, USA\cr
 Bernard Fraga, Harvard University, USA\cr
 Tal Galili, Tel Aviv University, Israel\cr
 Cheng Gao, Harvard University, USA\cr
+Simen Gaure, Frisch Center, Oslo, Norway\cr
 Charlie Gibbons, University of California-Berkeley, USA\cr
 Rebecca Goldstein, Harvard University, USA\cr
 Josiah Grover, Ball State University, USA\cr
+Andrew Heiss, Duke University, USA\cr
 Rasmus Hertzum, Glostrup University Hospital, Denmark\cr
 Gregor Hochschild, Germany \cr
 Christian Horea, University of Heidelberg, Germany \cr
@@ -60,6 +62,7 @@ Nathan Paxton, American University, USA\cr
 Stephen Pettigrew, Harvard University, USA\cr
 Giuseppe Ragusa, Luiss University, Rome, Italy\cr
 Christoph Riedl, Northeastern University, USA\cr
+James Ryans, University of California-Berkeley, USA\cr
 Francesco Sarracino, STATEC, Luxembourg\cr
 Martijn Schoonvelde, University of Exeter, United Kingdom \cr
 Jason Sclar, Harvard University, USA\cr
@@ -68,9 +71,12 @@ Boris Shor, University of Chicago, USA\cr
 Zachary Steinert-Threkeld, University of California-San Diego, USA\cr
 Emily Stephen, Boston University, USA\cr
 Bryan Stroube, University of Maryland, USA\cr
+David Szakonyi, Columbia University, USA\cr
 Beth Truesdale, Harvard University, USA\cr
 Anna Weisfeiler, University of Wisconsin-Madison, USA\cr
 Carl Witthoft, UTC Aerospace Systems, USA \cr
+Minkeun Woo, Stanford University, USA\cr
+Alex Wood-Doughty, University of California-Santa Barabara, USA\cr
 Jan Zilinsky, University of Chicago, USA\cr
 Steffen Zittlau, University of Mannheim, Germany\cr
 }

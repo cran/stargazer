@@ -8,7 +8,7 @@
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-The \code{stargazer} command produces LaTeX code, HTML code and ASCII text for well-formatted tables that hold regression analysis results from several models side-by-side. It can also output summary statistics and data frame content. \code{stargazer} supports model objects from \code{aftreg} (eha), \code{betareg} (betareg), \code{binaryChoice} (sampleSelection), \code{bj} (rms), \code{brglm} (brglm), \code{coeftest} (lmtest), \code{coxph} (survival), \code{coxreg} (eha), \code{clm} (ordinal), \code{clogit} (survival), \code{cph} (rms), \code{dynlm} (dynlm), \code{ergm} (ergm), \code{errorsarlm} (spdep), \code{felm} (lfe), \code{gam} (mgcv), \code{gee} (gee), \code{glm} (stats), \code{Glm} (rms), \code{glmer} (lme4), \code{gls} (nlme), \code{Gls} (rms), \code{gmm} (gmm), \code{heckit} (sampleSelection), \code{hurdle} (pscl),  \code{ivreg} (AER), \code{lagarlm} (spdep), \code{lm} (stats), \code{lmer} (lme4), \code{lmrob} (robustbase), \code{lrm} (rms), \code{maBina} (erer), \code{mclogit} (mclogit), \code{mlogit} (mlogit), \code{mlreg} (eha), \code{multinom} (nnet), \code{nlmer} (lme4), \code{ols} (rms), \code{phreg} (eha), \code{plm} (plm), \code{pmg} (plm), \code{polr} (MASS), \code{psm} (rms), \code{rem.dyad} (relevent), \code{rlm} (MASS), \code{rq} (quantreg), \code{Rq} (rms), \code{probit} (sampleSelection), \code{selection} (sampleSelection), \code{svyglm} (survey), \code{survreg} (survival), \code{tobit} (AER), \code{weibreg} (eha), \code{zeroinfl} (pscl), as well as from the implementation of these in \code{zelig}. It also supports the following \code{zelig} models: \code{"relogit"}, \code{"cloglog.net"}, \code{"gamma.net"}, \code{"probit.net"} and \code{"logit.net"}.
+The \code{stargazer} command produces LaTeX code, HTML code and ASCII text for well-formatted tables that hold regression analysis results from several models side-by-side. It can also output summary statistics and data frame content. \code{stargazer} supports a large number model objects from a variety of packages. Please see \link{stargazer models}.
 }
 \usage{
 stargazer(  ..., 
@@ -62,7 +62,7 @@ stargazer(  ...,
   \item{\dots}{one or more model objects (for regression analysis tables) or data frames/vectors/matrices (for summary statistics, or direct output of content). They can also be included as lists (or even lists within lists).
 %%     ~~Describe \code{\dots} here~~
 }
-  \item{type}{a character vector that specifies what type of output the command should produce. The two possible values are \code{"latex"} (default) for LaTeX code, \code{"html"} for HTML/CSS code, \code{"mmd"} for MultiMarkdown and \code{"text"} for ASCII text output. 
+  \item{type}{a character vector that specifies what type of output the command should produce. The possible values are \code{"latex"} (default) for LaTeX code, \code{"html"} for HTML/CSS code, \code{"text"} for ASCII text output. 
 %%     ~~Describe \code{type} here~~
 }
   \item{title}{a character vector with titles for the tables.
@@ -283,7 +283,7 @@ See \link{stargazer news} for a list of new models and features in each release 
 }
 
 \section{Please cite as:}{
-Hlavac, Marek (2014). stargazer: LaTeX/HTML code and ASCII text for well-formatted regression and summary statistics tables. R package version 5.0. http://CRAN.R-project.org/package=stargazer 
+Hlavac, Marek (2014). stargazer: LaTeX/HTML code and ASCII text for well-formatted regression and summary statistics tables. R package version 5.1. http://CRAN.R-project.org/package=stargazer 
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
