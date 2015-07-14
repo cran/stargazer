@@ -5,6 +5,31 @@ This page summarizes the models, features, and bug fixes that were introduced in
 Please note that I am always looking for comments and suggestions. 
 Do not hesitate to contact me at hlavac [at] fas.harvard.edu
 
+v. 5.2:
+
+- New models:
+-- arima (stats) 
+-- censReg (censReg) 
+-- garchFit (fGarch) 
+-- glmrob (robustbase) 
+-- lme (nlme) 
+-- nlme (nlme) 
+-- mnlogit (mnlogit) 
+-- pgmm (plm) 
+
+- New features:
+-- decimal mark (argument decimal.mark) now gets automatically updated in notes (argument notes) 
+
+- Fixed bugs:
+-- felm (lfe) working again 
+-- fixed formatting issues that led to an occasional inability to produce ASCII text output 
+-- much faster output of multi-model tables with many omitted variables 
+-- negative numbers are now properly displayed when initial.zero is set to FALSE 
+-- fixed minor bug that occasionally led to a misalignment of additional lines (argument add.lines) 
+-- lm() and glm() models now report AIC and BIC 
+-- underscores are now properly formatted in column and dependent variable labels
+-- fixed an issue with the mlogit model that led LR tests to crash the output when no intercept was present
+
 v. 5.1:
 
 - New features:

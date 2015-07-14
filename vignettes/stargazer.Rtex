@@ -87,7 +87,7 @@ specify the part of the data frame you would like to see, and set
 the \emph{summary} option to FALSE:\\
 
 
-\noindent \verb|stargazer(attitude[1:4,], summary=FALSE)| 
+\noindent \verb|stargazer(attitude[1:4,], summary=FALSE, rownames=FALSE)| 
 
 \begin{table}[!htbp] \centering    \caption{}    \label{}  \begin{tabular}{@{\extracolsep{5pt}} cccccccc}  \\[-1.8ex]\hline  \hline \\[-1.8ex]  rating & complaints & privileges & learning & raises & critical & advance & high.rating \\  \hline \\[-1.8ex]  $43$ & $51$ & $30$ & $39$ & $61$ & $92$ & $45$ & FALSE \\  $63$ & $64$ & $51$ & $54$ & $63$ & $73$ & $47$ & FALSE \\  $71$ & $70$ & $68$ & $69$ & $76$ & $86$ & $48$ & TRUE \\  $61$ & $63$ & $45$ & $47$ & $54$ & $84$ & $35$ & FALSE \\  \hline \\[-1.8ex]  \normalsize  \end{tabular}  \end{table}  
 
@@ -107,7 +107,7 @@ result.\newpage{}
 \verb|probit.model <- glm(high.rating ~ learning + critical + advance, data=attitude,| \newline
 \verb|family = binomial(link = "probit"))| \newline \newline
 \verb|stargazer(linear.1, linear.2, probit.model, title="Results", align=TRUE)|\begin{table}[htb] \centering    \caption{Results}    \label{}  \footnotesize 
-\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{3}{c}{\textit{Dependent variable:}} \\  \cline{2-4}  \\[-1.8ex] & \multicolumn{2}{c}{rating} & \multicolumn{1}{c}{high.rating} \\  \\[-1.8ex] & \multicolumn{2}{c}{\textit{OLS}} & \multicolumn{1}{c}{\textit{probit}} \\  \\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\  \hline \\[-1.8ex]   complaints & 0.692^{***} & 0.682^{***} &  \\    & (0.149) & (0.129) &  \\    & & & \\   privileges & -0.104 & -0.103 &  \\    & (0.135) & (0.129) &  \\    & & & \\   learning & 0.249 & 0.238^{*} & 0.164^{***} \\    & (0.160) & (0.139) & (0.053) \\    & & & \\   raises & -0.033 &  &  \\    & (0.202) &  &  \\    & & & \\   critical & 0.015 &  & -0.001 \\    & (0.147) &  & (0.044) \\    & & & \\   advance &  &  & -0.062 \\    &  &  & (0.042) \\    & & & \\   Constant & 11.011 & 11.258 & -7.476^{**} \\    & (11.704) & (7.318) & (3.570) \\    & & & \\  \hline \\[-1.8ex]  Observations & \multicolumn{1}{c}{$30$} & \multicolumn{1}{c}{$30$} & \multicolumn{1}{c}{$30$} \\  R$^{2}$ & \multicolumn{1}{c}{$0.715$} & \multicolumn{1}{c}{$0.715$} &  \\  Adjusted R$^{2}$ & \multicolumn{1}{c}{$0.656$} & \multicolumn{1}{c}{$0.682$} &  \\  Log likelihood &  &  & \multicolumn{1}{c}{$-9.087$} \\  Akaike Inf. Crit. &  &  & \multicolumn{1}{c}{$26.175$} \\  Residual Std. Error & \multicolumn{1}{c}{$7.139 (df = 24)$} & \multicolumn{1}{c}{$6.863 (df = 26)$} &  \\  F statistic & \multicolumn{1}{c}{$12.063^{***} (df = 5; 24)$} & \multicolumn{1}{c}{$21.743^{***} (df = 3; 26)$} &  \\  \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{3}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table}
+\begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{3}{c}{\textit{Dependent variable:}} \\  \cline{2-4}  \\[-1.8ex] & \multicolumn{2}{c}{rating} & \multicolumn{1}{c}{high.rating} \\  \\[-1.8ex] & \multicolumn{2}{c}{\textit{OLS}} & \multicolumn{1}{c}{\textit{probit}} \\  \\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\  \hline \\[-1.8ex]   complaints & 0.692^{***} & 0.682^{***} &  \\    & (0.149) & (0.129) &  \\    & & & \\   privileges & -0.104 & -0.103 &  \\    & (0.135) & (0.129) &  \\    & & & \\   learning & 0.249 & 0.238^{*} & 0.164^{***} \\    & (0.160) & (0.139) & (0.053) \\    & & & \\   raises & -0.033 &  &  \\    & (0.202) &  &  \\    & & & \\   critical & 0.015 &  & -0.001 \\    & (0.147) &  & (0.044) \\    & & & \\   advance &  &  & -0.062 \\    &  &  & (0.042) \\    & & & \\   Constant & 11.011 & 11.258 & -7.476^{**} \\    & (11.704) & (7.318) & (3.570) \\    & & & \\  \hline \\[-1.8ex]  Observations & \multicolumn{1}{c}{$30$} & \multicolumn{1}{c}{$30$} & \multicolumn{1}{c}{$30$} \\  R$^{2}$ & \multicolumn{1}{c}{$0.715$} & \multicolumn{1}{c}{$0.715$} &  \\  Adjusted R$^{2}$ & \multicolumn{1}{c}{$0.656$} & \multicolumn{1}{c}{$0.682$} &  \\  Log likelihood &  &  & \multicolumn{1}{c}{$-9.087$} \\  Akaike Inf. Crit. & \multicolumn{1}{c}{210.375} & \multicolumn{1}{c}{206.412} & \multicolumn{1}{c}{26.175} \\ Bayesian Inf. Crit. & \multicolumn{1}{c}{220.183} & \multicolumn{1}{c}{213.418} & \multicolumn{1}{c}{31.780} \\   Residual Std. Error & \multicolumn{1}{c}{$7.139 (df = 24)$} & \multicolumn{1}{c}{$6.863 (df = 26)$} &  \\  F statistic & \multicolumn{1}{c}{$12.063^{***} (df = 5; 24)$} & \multicolumn{1}{c}{$21.743^{***} (df = 3; 26)$} &  \\  \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{3}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table}
 
 \newpage{}
 
@@ -128,7 +128,7 @@ and \emph{covariate.labels} arguments. The result is a complex, publication-qual
 \newline \verb|"Opportunity to Learn","Performance-Based Raises","Too Critical","Advancement"),|
 \newline \verb|omit.stat=c("LL","ser","f"), no.space=TRUE)|
 
-\begin{table}[!htbp] \centering    \caption{Regression Results}    \label{}  \begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{3}{c}{\textit{Dependent variable:}} \\  \cline{2-4}  \\[-1.8ex] & \multicolumn{2}{c}{Overall Rating} & \multicolumn{1}{c}{High Rating} \\  \\[-1.8ex] & \multicolumn{2}{c}{\textit{OLS}} & \multicolumn{1}{c}{\textit{probit}} \\  \\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\  \hline \\[-1.8ex]   Handling of Complaints & 0.692^{***} & 0.682^{***} &  \\    & (0.149) & (0.129) &  \\    No Special Privileges & -0.104 & -0.103 &  \\    & (0.135) & (0.129) &  \\    Opportunity to Learn & 0.249 & 0.238^{*} & 0.164^{***} \\    & (0.160) & (0.139) & (0.053) \\    Performance-Based Raises & -0.033 &  &  \\    & (0.202) &  &  \\    Too Critical & 0.015 &  & -0.001 \\    & (0.147) &  & (0.044) \\    Advancement &  &  & -0.062 \\    &  &  & (0.042) \\    Constant & 11.011 & 11.258 & -7.476^{**} \\    & (11.704) & (7.318) & (3.570) \\   \hline \\[-1.8ex]  Observations & \multicolumn{1}{c}{30} & \multicolumn{1}{c}{30} & \multicolumn{1}{c}{30} \\  R$^{2}$ & \multicolumn{1}{c}{0.715} & \multicolumn{1}{c}{0.715} &  \\  Adjusted R$^{2}$ & \multicolumn{1}{c}{0.656} & \multicolumn{1}{c}{0.682} &  \\  Akaike Inf. Crit. &  &  & \multicolumn{1}{c}{26.175} \\  \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{3}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table} 
+\begin{table}[!htbp] \centering    \caption{Regression Results}    \label{}  \begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} }  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{3}{c}{\textit{Dependent variable:}} \\  \cline{2-4}  \\[-1.8ex] & \multicolumn{2}{c}{Overall Rating} & \multicolumn{1}{c}{High Rating} \\  \\[-1.8ex] & \multicolumn{2}{c}{\textit{OLS}} & \multicolumn{1}{c}{\textit{probit}} \\  \\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\  \hline \\[-1.8ex]   Handling of Complaints & 0.692^{***} & 0.682^{***} &  \\    & (0.149) & (0.129) &  \\    No Special Privileges & -0.104 & -0.103 &  \\    & (0.135) & (0.129) &  \\    Opportunity to Learn & 0.249 & 0.238^{*} & 0.164^{***} \\    & (0.160) & (0.139) & (0.053) \\    Performance-Based Raises & -0.033 &  &  \\    & (0.202) &  &  \\    Too Critical & 0.015 &  & -0.001 \\    & (0.147) &  & (0.044) \\    Advancement &  &  & -0.062 \\    &  &  & (0.042) \\    Constant & 11.011 & 11.258 & -7.476^{**} \\    & (11.704) & (7.318) & (3.570) \\   \hline \\[-1.8ex]  Observations & \multicolumn{1}{c}{30} & \multicolumn{1}{c}{30} & \multicolumn{1}{c}{30} \\  R$^{2}$ & \multicolumn{1}{c}{0.715} & \multicolumn{1}{c}{0.715} &  \\  Adjusted R$^{2}$ & \multicolumn{1}{c}{0.656} & \multicolumn{1}{c}{0.682} &  \\  Akaike Inf. Crit. & \multicolumn{1}{c}{210.375} & \multicolumn{1}{c}{206.412} & \multicolumn{1}{c}{26.175} \\ Bayesian Inf. Crit. & \multicolumn{1}{c}{220.183} & \multicolumn{1}{c}{213.418} & \multicolumn{1}{c}{31.780} \\   \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{3}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table} 
 
 \newpage{}In \textit{Table 5}, we limit ourselves to the two linear
 models, and report 90 percent confidence intervals (using \textit{ci}
@@ -143,7 +143,7 @@ report the coefficients and confidence intervals on the same row (using
 \newline \verb|"Opportunity to Learn","Performance-Based Raises","Too Critical","Advancement"),|
 \newline \verb|omit.stat=c("LL","ser","f"), ci=TRUE, ci.level=0.90, single.row=TRUE)|
 
-\begin{table}[!htbp] \centering    \caption{Regression Results}    \label{}  \begin{tabular}{@{\extracolsep{5pt}}lcc}  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{2}{c}{\textit{Dependent variable:}} \\  \cline{2-3}  \\[-1.8ex] & \multicolumn{2}{c}{Overall Rating} \\  \\[-1.8ex] & (1) & (2)\\  \hline \\[-1.8ex]   Handling of Complaints & 0.692$^{***}$ (0.447, 0.937) & 0.682$^{***}$ (0.470, 0.894) \\    No Special Privileges & $-$0.104 ($-$0.325, 0.118) & $-$0.103 ($-$0.316, 0.109) \\    Opportunity to Learn & 0.249 ($-$0.013, 0.512) & 0.238$^{*}$ (0.009, 0.467) \\    Performance-Based Raises & $-$0.033 ($-$0.366, 0.299) &  \\    Too Critical & 0.015 ($-$0.227, 0.258) &  \\    Advancement & 11.011 ($-$8.240, 30.262) & 11.258 ($-$0.779, 23.296) \\   \hline \\[-1.8ex]  Observations & 30 & 30 \\  R$^{2}$ & 0.715 & 0.715 \\  Adjusted R$^{2}$ & 0.656 & 0.682 \\  \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table}  
+\begin{table}[!htbp] \centering    \caption{Regression Results}    \label{}  \begin{tabular}{@{\extracolsep{5pt}}lcc}  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{2}{c}{\textit{Dependent variable:}} \\  \cline{2-3}  \\[-1.8ex] & \multicolumn{2}{c}{Overall Rating} \\  \\[-1.8ex] & (1) & (2)\\  \hline \\[-1.8ex]   Handling of Complaints & 0.692$^{***}$ (0.447, 0.937) & 0.682$^{***}$ (0.470, 0.894) \\    No Special Privileges & $-$0.104 ($-$0.325, 0.118) & $-$0.103 ($-$0.316, 0.109) \\    Opportunity to Learn & 0.249 ($-$0.013, 0.512) & 0.238$^{*}$ (0.009, 0.467) \\    Performance-Based Raises & $-$0.033 ($-$0.366, 0.299) &  \\    Too Critical & 0.015 ($-$0.227, 0.258) &  \\    Advancement & 11.011 ($-$8.240, 30.262) & 11.258 ($-$0.779, 23.296) \\   \hline \\[-1.8ex]  Observations & 30 & 30 \\  R$^{2}$ & 0.715 & 0.715 \\  Adjusted R$^{2}$ & 0.656 & 0.682 \\ Akaike Inf. Crit. & 210.375 & 206.412 \\ Bayesian Inf. Crit. & 220.183 & 213.418 \\   \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table}  
 
 \newpage{}To produce ASCII text output, rather than \LaTeX{} code,
 we simply set the argument \textit{type} to \textit{``text''}:
@@ -172,6 +172,8 @@ we simply set the argument \textit{type} to \textit{``text''}:
 \verb|Observations                       30                      30           |\newline
 \verb|R2                                0.715                   0.715         |\newline
 \verb|Adjusted R2                       0.656                   0.682         |\newline
+\verb|Akaike Inf. Crit.                210.375                 206.412        |\newline
+\verb|Bayesian Inf. Crit.              220.183                 213.418        |\newline
 \verb|========================================================================|\newline
 \verb|Note:                                        *p<0.1; **p<0.05; ***p<0.01|\newline
 
@@ -267,25 +269,27 @@ in two columns, side by side:
 \verb|column.labels=c("default","robust"), align=TRUE)| \newline
 
 
-\noindent \begin{table}[!htbp] \centering    \caption{}    \label{}  \begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} }  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{2}{c}{\textit{Dependent variable:}} \\  \cline{2-3}  \\[-1.8ex] & \multicolumn{2}{c}{sales} \\   & \multicolumn{1}{c}{default} & \multicolumn{1}{c}{robust} \\  \\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)}\\  \hline \\[-1.8ex]   temp & 2.972^{***} & 2.972^{***} \\    & (0.067) & (0.084) \\    & & \\   female & -37.819 & -37.819 \\    & (81.064) & (78.926) \\    & & \\   Constant & 23.916 & 23.916 \\    & (41.187) & (40.408) \\    & & \\  \hline \\[-1.8ex]  Observations & \multicolumn{1}{c}{500} & \multicolumn{1}{c}{500} \\  R$^{2}$ & \multicolumn{1}{c}{0.799} & \multicolumn{1}{c}{0.799} \\  Adjusted R$^{2}$ & \multicolumn{1}{c}{0.798} & \multicolumn{1}{c}{0.798} \\  Residual Std. Error (df = 497) & \multicolumn{1}{c}{18.068} & \multicolumn{1}{c}{18.068} \\  F Statistic (df = 2; 497) & \multicolumn{1}{c}{984.916$^{***}$} & \multicolumn{1}{c}{984.916$^{***}$} \\  \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table} 
+\noindent \begin{table}[!htbp] \centering    \caption{}    \label{}  \begin{tabular}{@{\extracolsep{5pt}}lD{.}{.}{-3} D{.}{.}{-3} }  \\[-1.8ex]\hline  \hline \\[-1.8ex]   & \multicolumn{2}{c}{\textit{Dependent variable:}} \\  \cline{2-3}  \\[-1.8ex] & \multicolumn{2}{c}{sales} \\   & \multicolumn{1}{c}{default} & \multicolumn{1}{c}{robust} \\  \\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)}\\  \hline \\[-1.8ex]   temp & 2.972^{***} & 2.972^{***} \\    & (0.067) & (0.084) \\    & & \\   female & -37.819 & -37.819 \\    & (81.064) & (78.926) \\    & & \\   Constant & 23.916 & 23.916 \\    & (41.187) & (40.408) \\    & & \\  \hline \\[-1.8ex]  Observations & \multicolumn{1}{c}{500} & \multicolumn{1}{c}{500} \\  R$^{2}$ & \multicolumn{1}{c}{0.799} & \multicolumn{1}{c}{0.799} \\  Adjusted R$^{2}$ & \multicolumn{1}{c}{0.798} & \multicolumn{1}{c}{0.798} \\ Akaike Inf. Crit. & \multicolumn{1}{c}{4,318.054} & \multicolumn{1}{c}{4,318.054} \\ Bayesian Inf. Crit. & \multicolumn{1}{c}{4,334.912} & \multicolumn{1}{c}{4,334.912} \\   Residual Std. Error (df = 497) & \multicolumn{1}{c}{18.068} & \multicolumn{1}{c}{18.068} \\  F Statistic (df = 2; 497) & \multicolumn{1}{c}{984.916$^{***}$} & \multicolumn{1}{c}{984.916$^{***}$} \\  \hline  \hline \\[-1.8ex]  \textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\  \normalsize  \end{tabular}  \end{table} 
 
 \subsection{Many supported models}
 
 \emph{stargazer} supports objects from the most widely used statistical
 functions and packages. In particular, the package supports model
-objects from \emph{aftreg }(eha)\emph{, betareg} (betareg), \emph{binaryChoice
-}(sampleSelection)\emph{, bj }(rms)\emph{, brglm }(brglm)\emph{, coeftest
+objects from \emph{aftreg }(eha)\emph{, arima} (stats)\emph{, betareg} (betareg), \emph{binaryChoice
+}(sampleSelection)\emph{, bj }(rms)\emph{, brglm }(brglm)\emph{, censReg} (censReg)\emph{, coeftest
 }(lmtest)\emph{, coxph }(survival), \emph{coxreg }(eha)\emph{, clm
 }(ordinal), \emph{clogit }(survival), \textit{cph} (rms), \textit{dynlm}
 (dynlm), \emph{ergm }(ergm), \textit{errorsarlm} (spdev), \emph{felm} (lfe), \emph{gam
-}(mgcv),\emph{ gee }(gee),\emph{ glm }(stats), \textit{Glm} (rms),\emph{
-glmer }(lme4), \emph{gls} (nlme), \textit{Gls} (rms), \textit{gmm}
+}(mgcv),\emph{ garchFit }(fGarch),\emph{ gee }(gee),\emph{ glm }(stats), \textit{Glm} (rms),\emph{
+glmer }(lme4),\emph{ glmrob}(robustbase), \emph{gls} (nlme), \textit{Gls} (rms), \textit{gmm}
 (gmm), \emph{heckit} (sampleSelection), \emph{hetglm} (glmx), \emph{hurdle }(pscl), \emph{ivreg}
-(AER), \textit{lagarlm} (spdep), \emph{lm}(stats), \emph{lmer} (lme4),
+(AER), \textit{lagarlm} (spdep), \emph{lm}(stats),\emph{ lme }(nlme), \emph{lmer} (lme4),
 \emph{lmrob} (robustbase), \textit{lrm} (rms), \textit{maBina}\textit{\emph{
 (erer)}}\textit{, mclogit }\textit{\emph{(mclogit)}}\textit{, mlogit
-}\textit{\emph{(mlogit)}}\textit{, mlreg} (eha), \emph{multinom} (nnet),
-\emph{nlmer} (lme4), \textit{ols} (rms), \textit{phreg} (eha), \emph{plm}
+}\textit{\emph{(mlogit)}}\textit{, mnlogit
+}\textit{\emph{(mnlogit)}}\textit{, mlreg} (eha), \emph{multinom} (nnet),\emph{ nlme }(nlme),
+\emph{nlmer} (lme4), \textit{ols} (rms), \emph{pgmm}
+(plm), \textit{phreg} (eha), \emph{plm}
 (plm), \emph{pmg} (plm), \emph{polr} (MASS), \textit{psm} (rms), \textit{rem.dyad}
 (relevent), \emph{rlm} (MASS), \textit{rq} (quantreg), \textit{Rq}
 (rms), \emph{selection }(sampleSelection)\emph{, svyglm} (survey),
@@ -326,11 +330,8 @@ If you use the \emph{stargazer} package in your research publications,
 please remember to include the following citation:\\
 
 
-\noindent \texttt{Hlavac, Marek (2014). stargazer: LaTeX/HTML code and
-ASCII text for well-formatted regression and summary statistics tables. R
-package version 5.1.}~\\
-\texttt{http://CRAN.R-project.org/package=stargazer}~\\
-\texttt{}~\\
+\noindent \texttt{Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables. R
+package version 5.2.} \texttt{http://CRAN.R-project.org/package=stargazer}~\\
 \texttt{}~\\
 
 

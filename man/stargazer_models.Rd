@@ -23,6 +23,9 @@ The package name is indicated in bold and is followed by a list of functions/obj
 \bold{brglm}: \cr
 - \code{brglm}\cr
 \cr
+\bold{censReg}:\cr
+- \code{censReg}\cr
+\cr
 \bold{dynlm}: \cr
 - \code{dynlm}\cr
 \cr
@@ -38,6 +41,9 @@ The package name is indicated in bold and is followed by a list of functions/obj
 \cr
 \bold{ergm}: \cr
 - \code{ergm}\cr
+\cr
+\bold{fGarch}:\cr
+- \code{garchFit}\cr
 \cr
 \bold{gee}:\cr
 - \code{gee}\cr
@@ -73,8 +79,13 @@ The package name is indicated in bold and is followed by a list of functions/obj
 \bold{mlogit}: \cr
 - \code{mlogit}\cr
 \cr
+\bold{mnlogit}: \cr
+- \code{mnlogit}\cr
+\cr
 \bold{nlme}:\cr
 - \code{gls}\cr
+- \code{lme}\cr
+- \code{nlme}\cr
 \cr
 \bold{nnet}: \cr
 - \code{multinom}\cr
@@ -83,6 +94,7 @@ The package name is indicated in bold and is followed by a list of functions/obj
 - \code{clm}\cr
 \cr
 \bold{plm}:\cr
+- \code{pgmm}\cr
 - \code{plm}\cr
 - \code{pmg}\cr
 \cr
@@ -107,6 +119,7 @@ The package name is indicated in bold and is followed by a list of functions/obj
 - \code{quantreg}\cr
 \cr
 \bold{robustbase}: \cr
+- \code{glmrob}\cr
 - \code{lmrob}\cr
 \cr
 \bold{sampleSelection}:\cr
@@ -120,6 +133,7 @@ The package name is indicated in bold and is followed by a list of functions/obj
 - \code{largarlm}\cr
 \cr
 \bold{stats}:\cr
+- \code{arima}\cr
 - \code{glm}\cr
 - \code{lm}\cr
 \cr
@@ -132,13 +146,14 @@ The package name is indicated in bold and is followed by a list of functions/obj
 - \code{survreg}\cr
 \cr
 \bold{Zelig}:\cr
-- the implementation of the above models 
+- the implementation of the above models \cr
 - \code{relogit}\cr
 - \code{cloglog.net}\cr
 - \code{gamma.net}\cr
 - \code{probit.net}\cr
 - \code{logit.net}\cr
 \cr
+
 
 }
 

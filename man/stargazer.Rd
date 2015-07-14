@@ -283,7 +283,7 @@ See \link{stargazer news} for a list of new models and features in each release 
 }
 
 \section{Please cite as:}{
-Hlavac, Marek (2014). stargazer: LaTeX/HTML code and ASCII text for well-formatted regression and summary statistics tables. R package version 5.1. http://CRAN.R-project.org/package=stargazer 
+Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables. R package version 5.2. http://CRAN.R-project.org/package=stargazer 
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~

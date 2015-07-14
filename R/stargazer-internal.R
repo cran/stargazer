@@ -1,8 +1,8 @@
 .onAttach <- 
 function(libname, pkgname) {
   packageStartupMessage("\nPlease cite as: \n")
-  packageStartupMessage(" Hlavac, Marek (2014). stargazer: LaTeX code and ASCII text for well-formatted regression and summary statistics tables.")
-  packageStartupMessage(" R package version 5.1. http://CRAN.R-project.org/package=stargazer \n")
+  packageStartupMessage(" Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables.")
+  packageStartupMessage(" R package version 5.2. http://CRAN.R-project.org/package=stargazer \n")
 }
 
 .stargazer.wrap <-
@@ -45,7 +45,7 @@ function(libname, pkgname) {
     }
     
     for (model.num in 1:model.num.total) {
-      
+                                                       
       .global.models <<- append(.global.models, .model.identify(object.name))
   	
   	  .global.dependent.variables <<- append(.global.dependent.variables, .dependent.variable(object.name, model.num))
@@ -61,6 +61,7 @@ function(libname, pkgname) {
   	  .global.scale <<- append(.global.scale, .get.scale(object.name))
       .global.UBRE <<- append(.global.UBRE, .gcv.UBRE(object.name))
   	  .global.sigma2 <<- append(.global.sigma2, .get.sigma2(object.name))
+  	  
       
       .global.rho <<- cbind(.global.rho, .get.rho(object.name))
       .global.mills <<- cbind(.global.mills, .get.mills(object.name))
@@ -78,27 +79,31 @@ function(libname, pkgname) {
 
   	  # add RHS variables and coefficients
   	  coef.var <- .coefficient.variables(object.name)
+  	  .global.coef.vars.by.model <<-  cbind(.global.coef.vars.by.model, coef.var)
 
   	  temp.gcv <- rep(NA,each=1,times=max.length)
 
   	  temp.gcv[1:length(.global.coefficient.variables)] <- .global.coefficient.variables
 
   	  how.many.gcv <- length(.global.coefficient.variables)
-
+  	  
+  	  # try to find variable
   	  position <- 0
   	  for (i in seq(1:length(coef.var))) {
-
-  		  found <- FALSE
+  	    
+  	    found <- FALSE
+  	    
   		  for (j in seq(1:length(.global.coefficient.variables))) {
-  				  if (coef.var[i] == .global.coefficient.variables[j]) {
-  					  found <- TRUE
-  					  for (k in 1:how.many.gcv) {
-  						  if (coef.var[i]==temp.gcv[k]) {
-  							  position <- k
-  						  }
-  					  }
-  				  }
+  			    if (coef.var[i] == .global.coefficient.variables[j]) {
+  				    found <- TRUE
+  				    for (k in 1:how.many.gcv) {
+  					    if (coef.var[i]==temp.gcv[k]) {
+  					  	  position <- k
+  					    }
+  				    }
+  			    }
   		  }
+  		  
 
   		  # If variable was found, no need to add it
   		  if (found == FALSE) {
@@ -112,17 +117,58 @@ function(libname, pkgname) {
   			  how.many.gcv <- how.many.gcv + 1
   			  position <- position + 1
   		  }
-		
+  	    
   	  }
-  
+  	  
   	  .global.coefficient.variables <<- temp.gcv[1:how.many.gcv]
-
+  	  
   	  # build up coefficients from scratch
   	  temp.coefficients <- temp.std.errors <- temp.ci.lb <- temp.ci.rb <- temp.t.stats <- temp.p.values <- matrix(data = NA, nrow = length(.global.coefficient.variables), ncol = ncol(.global.coefficients)+1)
 	    rownames(temp.coefficients) <- rownames(temp.std.errors) <- rownames(temp.ci.lb) <- rownames(temp.ci.rb) <- rownames(temp.t.stats) <- rownames(temp.p.values) <- .global.coefficient.variables
 
   	  # fill in from previous iteration of .global coefficients
+	    which.variable <- 0
   	  for (row in .global.coefficient.variables) {
+  	    
+  	    which.variable <- which.variable + 1
+  	    
+  	    row.i <- .rename.intercept(row)   # row with intercept renamed to get the omit and keep right
+  	    
+  	    ### if omitted variable, then advance to the next iteration of the loop --- !!! do this also for index
+  	    #skip all of this if omitted based on regular expression
+  	    omitted <- FALSE
+  	    
+  	    if (!is.null(.format.omit.regexp)) {
+  	      for (i in seq(1:length(.format.omit.regexp))) {
+  	        if (length(grep(.format.omit.regexp[i], row.i, perl=.format.perl, fixed=FALSE))!=0) { omitted <- TRUE	}
+  	      }
+  	    }
+  	    
+  	    if (!is.null(.format.keep.regexp)) {
+  	      omitted <- TRUE
+  	      for (i in seq(1:length(.format.keep.regexp))) {
+  	        if (length(grep(.format.keep.regexp[i], row.i, perl=.format.perl, fixed=FALSE))!=0) { omitted <- FALSE	}
+  	      }
+  	    }
+  	    
+  	    if (!is.null(.format.omit.index)) {
+  	       for (i in seq(1:length(.format.omit.index))) {
+  	        if (.format.omit.index[i] == which.variable) { omitted <- TRUE }
+  	       }
+  	    }
+  	    
+  	    if (!is.null(.format.keep.index)) {
+  	      omitted <- TRUE
+  	      for (i in seq(1:length(.format.keep.index))) {
+  	        if (.format.keep.index[i] == which.variable) { omitted <- FALSE }
+  	      }
+  	    }
+  	    
+  	    if (omitted == TRUE) { next }
+
+  	    
+  	    ###
+  	    
 		    for (col in seq(1:ncol(.global.coefficients))) {
   			  if (sum(as.vector(rownames(.global.coefficients[,col, drop=FALSE])==row))!=0) { 
   				  if (!is.null(.global.coefficients)) { temp.coefficients[row, col] <- .global.coefficients[row, col] }
@@ -165,14 +211,14 @@ function(libname, pkgname) {
     
     }
 
-  }
+ } 
 
   .adj.r.squared <-
   function(object.name) {
 
   	model.name <- .get.model.name(object.name)
 
-  	if (!(model.name %in% c("arima","coeftest","maBina", "lmer", "glmer", "nlmer", "Gls"))) {
+  	if (!(model.name %in% c("arima","fGARCH","Arima","coeftest","maBina", "lmer", "glmer", "nlmer", "Gls"))) {
       if (model.name %in% c("heckit")) {
         return(.summary.object$rSquared$R2adj)
       }
@@ -478,8 +524,16 @@ function(libname, pkgname) {
       return(NA)
     }
     
-    if (model.name %in% c("lmer","glmer","nlmer", "ergm", "gls", "Gls", "lagsarlm", "errorsarlm", "")) {
+    if (model.name %in% c("lmer","lme","nlme","glmer","nlmer", "ergm", "gls", "Gls", "lagsarlm", "errorsarlm", "", "Arima")) {
       return(as.vector(AIC(object.name)))
+    }
+    
+    if (model.name %in% c("censReg")) {
+      return(as.vector(AIC(object.name)[1]))
+    }
+    
+    if (model.name %in% c("fGARCH")) {
+      return(object.name@fit$ics["AIC"])
     }
     
     if (model.name %in% c("maBina")) {
@@ -495,7 +549,7 @@ function(libname, pkgname) {
     else if (!is.null(object.name$AIC)) {
       return(as.vector(object.name$AIC)) 
     }
-    
+
     return(NA)
   }
   
@@ -504,11 +558,19 @@ function(libname, pkgname) {
       
       model.name <- .get.model.name(object.name)
       
-      if (model.name %in% c("coeftest","maBina")) {
+      if (model.name %in% c("coeftest","maBina","Arima")) {
         return(NA)
       }
-            
-      if (model.name %in% c("lmer","glmer","nlmer", "ergm", "gls", "Gls")) {
+      
+      if (model.name %in% c("censReg")) {
+        return(as.vector(BIC(object.name)[1]))
+      }
+      
+      if (model.name %in% c("fGARCH")) {
+        return(object.name@fit$ics["BIC"])
+      }
+      
+      if (model.name %in% c("lmer","lme","nlme","glmer","nlmer", "ergm", "gls", "Gls")) {
         return(as.vector(BIC(object.name)))
       }
       
@@ -532,7 +594,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima","maBina","coeftest","lmer", "Gls", "glmer", "nlmer", "normal.gam","logit.gam","probit.gam","poisson.gam","gam()"))) {
+    if (!(model.name %in% c("arima","fGARCH","Arima","maBina","coeftest","lmer", "Gls", "glmer", "nlmer", "normal.gam","logit.gam","probit.gam","poisson.gam","gam()"))) {
       if (!is.null(.summary.object$chi)) {
         chi.value <- suppressMessages(.summary.object$chi)
         df.value <- suppressMessages(.summary.object$df) - suppressMessages(.summary.object$idf)
@@ -821,10 +883,28 @@ function(libname, pkgname) {
 
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.gee", "logit.gee", "probit.gee", "poisson.gee", "normal.gam", 
   				    "logit.gam", "probit.gam", "poisson.gam", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.gee", "gamma.survey",
-  				    "exp", "weibull", "coxph", "clogit", "lognorm", "tobit", "tobit(AER)", "brglm", "glm()", "Glm()", "svyglm()", "gee()", "survreg()", "gam()", "plm", "ivreg", "pmg", "lmrob", 
-              "dynlm", "gls", "rq", "lagsarlm", "errorsarlm", "gmm", "mclogit", "felm")) {
+  				    "exp", "weibull", "coxph", "clogit", "lognorm", "tobit", "tobit(AER)", "brglm", "glm()", "Glm()", "svyglm()", "gee()", "survreg()", "gam()", "plm", "ivreg", "pmg", "lmrob", "glmrob", 
+              "dynlm", "gls", "rq", "lagsarlm", "errorsarlm", "gmm", "mclogit")) {
   		return(as.vector(names(object.name$coefficients)))
   	}
+  	else if (model.name %in% c("Arima")) {
+  	  return(names(object.name$coef))
+  	}
+  	else if (model.name %in% c("fGARCH")) {
+  	  return(rownames(object.name@fit$matcoef))
+  	}
+  	else if (model.name %in% c("censReg")) {
+  	  return(rownames(.summary.object$estimate))
+  	}
+  	else if (model.name %in% c("mnlogit")) {
+  	  return(rownames(.summary.object$CoefTable))
+  	}
+  	else if (model.name %in% c("lme","nlme")) {
+  	  return(rownames(.summary.object$tTable))
+  	}
+  	else if (model.name %in% c("felm")) {
+  	  return(row.names(object.name$coefficients))
+    }
   	else if (model.name %in% c("maBina")) {
   	  return(as.vector(rownames(object.name$out)))
   	}
@@ -853,7 +933,7 @@ function(libname, pkgname) {
       if (.format.ordered.intercepts == FALSE) { return(as.vector(names(object.name$beta))) }
       else { return(c(as.vector(names(object.name$beta)), as.vector(names(object.name$alpha)))) }
     }
-    else if (model.name %in% c("lmer", "glmer", "nlmer")) {
+    else if (model.name %in% c("lmer", "glmer", "nlmer", "pgmm")) {
       return(as.vector(rownames(.summary.object$coefficients)))
     }
     else if (model.name %in% c("ergm", "rem.dyad")) {
@@ -899,8 +979,14 @@ function(libname, pkgname) {
   function(object.name, model.num=1) {
     
     model.name <- .get.model.name(object.name)
-    if (model.name %in% c("lmer", "glmer", "nlmer", "gls", "felm")) {
+    if (model.name %in% c("lmer", "glmer", "nlmer", "gls")) {
       return(as.vector(as.character(formula(object.name))[2]))
+    }
+    if (model.name %in% c("Arima")) {
+      return(as.character(object.name$call$x))
+    }
+    if (model.name %in% c("fGARCH")) {
+        return(as.character(object.name@call$data))
     }
     if (model.name %in% c("multinom")) {
       if (!is.null(rownames(.summary.object$coefficients))) {
@@ -933,6 +1019,14 @@ function(libname, pkgname) {
     if (model.name %in% c("maBina")) {
       object.name <- object.name$w
     }
+    
+    if (model.name %in% c("lme")) {
+      object.name$call$formula <- object.name$call$fixed
+    }
+    if (model.name %in% c("nlme")) {
+      object.name$call$formula <- object.name$call$model
+    }
+    
     if (!is.null(object.name$call$formula)) {
       if (is.symbol(object.name$call$formula)) {
         formula.temp <- as.formula(object.name)  
@@ -1032,7 +1126,7 @@ function(libname, pkgname) {
 
   	model.name <- .get.model.name(object.name)
 
-  	if (!(model.name %in% c("arima", "maBina","coeftest", "lmer", "glmer", "nlmer", "Gls"))) {
+  	if (!(model.name %in% c("arima","fGARCH", "Arima", "maBina","coeftest", "lmer", "glmer", "nlmer", "Gls"))) {
       if (model.name %in% c("plm")) {
         F.stat.value <- .summary.object$fstatistic$statistic
         df.numerator <- .summary.object$fstatistic$parameter["df1"]
@@ -1060,7 +1154,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima","maBina", "coeftest", "lmer", "Gls", "glmer", "nlmer"))) {
+    if (!(model.name %in% c("arima","fGARCH", "Arima", "maBina", "coeftest", "lmer", "Gls", "glmer", "nlmer"))) {
       if (!is.null(object.name$gcv.ubre)) {
         return(as.vector(object.name$gcv.ubre))
       }
@@ -1132,9 +1226,21 @@ function(libname, pkgname) {
     model.name <- .get.model.name(object.name)
     
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.survey",
-                            "cloglog.net", "gamma.net", "logit.net", "probit.net", "brglm", "glm()", "Glm()", "svyglm()", "plm", "ivreg", "lmrob", "dynlm", "rq", "gmm","mclogit","felm")) {
+                            "cloglog.net", "gamma.net", "logit.net", "probit.net", "brglm", "glm()", "Glm()", "svyglm()", "plm", "pgmm", "ivreg", "lmrob", "glmrob", "dynlm", "rq", "gmm","mclogit","felm")) {
   		return(.summary.object$coefficients[,4])
   	}
+    if (model.name %in% c("censReg")) {
+      return(.summary.object$estimate[,4])
+    }
+    if (model.name %in% c("mnlogit")) {
+      return(.summary.object$CoefTable[,4])
+    }
+    if (model.name %in% c("fGARCH")) {
+      return(object.name@fit$matcoef[,4])
+    }
+    if (model.name %in% c("lme", "nlme")) {
+      return(.summary.object$tTable[,5])
+    }
     if (model.name %in% c("maBina")) {
       return(as.vector(object.name$out[,4]))
     }
@@ -1171,6 +1277,13 @@ function(libname, pkgname) {
       names(pval) <- names(coefs)
   	  return(pval)
   	}
+    if (model.name %in% c("Arima")) {
+      coef.temp <- object.name$coef
+      se.temp <- sqrt(diag(object.name$var.coef))
+      tstat <- coef.temp / se.temp 
+      pval <- 2 * pnorm(abs(tstat), lower.tail = FALSE)
+      return(pval)
+    }
   	if (model.name %in% c("ergm")) {
   	  return(.summary.object$coefs[,4])
   	}
@@ -1304,7 +1417,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima","maBina", "coeftest", "Gls", "lmer", "glmer", "nlmer"))) {
+    if (!(model.name %in% c("arima","fGARCH","Arima","maBina", "coeftest", "Gls", "lmer", "glmer", "nlmer"))) {
       if (!is.null(object.name$scale)) {
         if (model.name %in% c("normal.gee", "logit.gee", "poisson.gee", "probit.gee", "gamma.gee", "gee()", "exp","lognorm","weibull","tobit","survreg()","tobit(AER)")) {
           return(as.vector(object.name$scale))
@@ -1319,7 +1432,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
     
-    if (model.name %in% c("arima","maBina", "coeftest", "Gls", "lmer", "glmer", "nlmer")) {
+    if (model.name %in% c("arima","fGARCH","maBina", "coeftest", "Gls", "lmer", "glmer", "nlmer")) {
       return(NA)
     }
     if (model.name %in% c("lagsarlm", "errorsarlm")) {
@@ -1386,8 +1499,23 @@ function(libname, pkgname) {
   	model.name <- .get.model.name(object.name)
 
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.survey",
-                            "cloglog.net", "gamma.net", "logit.net", "probit.net", "brglm", "glm()", "Glm()", "svyglm()", "plm", "ivreg", "lmrob", "dynlm", "gmm","mclogit")) {
+                            "cloglog.net", "gamma.net", "logit.net", "probit.net", "brglm", "glm()", "Glm()", "svyglm()", "plm", "pgmm", "ivreg", "lmrob", "glmrob", "dynlm", "gmm","mclogit")) {
   		return(.summary.object$coefficients[,"Std. Error"])
+  	}
+  	if (model.name %in% c("Arima")) {
+  	  return(sqrt(diag(object.name$var.coef)))
+  	}
+  	if (model.name %in% c("censReg")) {
+  	  return(.summary.object$estimate[,2])
+  	}
+  	if (model.name %in% c("mnlogit")) {
+  	  return(.summary.object$CoefTable[,2])
+  	}
+  	if (model.name %in% c("fGARCH")) {
+  	  return(object.name@fit$matcoef[,2])
+  	}
+  	if (model.name %in% c("lme", "nlme")) {
+  	  return(.summary.object$tTable[,2])
   	}
     if (model.name %in% c("maBina")) {
       return(as.vector(object.name$out[,2]))
@@ -1658,8 +1786,20 @@ function(libname, pkgname) {
   	model.name <- .get.model.name(object.name)
 
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.survey",
-      				    "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "Glm()", "svyglm()","plm", "ivreg", "lmrob", "dynlm", "gmm", "mclogit", "felm")) {
+      				    "cloglog.net", "gamma.net", "logit.net", "probit.net", "glm()", "Glm()", "svyglm()","plm", "pgmm", "ivreg", "lmrob", "glmrob", "dynlm", "gmm", "mclogit", "felm")) {
   		return(.summary.object$coefficients[,3])
+  	}
+  	if (model.name %in% c("censReg")) {
+  	  return(.summary.object$estimate[,3])
+  	}
+  	if (model.name %in% c("mnlogit")) {
+  	  return(.summary.object$CoefTable[,3])
+  	}
+  	if (model.name %in% c("fGARCH")) {
+  	  return(object.name@fit$matcoef[,3])
+  	}
+  	if (model.name %in% c("lme", "nlme")) {
+  	  return(.summary.object$tTable[,4])
   	}
     if (model.name %in% c("coeftest")) {
       return(as.vector(object.name[,3]))
@@ -1776,6 +1916,11 @@ function(libname, pkgname) {
       se.temp <- sqrt(diag(object.name$var))
       return(coef.temp / se.temp )
     }
+  	else if (model.name %in% c("Arima")) {
+  	  coef.temp <- object.name$coef
+  	  se.temp <- sqrt(diag(object.name$var.coef))
+  	  return(coef.temp / se.temp )
+  	}
     else if (model.name %in% c("rem.dyad")) {
       coef.temp <- object.name$coef
       se.temp <- sqrt(diag(object.name$cov))
@@ -1823,7 +1968,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima","maBina", "coeftest", "Gls", "lmer", "glmer", "nlmer"))) {
+    if (!(model.name %in% c("arima","fGARCH","Arima","maBina", "coeftest", "Gls", "lmer", "glmer", "nlmer"))) {
       if ((!is.null(object.name$theta)) & (!is.null(object.name$SE.theta))) {
         theta.value <- object.name$theta
         theta.se.value <- object.name$SE.theta
@@ -1933,6 +2078,15 @@ function(libname, pkgname) {
         
       }	
       
+      # remove initial zero and there are decimal places, if that is requested
+      if (.format.initial.zero==FALSE)  {
+        if ((round.result > 0) & (round.result < 1)) {
+          if ((is.na(decimal.places)) | (decimal.places > 0)) {
+            first.part <- ""
+          }
+        }
+      }
+      
       if (x.original < 0) {    # use math-mode for a better looking negative sign
         if (.format.dec.mark.align == TRUE) {
           first.part <- paste("-", first.part, sep="")
@@ -1949,12 +2103,7 @@ function(libname, pkgname) {
         }
       }
       
-      # remove initial zero, if that is requested
-      if (.format.initial.zero==FALSE) {
-        if ((round.result >= 0) & (round.result < 1)) {
-          first.part <- ""
-        }
-      }
+
       
       if (length(split.round.result)==2) {
         if (is.na(decimal.places)) { return(paste(first.part,.format.decimal.character,split.round.result[2],sep="")) }
@@ -1996,19 +2145,22 @@ function(libname, pkgname) {
 
   	model.name <- .get.model.name(object.name)
     
-    if (model.name %in% c("coeftest","maBina")) {
+    if (model.name %in% c("coeftest","maBina","gamma.net","logit.net","probit.net","cloglog.net")) {
       return(NA) 
     }
-  	if (model.name %in% c("mlogit")) {
+  	if (model.name %in% c("fGARCH")) {
+  	  return(object.name@fit$value)
+  	}
+  	if (model.name %in% c("mlogit", "mnlogit")) {
   	  return(as.vector(object.name$logLik[1]))
   	}
-  	if (model.name %in% c("arima", "betareg", "zeroinfl", "hurdle", "hetglm")) {
+  	if (model.name %in% c("arima", "betareg", "zeroinfl", "hurdle", "hetglm", "Arima")) {
   		return(as.vector(object.name$loglik))
   	}
   	if (model.name %in% c("selection","binaryChoice", "probit.ss")) {
   	  return(as.vector(.summary.object$loglik))
   	}  	
-  	if (model.name %in% c("lmer", "glmer", "nlmer")) { 
+  	if (model.name %in% c("lme","nlme","lmer", "glmer", "nlmer","censReg")) { 
   	  return(as.vector(logLik(object.name)[1]))
   	}
   	if (model.name %in% c("lagsarlm", "errorsarlm")) {
@@ -2035,7 +2187,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima","maBina", "coeftest", "Gls", "lmer", "glmer", "nlmer"))) {
+    if (!(model.name %in% c("arima","fGARCH","Arima","maBina", "coeftest", "Gls", "lmer", "glmer", "nlmer"))) {
       if (!is.null(.summary.object$logtest)) {
         logrank.value <- suppressMessages(.summary.object$sctest[1])
         df.value <- suppressMessages(.summary.object$sctest[2])
@@ -2057,9 +2209,11 @@ function(libname, pkgname) {
     
     if (model.name %in% c("mlogit")) {
       log.value <- as.vector(.summary.object$lratio$statistic["chisq"]) 
-      df.value <- as.vector(length(object.name$coeff))
-      log.p.value <- as.vector(pchisq(log.value,df.value,lower.tail=FALSE))
-      log.output <- as.vector(c(log.value, df.value, log.p.value))
+      if (!is.null(log.value)) {
+        df.value <- as.vector(length(object.name$coeff))
+        log.p.value <- as.vector(pchisq(log.value,df.value,lower.tail=FALSE))
+        log.output <- as.vector(c(log.value, df.value, log.p.value))
+      }
     }
     else if (model.name %in% c("lagsarlm", "errorsarlm")) {
       log.value <- as.vector(.summary.object$LR1$statistic)
@@ -2067,7 +2221,7 @@ function(libname, pkgname) {
       log.p.value <- as.vector(.summary.object$LR1$p.value)
       log.output <- as.vector(c(log.value, df.value, log.p.value))
     }
-    else if (!(model.name %in% c("arima","maBina","coeftest","Gls","lmer","glmer","nlmer"))) {
+    else if (!(model.name %in% c("arima","fGARCH","Arima","maBina","coeftest","Gls","lmer","glmer","nlmer"))) {
       if (!is.null(.summary.object$logtest)) {
         log.value <- suppressMessages(.summary.object$logtest[1])
         df.value <- suppressMessages(.summary.object$logtest[2])
@@ -2086,7 +2240,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima","maBina", "coeftest", "lmer", "glmer", "nlmer", "Gls"))) {
+    if (!(model.name %in% c("arima","fGARCH","fGARCH","Arima","maBina", "coeftest", "lmer", "glmer", "nlmer", "Gls", "Arima"))) {
       if (model.name %in% c("coxph", "clogit")) {
         return(as.vector(.summary.object$rsq[2]))
       }
@@ -2101,9 +2255,34 @@ function(libname, pkgname) {
       return("NULL")
     }
     
+    if (class(object.name)[1]=="Arima") {
+      return("Arima")
+    }
+    
+    if (class(object.name)[1]=="fGARCH") {
+      return("fGARCH")
+    }
+    
+    if (class(object.name)[1]=="censReg") {
+      return("censReg")
+    }
+    
     if (class(object.name)[1]=="ergm") {
       return("ergm")
     }
+    
+    if (class(object.name)[1]=="mnlogit") {
+      return("mnlogit")
+    }
+    
+    if (class(object.name)[1]=="lme") {
+      return("lme")
+    }
+    
+    if (class(object.name)[1]=="nlme") {
+      return("nlme")
+    }
+    
     if (class(object.name)[1]=="felm") {
       return("felm")
     }
@@ -2317,6 +2496,9 @@ function(libname, pkgname) {
   	if (object.name$call[1]=="lmrob()") {
   	  return("lmrob")
   	}
+     if (object.name$call[1]=="glmrob()") {
+       return("glmrob")
+     }
   	if (object.name$call[1]=="dynlm()") {
   	  return("dynlm")
   	}
@@ -2414,7 +2596,10 @@ function(libname, pkgname) {
   	}  	
   	else if (object.name$call[1]=="plm()") {
   	  return("plm")
-  	}  	
+  	}
+    else if (object.name$call[1]=="pgmm()") {
+       return("pgmm")
+    }  	
   	else if (object.name$call[1]=="ivreg()") {
   	  return("ivreg")
   	} 
@@ -2456,6 +2641,7 @@ function(libname, pkgname) {
     .global.dependent.variables.written <<- NULL
     
     .global.coefficient.variables <<- NULL
+    .global.coef.vars.by.model <<- NULL
     .global.coefficients <<- NULL
     .global.std.errors <<- NULL
     .global.ci.lb <<- NULL
@@ -2495,6 +2681,8 @@ function(libname, pkgname) {
   	  .global.dependent.variables.written <<- c(.global.dependent.variables.written, suppressMessages(.dependent.variable.written(object.name, model.num)))
       .global.coefficient.variables <<- suppressMessages(.coefficient.variables(object.name))
       
+      .global.coef.vars.by.model <<-  suppressMessages(cbind(.global.coef.vars.by.model, .global.coefficient.variables))
+      
       get.coef <- suppressMessages(.get.coefficients(object.name, user.coef, model.num=model.num))
       get.se <- suppressMessages(.get.standard.errors(object.name, user.se, model.num=model.num))
       
@@ -2512,7 +2700,8 @@ function(libname, pkgname) {
     
   	  .global.t.stats <<- suppressMessages(cbind(.global.t.stats, .get.t.stats(object.name, user.t, auto.t, feed.coef, feed.se, user.coef, user.se, model.num=model.num)))
   	  .global.p.values <<- suppressMessages(cbind(.global.p.values, .get.p.values(object.name, user.p, auto.p, feed.coef, feed.se, user.coef, user.se, model.num=model.num)))
-
+  	  
+  	  
   	  .global.N <<- c(.global.N, suppressMessages(.number.observations(object.name)))
   	  .global.LL <<- c(.global.LL, suppressMessages(.log.likelihood(object.name)))
   	  .global.R2 <<- c(.global.R2, suppressMessages(.r.squared(object.name)))
@@ -2545,7 +2734,7 @@ function(libname, pkgname) {
 
   	model.name <- .get.model.name(object.name)
 
-  	if (!(model.name %in% c("arima","coeftest","Gls","lmer","glmer","nlmer", "ergm"))) {
+  	if (!(model.name %in% c("arima","fGARCH","Arima","coeftest","Gls","lmer","glmer","nlmer", "ergm"))) {
   	  if (model.name %in% c("rem.dyad", "mclogit")) {
   	    null.deviance.value <- object.name$null.deviance
   	    null.deviance.output <- as.vector(c(null.deviance.value, NA, NA))
@@ -2584,6 +2773,9 @@ function(libname, pkgname) {
                           "z.arima", "brglm","glm()", "Glm()", "svyglm()")) {
       return(length(object.name$residuals))
     }
+    else if (model.name %in% c("fGARCH")) {
+      return(length(object.name@data))
+    }
     else if (model.name %in% c("maBina")) {
       return(length(object.name$w$residuals))
     }
@@ -2608,8 +2800,11 @@ function(libname, pkgname) {
     else if (model.name %in% c("gmm")) {
       return(object.name$n)
     }
-    else if (model.name %in% c("plm", "pmg", "rlm", "lmrob", "dynlm", "rq", "lagsarlm", "errorsarlm", "rem.dyad")) {
+    else if (model.name %in% c("plm", "pgmm", "pmg", "rlm", "lmrob", "glmrob", "dynlm", "rq", "lagsarlm", "errorsarlm", "rem.dyad")) {
       return(as.vector(length(object.name$residual)))
+    }
+    else if (model.name %in% c("mnlogit")) {
+      return(as.vector(.summary.object$model.size$N))
     }
     else if (model.name %in% c("hurdle", "zeroinfl")) {
       return(as.vector(object.name$n))
@@ -2635,11 +2830,22 @@ function(libname, pkgname) {
     else if (model.name %in% c("tobit(AER)")) {
       return(as.vector(.summary.object$n["Total"]))
     }
-    else if (model.name %in% c("weibreg", "coxreg", "phreg", "aftreg", "bj", "cph", "Gls", "lrm", "ols", "psm", "Rq")) {
+    else if (model.name %in% c("Arima","censReg","lme","nlme","weibreg", "coxreg", "phreg", "aftreg", "bj", "cph", "Gls", "lrm", "ols", "psm", "Rq")) {
       return(as.vector(nobs(object.name)))
     }
     return(NA)
   }
+  
+  .rename.intercept <-
+    function(x) {
+      out <- x
+      for (i in seq(1:length(x))) {
+        if (x[i] %in% .global.intercept.strings) { 
+          out[i] <- .format.intercept.name
+        }
+      }
+      return(out)
+    }
   
   .order.reg.table <- 
     function(order) {
@@ -2650,7 +2856,7 @@ function(libname, pkgname) {
         if (.global.coefficient.variables[i] %in% .global.intercept.strings) { 
           intercept.position <- i 
           
-          .global.coefficient.variables[i] <<- .format.intercept.name
+          .global.coefficient.variables[i] <<- .format.intercept.name   
           rownames(.global.coefficients)[i] <<- .format.intercept.name
           rownames(.global.std.errors)[i] <<- .format.intercept.name
           rownames(.global.ci.lb)[i] <<- .format.intercept.name
@@ -2781,6 +2987,8 @@ function(libname, pkgname) {
   	  else if (max.l < length(.format.add.lines[[line]])) {
         .format.add.lines[[line]] <- .format.add.lines[[line]][1:max.l]
   	  }
+      
+      .format.add.lines[[line]] <- .format.add.lines[[line]]
         
       ## print each line
       for (i in 1:max.l) {
@@ -2792,7 +3000,14 @@ function(libname, pkgname) {
             cat(" & ",.format.add.lines[[line]][i], sep="") 
           }
         }
-        else { cat(" & ", sep="") }
+        else { 
+          if (i==1) {
+            cat("   ", sep="") 
+          }
+          else {
+            cat(" & ", sep="") 
+          }
+        }
       }
       cat(" \\\\ \n")
     }
@@ -3214,6 +3429,7 @@ function(libname, pkgname) {
         col.position <- 1
         for (i in seq(1:length(.format.column.separate))) {
           if (is.null(.format.column.labels[col.position])) { .format.column.labels[col.position] <- "" }
+          if (is.na(.format.column.labels[col.position])) { .format.column.labels[col.position] <- "" }
           if (.format.column.separate[i]==1) {
             if (.format.dec.mark.align==TRUE) {
               cat(" & \\multicolumn{1}{c}{",.format.column.left,.format.column.labels[col.position],.format.column.right,"}", sep="") 
@@ -3290,12 +3506,10 @@ function(libname, pkgname) {
   		  .format.omit.table <<- matrix(.format.omit.no, nrow=length(.format.omit.regexp), ncol=length(.global.models)) 
   		  for (i in seq(1:length(.global.models))) {
   				for (j in seq(1:length(.format.omit.regexp))) {
-  					for (k in seq(1:length(.global.coefficients))) {
-  					  relevant.coef.var <- .global.coefficient.variables[k]
-  						if (length(grep(.format.omit.regexp[j], relevant.coef.var, perl=.format.perl, fixed=FALSE))!=0) {
-  						  if (!is.na(.global.coefficients[relevant.coef.var,i])) {
+  					for (k in seq(1:length(.global.coef.vars.by.model[,i]))) {
+  					  relevant.coef.var <- .global.coef.vars.by.model[k,i]
+  					  if (length(grep(.format.omit.regexp[j], relevant.coef.var, perl=.format.perl, fixed=FALSE))!=0) {
   						   .format.omit.table[j,i] <<- .format.omit.yes
-  						  }
   						}
   					}
   				}
@@ -3423,6 +3637,8 @@ function(libname, pkgname) {
   	else if (part=="notes") {
   		if (.format.note != "") { cat(.format.note) }
   		for (i in seq(1:length(.format.note.content))) {
+  		  
+  		  .format.note.content[i] <- .format.note.content[i]
         
         # print individual notes
   			if (.format.note == "") { cat("\\multicolumn{",length(.global.models)+1,"}{",.format.note.alignment,"}{",.format.note.content[i],"} \\\\ \n", sep="") }
@@ -3446,7 +3662,7 @@ function(libname, pkgname) {
 
   	model.name <- .get.model.name(object.name)
 
-  	if (!(model.name %in% c("arima","maBina","coeftest","nlmer", "glmer", "lmer","Gls"))) {
+  	if (!(model.name %in% c("arima","fGARCH","Arima","maBina","coeftest","nlmer", "glmer", "lmer","Gls","Arima"))) {
   	  if (model.name %in% c("heckit")) {
   	    return(.summary.object$rSquared$R2)
   	  }
@@ -3515,7 +3731,7 @@ function(libname, pkgname) {
 
   	model.name <- .get.model.name(object.name)
 
-  	if (!(model.name %in% c("arima","coeftest", "Gls","multinom","lmer","glmer","nlmer"))) {
+  	if (!(model.name %in% c("arima","fGARCH","Arima","coeftest", "Gls","multinom","lmer","glmer","nlmer"))) {
       if (model.name %in% c("rem.dyad")) {
         residual.deviance.value <- object.name$residual.deviance
         residual.deviance.output <- as.vector(c(residual.deviance.value, NA, NA))
@@ -3641,7 +3857,7 @@ function(libname, pkgname) {
 
   	model.name <- .get.model.name(object.name)
 
-  	if (!(model.name %in% c("arima","maBina","coeftest","lmer","glmer","nlmer","gls","Gls"))) {
+  	if (!(model.name %in% c("arima","lme","nlme","fGARCH","Arima","maBina","coeftest","lmer","glmer","nlmer","gls","Gls"))) {
       if (model.name %in% c("felm")) {
         SER.output <- as.vector(c(.summary.object$rse, .summary.object$rdf, NA))
       }
@@ -3930,6 +4146,7 @@ function(libname, pkgname) {
     else if ((part=="notes") & (!is.null(.format.s.note.content))) {
       if (.format.s.note != "") cat(.format.s.note)
       for (i in seq(1:length(.format.s.note.content))) {
+        .format.s.note.content[i] <- .format.s.note.content[i]
         if (.format.s.note == "") { cat("\\multicolumn{",length(names(object)),"}{",.format.s.note.alignment,"}{",.format.s.note.content[i],"} \\\\ \n", sep="") }
         else { cat(" & \\multicolumn{",length(names(object)),"}{",.format.s.note.alignment,"}{",.format.s.note.content[i],"} \\\\ \n", sep="") }
       }
@@ -4299,6 +4516,7 @@ function(libname, pkgname) {
       else { width <- length(included) + offset }
       
   		for (i in seq(1:length(.format.s.note.content))) {
+  		  .format.s.note.content[i] <- .format.s.note.content[i]
   			if (.format.s.note == "") { cat("\\multicolumn{",width,"}{",.format.s.note.alignment,"}{",.format.s.note.content[i],"} \\\\ \n", sep="") }
   			else { cat(" & \\multicolumn{",width,"}{",.format.s.note.alignment,"}{",.format.s.note.content[i],"} \\\\ \n", sep="") }
   		}
@@ -4475,7 +4693,7 @@ function(libname, pkgname) {
   
     model.name <- .get.model.name(object.name)
   
-    if (!(model.name %in% c("arima","maBina","coeftest", "Gls", "ivreg","lmer","glmer","nlmer"))) {
+    if (!(model.name %in% c("arima","fGARCH","Arima","maBina","coeftest", "Gls", "ivreg","lmer","glmer","nlmer"))) {
       if (!is.null(.summary.object$waldtest)) {
         wald.value <- suppressMessages(.summary.object$waldtest[1])
         df.value <- suppressMessages(.summary.object$waldtest[2])
@@ -4517,8 +4735,23 @@ function(libname, pkgname) {
   	model.name <- .get.model.name(object.name)
 	
   	if (model.name %in% c("ls", "normal", "logit", "probit", "relogit", "poisson", "negbin", "normal.survey", "poisson.survey", "probit.survey", "logit.survey", "gamma", "gamma.survey",
-     				    "cloglog.net", "gamma.net", "logit.net", "probit.net", "brglm", "glm()", "Glm()", "svyglm()", "plm", "ivreg", "lmrob", "dynlm", "gmm", "mclogit")) {
+     				    "cloglog.net", "gamma.net", "logit.net", "probit.net", "brglm", "glm()", "Glm()", "svyglm()", "plm", "pgmm", "ivreg", "lmrob", "glmrob", "dynlm", "gmm", "mclogit")) {
   		return(.summary.object$coefficients[,"Estimate"])
+  	}
+  	if (model.name %in% c("Arima")) {
+  	  return(object.name$coef)
+  	}
+  	if (model.name %in% c("censReg")) {
+  	  return(.summary.object$estimate[,1])
+  	}
+  	if (model.name %in% c("mnlogit")) {
+  	  return(.summary.object$CoefTable[,1])
+  	}
+  	if (model.name %in% c("fGARCH")) {
+  	  return(object.name@fit$matcoef[,1])
+  	}
+  	if (model.name %in% c("lme","nlme")) {
+  	  return(.summary.object$tTable[,1])
   	}
     if (model.name %in% c("maBina")) {
       return(as.vector(object.name$out[,1]))
@@ -5318,7 +5551,6 @@ function(libname, pkgname) {
               
               total.width <- total.width + max.length[i] + 1 
               if (i > from.c) {
-                for (k in 1:(column.matrix[r,c]-1)) {
                   for (j in i:ncol(column.matrix)) {
                     if ((j+1) <= ncol(column.matrix)) {
                       w.matrix[r,j] <- w.matrix[r, j+1]
@@ -5328,7 +5560,7 @@ function(libname, pkgname) {
                       w.matrix[r,j] <- NA
                     }
                   }
-                }
+              
               }
             }
             w.matrix[r,c] <- total.width - 1
@@ -5746,7 +5978,7 @@ function(libname, pkgname) {
         if (!is.data.frame(objects[[i]])) {
         
           # if zelig$result relevant, identify this automatically
-          if (class(objects[[i]]) %in% c("coeftest","lmerMod","glmerMod","nlmerMod")) {  # use this to eliminate lmer, glmer, nlmer
+          if (class(objects[[i]]) %in% c("coeftest","lmerMod","glmerMod","nlmerMod","fGARCH")) {  # use this to eliminate lmer, glmer, nlmer
             if (.model.identify(objects[[i]])=="unknown") { error.present <- c(error.present, "% Error: Unrecognized object type.\n",i) }
           }
           else {
@@ -6106,7 +6338,7 @@ function(libname, pkgname) {
 
     # info about the package and author
     .global.package.name <- "stargazer"
-    .global.package.version <- "5.1"
+    .global.package.version <- "5.2"
     .global.package.author.name <- "Marek Hlavac"
     .global.package.author.affiliation <- "Harvard University"
     .global.package.author.email <- "hlavac at fas.harvard.edu"
@@ -6116,6 +6348,7 @@ function(libname, pkgname) {
     .global.models <- NULL
     .global.dependent.variables <- NULL
     .global.coefficient.variables <- NULL
+    .global.coef.vars.by.model <- NULL  ## list of coefficient variables by model - to be used by omit, omit.labels, etc
     .global.std.errors <- NULL
     .global.ci.lb <- NULL
     .global.ci.rb <- NULL
@@ -6125,7 +6358,7 @@ function(libname, pkgname) {
     .global.LL <- NULL
     .global.R2 <- NULL
     .global.mills <- NULL
-    .global.max.R2 <- NULL # maximum possible R2
+    .global.max.R2 <- NULL # maximum possible R2 
     .global.adj.R2 <- NULL
     .global.AIC <- NULL
     .global.BIC <- NULL
@@ -6183,16 +6416,16 @@ function(libname, pkgname) {
     # names for models
     .format.model.names.include <- TRUE
     .format.model.names <- NULL
-    .format.model.names <- cbind(c("aov","ANOVA",""), c("arima","ARIMA",""), c("blogit","bivariate","logistic"))
+    .format.model.names <- cbind(c("aov","ANOVA",""), c("arima","ARIMA",""), c("Arima","ARIMA",""), c("blogit","bivariate","logistic"))
     .format.model.names <- cbind(.format.model.names, c("bprobit","bivariate","probit"), c("betareg", "beta",""), c("chopit","compound hierarchical","ordered probit"))
-    .format.model.names <- cbind(.format.model.names, c("clm","cumulative","link"), c("cloglog.net","network compl.","log log"), c("clogit","conditional","logistic"), c("coxph","Cox","prop. hazards"))
+    .format.model.names <- cbind(.format.model.names, c("clm","cumulative","link"), c("censReg", "censored", "regression"), c("cloglog.net","network compl.","log log"), c("clogit","conditional","logistic"), c("coxph","Cox","prop. hazards"))
     .format.model.names <- cbind(.format.model.names, c("dynlm","dynamic","linear"), c("lagsarlm","spatial","autoregressive"), c("errorsarlm","spatial","error"))
     .format.model.names <- cbind(.format.model.names, c("ei.dynamic","Quinn dynamic","ecological inference"), c("ei.hier","$2 \times 2$ hierarchical","ecological inference"))
     .format.model.names <- cbind(.format.model.names, c("ei.RxC","hierarchical multinominal-Dirichlet","ecological inference"), c("exp","exponential",""), c("ergm","exponential family","random graph"))
     .format.model.names <- cbind(.format.model.names, c("factor.bayes","Bayesian","factor analysis"), c("factor.mix","mixed data","factor analysis"))
-    .format.model.names <- cbind(.format.model.names, c("factor.ord","ordinal data","factor analysis"), c("gamma","gamma",""))
+    .format.model.names <- cbind(.format.model.names, c("factor.ord","ordinal data","factor analysis"), c("fGARCH","GARCH",""), c("gamma","gamma",""))
     .format.model.names <- cbind(.format.model.names, c("gamma.gee","gamma generalized","estimating equation"), c("gamma.mixed","mixed effects","gamma"))
-    .format.model.names <- cbind(.format.model.names, c("gamma.net","network","gamma"), c("gamma.survey","survey-weighted","gamma"), c("gls","generalized","least squares"))
+    .format.model.names <- cbind(.format.model.names, c("gamma.net","network","gamma"), c("gamma.survey","survey-weighted","gamma"), c("glmrob","robust","GLM"), c("gls","generalized","least squares"))
     .format.model.names <- cbind(.format.model.names, c("gmm","GMM",""), c("rem.dyad", "relational", "event (dyadic)"))
     .format.model.names <- cbind(.format.model.names, c("irt1d","IRT","(1-dim.)"), c("irtkd","IRT","(k-dim.)"))
     .format.model.names <- cbind(.format.model.names, c("logit","logistic",""), c("logit.bayes","Bayesian","logistic"))
@@ -6200,10 +6433,10 @@ function(libname, pkgname) {
     .format.model.names <- cbind(.format.model.names, c("logit.mixed","mixed effects","logistic"), c("logit.net","network","logistic"))
     .format.model.names <- cbind(.format.model.names, c("logit.survey","survey-weighted","logistic"), c("lognorm","log-normal",""))
     .format.model.names <- cbind(.format.model.names, c("lmer","linear","mixed-effects"), c("glmer","generalized linear","mixed-effects"), c("nlmer","non-linear","mixed-effects"))
-    .format.model.names <- cbind(.format.model.names, c("ls","OLS",""), c("ls.mixed","mixed effect","linear"), c("lmrob","MM-type","linear"))
-    .format.model.names <- cbind(.format.model.names, c("ls.net","network","least squares"), c("mlogit","multinomial","logistic"))
+    .format.model.names <- cbind(.format.model.names, c("ls","OLS",""), c("ls.mixed","mixed effect","linear"), c("lme","linear","mixed effects"), c("lmrob","MM-type","linear"))
+    .format.model.names <- cbind(.format.model.names, c("ls.net","network","least squares"), c("mlogit","multinomial","logistic"), c("mnlogit","multinomial","logit"))
     .format.model.names <- cbind(.format.model.names, c("mlogit.bayes","Bayesian","multinomial logistic"), c("negbin","negative","binomial"), c("normal","normal",""))
-    .format.model.names <- cbind(.format.model.names, c("multinom","multinomial log-linear","(neural networks)"))
+    .format.model.names <- cbind(.format.model.names, c("multinom","multinomial log-linear","(neural networks)"), c("nlme","non-linear","mixed effects"))
     .format.model.names <- cbind(.format.model.names, c("normal.bayes","Bayesian","normal"), c("normal.gam","GAM","(continuous)"))
     .format.model.names <- cbind(.format.model.names, c("normal.gee","normal generalized","estimating equation"), c("normal.net","network","normal"))
     .format.model.names <- cbind(.format.model.names, c("normal.survey","survey-weighted","normal"), c("ologit","ordered","logistic"))
@@ -6220,7 +6453,7 @@ function(libname, pkgname) {
     .format.model.names <- cbind(.format.model.names, c("tobit","Tobit",""), c("tobit(AER)","Tobit",""), c("tobit.bayes","Bayesian","Tobit"))
     .format.model.names <- cbind(.format.model.names, c("twosls","2SLS",""), c("weibull","Weibull",""))
     .format.model.names <- cbind(.format.model.names, c("zeroinfl","zero-inflated","count data"), c("hurdle","hurdle",""))
-    .format.model.names <- cbind(.format.model.names, c("plm","panel","linear"), c("ivreg","instrumental","variable"))
+    .format.model.names <- cbind(.format.model.names, c("plm","panel","linear"), c("pgmm","panel","GMM"), c("ivreg","instrumental","variable"))
     .format.model.names <- cbind(.format.model.names, c("coxreg","Cox",""), c("mlreg","ML","prop. hazards"), c("weibreg","Weibull",""))
     .format.model.names <- cbind(.format.model.names, c("aftreg","accelerated"," failure time"), c("phreg","parametric","prop. hazards"))
     .format.model.names <- cbind(.format.model.names, c("bj","Buckley-James",""), c("cph","Cox",""), c("Gls","generalized","least squares"), c("lrm","logistic",""))
@@ -6613,13 +6846,15 @@ function(libname, pkgname) {
       
       # notes
       
+      replace.dec.mark <- function(s) { return (gsub(".", .format.decimal.character, s, fixed=TRUE))}
+      
       # replace star cutoffs in the notes section
       for (i in 1:length(.format.cutoffs)) {
         if (!is.na(.format.stars[i])) {
           star.string <- paste(rep("*", i), sep="", collapse="")
-          .format.note.content <- gsub(paste("[.",star.string,"]",sep=""), gsub("^[0]+", "",.format.cutoffs[i]), .format.note.content, fixed=TRUE)  
-          .format.note.content <- gsub(paste("[0.",star.string,"]",sep=""), .format.cutoffs[i], .format.note.content, fixed=TRUE)
-          .format.note.content <- gsub(paste("[",star.string,"]",sep=""), .format.cutoffs[i]*100, .format.note.content, fixed=TRUE)        
+          .format.note.content <- gsub(paste("[.",star.string,"]",sep=""), replace.dec.mark(gsub("^[0]+", "",.format.cutoffs[i])), .format.note.content, fixed=TRUE)  
+          .format.note.content <- gsub(paste("[0.",star.string,"]",sep=""), replace.dec.mark(.format.cutoffs[i]), .format.note.content, fixed=TRUE)
+          .format.note.content <- gsub(paste("[",star.string,"]",sep=""), replace.dec.mark(.format.cutoffs[i]*100), .format.note.content, fixed=TRUE)        
         }
       }
 
@@ -6640,7 +6875,7 @@ function(libname, pkgname) {
       }
       
       if (!is.null(notes.label)) { 
-        .format.note <- notes.label 
+        .format.note <- notes.label
         .format.s.note <- notes.label
       }    
       
