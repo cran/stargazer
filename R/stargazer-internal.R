@@ -6285,7 +6285,7 @@ function(libname, pkgname) {
       tp.error <- FALSE
       for (i in 1:nchar(table.placement)) {
         ch <- substring(table.placement,i,i)
-        if (!(ch %in% c("h","t","b","p","!","H"))) (tp.error <- TRUE)
+        if (!(ch %in% c("h","t","b","p","!","H", ""))) (tp.error <- TRUE)
       }
       if (tp.error) { error.present <- c(error.present, "% Error: Argument 'table.placement' can only consist of \"h\",\"t\",\"b\",\"p\",\"!\",\"H\".\n") }
     }
