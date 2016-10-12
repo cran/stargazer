@@ -1,8 +1,8 @@
 .onAttach <- 
 function(libname, pkgname) {
   packageStartupMessage("\nPlease cite as: \n")
-  packageStartupMessage(" Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables.")
-  packageStartupMessage(" R package version 5.2. http://CRAN.R-project.org/package=stargazer \n")
+  packageStartupMessage(" Hlavac, Marek (2016). stargazer: Well-Formatted Regression and Summary Statistics Tables.")
+  packageStartupMessage(" R package version 5.2.1. http://CRAN.R-project.org/package=stargazer \n")
 }
 
 .stargazer.wrap <-
@@ -2313,8 +2313,9 @@ function(libname, pkgname) {
        
    if (!is.null(object.name$call)) {
     
-  	if (object.name$call[1]=="lm()") { return("ls") }
-  	else if ((object.name$call[1]=="glm()") | (object.name$call[1]=="Glm()")) {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?lm()")) { return("ls") }
+  	else if ((stringr::str_detect(as.character(object.name$call[1]), ":?glm()")) | 
+  	         (stringr::str_detect(as.character(object.name$call[1]), ":?Glm()"))) {
   		if (object.name$family$family=="gaussian") {
   			if (object.name$family$link=="identity") {
   				return("normal")
@@ -2342,7 +2343,7 @@ function(libname, pkgname) {
   		return(paste("glm()#",object.name$family$family,"#",object.name$family$link, sep=""))
   	}
 
-  	else if (object.name$call[1]=="svyglm()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?svyglm()")) {
   		if (object.name$family$family=="gaussian") {
   			if (object.name$family$link=="identity") {
   				return("normal.survey")
@@ -2370,7 +2371,7 @@ function(libname, pkgname) {
   		return(paste("svyglm()#",object.name$family$family,"#",object.name$family$link, sep=""))
   	}
 
-  	else if (object.name$call[1]=="gam()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?gam()")) {
   		if (object.name$family$family=="gaussian") {
   			if (object.name$family$link=="identity") {
   				return("normal.gam")
@@ -2398,7 +2399,7 @@ function(libname, pkgname) {
   		return(paste("gam()#",object.name$family$family,"#",object.name$family$link, sep=""))
   	}
 	
-  	else if (object.name$call[1]=="polr()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?polr()")) {
   		if (object.name$method=="logistic") {
   			return("ologit")
   		}
@@ -2409,7 +2410,7 @@ function(libname, pkgname) {
   	}
 
 
-  	else if (object.name$call[1]=="gee()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?gee()")) {
   		if (object.name$family$family=="gaussian") {
   			if (object.name$family$link=="identity") {
   				return("normal.gee")
@@ -2437,7 +2438,7 @@ function(libname, pkgname) {
   		return(paste("gee()#",object.name$family$family,"#",object.name$family$link, sep=""))
   	}
 
-  	else if (object.name$call[1]=="survreg()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?survreg()")) {
   		if (object.name$dist=="exponential") {
   			return("exp")
   		}
@@ -2453,10 +2454,10 @@ function(libname, pkgname) {
   		return(paste("survreg()#",object.name$dist, sep=""))
   	}
 
-  	else if (object.name$call[1]=="glm.nb()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?glm.nb()")) {
   		return("negbin")
   	}
-  	else if (object.name$call[1]=="\"glm.nb\"()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?\"glm.nb\"()")) {
   	  return("negbin")
   	}
   	
@@ -2466,106 +2467,106 @@ function(libname, pkgname) {
   	  }
   	}
   	
-    if (object.name$call[1]=="coxph()") {
+    if (stringr::str_detect(as.character(object.name$call[1]), ":?coxph()")) {
   		return("coxph")
   	}
-  	if (object.name$call[1]=="pmg()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?pmg()")) {
   	  return("pmg")
   	}
-  	if (object.name$call[1]=="selection()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?selection()")) {
   	  return("selection")
   	}
-  	if (object.name$call[1]=="heckit()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?heckit()")) {
   	  return("heckit")
   	}
-  	if (object.name$call[1]=="probit()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?probit()")) {
   	  return("probit.ss")
   	}
-  	if (object.name$call[1]=="binaryChoice()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?binaryChoice()")) {
   	  return("binaryChoice")
   	}
-  	if (object.name$call[1]=="brglm()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?brglm()")) {
   	  return("brglm")
   	}
-  	if (object.name$call[1]=="gls()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?gls()")) {
   	  return("gls")
   	}
-  	if (object.name$call[1]=="clm()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?clm()")) {
   	  return("clm")
   	}
-  	if (object.name$call[1]=="lmrob()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?lmrob()")) {
   	  return("lmrob")
   	}
-     if (object.name$call[1]=="glmrob()") {
+     if (stringr::str_detect(as.character(object.name$call[1]), ":?glmrob()")) {
        return("glmrob")
      }
-  	if (object.name$call[1]=="dynlm()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?dynlm()")) {
   	  return("dynlm")
   	}
-  	if (object.name$call[1]=="rq()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?rq()")) {
   	  return("rq")
   	}
-  	if (object.name$call[1]=="gmm()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?gmm()")) {
   	  return("gmm")
   	}
-  	if (object.name$call[1]=="lagsarlm()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?lagsarlm()")) {
   	  return("lagsarlm")
   	}
-  	if (object.name$call[1]=="errorsarlm()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?errorsarlm()")) {
   	  return("errorsarlm")
   	}
-  	if (object.name$call[1]=="rlm()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?rlm()")) {
   	  return("rlm")
   	}
-  	if (object.name$call[1]=="aftreg()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?aftreg()")) {
   	  return("aftreg")
   	}
-  	if (object.name$call[1]=="coxreg()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?coxreg()")) {
   	  return("coxreg")
   	}
-  	if (object.name$call[1]=="phreg()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?phreg()")) {
   	  return("phreg")
   	}
-  	if (object.name$call[1]=="weibreg()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?weibreg()")) {
   	  return("weibreg")
   	}
-  	if (object.name$call[1]=="bj()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?bj()")) {
   	  return("bj")
   	}
-  	if (object.name$call[1]=="cph()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?cph()")) {
   	  return("cph")
   	}
-  	if (object.name$call[1]=="Gls()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?Gls()")) {
   	  return("Gls")
   	}
-  	if (object.name$call[1]=="lrm()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?lrm()")) {
   	  return("lrm")
   	}
-  	if (object.name$call[1]=="ols()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?ols()")) {
   	  return("ols")
   	}
-  	if (object.name$call[1]=="psm()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?psm()")) {
   	  return("psm")
   	}
-  	if (object.name$call[1]=="Rq()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?Rq()")) {
   	  return("Rq")
   	}
-  	if (object.name$call[1]=="hetglm()") {
+  	if (stringr::str_detect(as.character(object.name$call[1]), ":?hetglm()")) {
   	  return("hetglm")
   	}
-    else if (object.name$call[1]=="relogit()") {
+    else if (stringr::str_detect(as.character(object.name$call[1]), ":?relogit()")) {
       return("relogit")
     }
-  	else if (object.name$call[1]=="netbinom()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?netbinom()")) {
   	  if (object.name$call$LF=="probit") { return("probit.net") }      
       if (object.name$call$LF=="logit") { return("logit.net") }
   	  if (object.name$call$LF=="cloglog") { return("cloglog.net") }
   	}
-  	else if (object.name$call[1]=="netgamma()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?netgamma()")) {
   	  return("gamma.net")
   	}
 
-  	else if (object.name$call[1]=="zelig()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?zelig()")) {
         if (object.name$call$model %in% c("ls","normal","logit","probit","relogit","poisson","poisson.survey",
                                            "negbinom","probit.survey","logit.survey","normal.gee","logit.gee","probit.gee",
                                            "poisson.gee","normal.gam","logit.gam","probit.gam","poisson.gam","exp",
@@ -2577,30 +2578,30 @@ function(libname, pkgname) {
           else { return("unsupported zelig") }
   	}
     
-  	else if (object.name$call[1]=="tobit()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?tobit()")) {
   	  return("tobit(AER)")
   	}
     
-    else if (object.name$call[1]=="multinom()") {
+    else if (stringr::str_detect(as.character(object.name$call[1]), ":?multinom()")) {
       return("multinom")
     }
     
-  	else if (object.name$call[1]=="betareg()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?betareg()")) {
   	  return("betareg")
   	}
-  	else if (object.name$call[1]=="zeroinfl()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?zeroinfl()")) {
   	  return("zeroinfl")
   	}
-  	else if (object.name$call[1]=="hurdle()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?hurdle()")) {
   	  return("hurdle")
   	}  	
-  	else if (object.name$call[1]=="plm()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?plm()")) {
   	  return("plm")
   	}
-    else if (object.name$call[1]=="pgmm()") {
+    else if (stringr::str_detect(as.character(object.name$call[1]), ":?pgmm()")) {
        return("pgmm")
     }  	
-  	else if (object.name$call[1]=="ivreg()") {
+  	else if (stringr::str_detect(as.character(object.name$call[1]), ":?ivreg()")) {
   	  return("ivreg")
   	} 
    }
@@ -6338,7 +6339,7 @@ function(libname, pkgname) {
 
     # info about the package and author
     .global.package.name <- "stargazer"
-    .global.package.version <- "5.2"
+    .global.package.version <- "5.2.1"
     .global.package.author.name <- "Marek Hlavac"
     .global.package.author.affiliation <- "Harvard University"
     .global.package.author.email <- "hlavac at fas.harvard.edu"

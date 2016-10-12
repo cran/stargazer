@@ -10,6 +10,11 @@ This page summarizes the models, features, and bug fixes that were introduced in
 }
 
 \section{What's new?}{
+v. 5.2.1:\cr
+\cr
+- Fixed bugs:
+-- some models previously not recognized if package namespace explicitly used when calling them (i.e. \code{MASS::polr()} vs. \code{polr()})\cr
+\cr
 v. 5.2:\cr
 \cr
 - New models:\cr
