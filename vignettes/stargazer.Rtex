@@ -27,9 +27,9 @@ beautiful \LaTeX{}, HTML and ASCII tables from R statistical output}
 
 
 \author{Marek Hlavac%
-\thanks{Harvard University, Political Economy and Government; hlavac@fas.harvard.edu%
+\thanks{Department of Economics, UWC Adriatic, Duino (Trieste), Italy; Research Fellow, Central European Labour Studies Institute (CELSI), Bratislava, Slovakia; mhlavac@alumni.princeton.edu%
 }\\
-Harvard University}
+Central European Labour Studies Institute}
 
 \maketitle
 
@@ -330,8 +330,8 @@ If you use the \emph{stargazer} package in your research publications,
 please remember to include the following citation:\\
 
 
-\noindent \texttt{Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables. R
-package version 5.2.} \texttt{http://CRAN.R-project.org/package=stargazer}~\\
+\noindent \texttt{Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables. R
+package version 5.2.1.} \texttt{https://CRAN.R-project.org/package=stargazer}~\\
 \texttt{}~\\
 
 

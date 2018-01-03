@@ -1,8 +1,8 @@
 .onAttach <- 
 function(libname, pkgname) {
   packageStartupMessage("\nPlease cite as: \n")
-  packageStartupMessage(" Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables.")
-  packageStartupMessage(" R package version 5.2. http://CRAN.R-project.org/package=stargazer \n")
+  packageStartupMessage(" Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables.")
+  packageStartupMessage(" R package version 5.2.1. https://CRAN.R-project.org/package=stargazer \n")
 }
 
 .stargazer.wrap <-

@@ -1,10 +1,10 @@
 Package: stargazer
 Type: Package
 Title: Well-Formatted Regression and Summary Statistics Tables
-Version: 5.2
-Date: 2015-07-14
-Author: Marek Hlavac <hlavac@fas.harvard.edu>
-Maintainer: Marek Hlavac <hlavac@fas.harvard.edu>
+Version: 5.2.1
+Date: 2018-01-03
+Author: Marek Hlavac <mhlavac@alumni.princeton.edu>
+Maintainer: Marek Hlavac <mhlavac@alumni.princeton.edu>
 Description: Produces LaTeX code, HTML/CSS code and ASCII text for well-formatted tables that hold 
     regression analysis results from several models side-by-side, as well as summary
     statistics.
@@ -16,7 +16,8 @@ Enhances: AER, betareg, brglm, censReg, dynlm, eha, erer, ergm, fGarch,
         relevent, robustbase, sampleSelection, spdep, survey, survival,
         Zelig
 LazyLoad: yes
+Collate: 'stargazer-internal.R' 'stargazer.R'
 NeedsCompilation: no
-Packaged: 2015-07-14 04:45:58 UTC; Marek Hlavac
+Packaged: 2018-01-03 18:56:20 UTC; Marek
 Repository: CRAN
-Date/Publication: 2015-07-14 20:41:01
+Date/Publication: 2018-01-03 23:14:51 UTC

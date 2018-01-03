@@ -6,7 +6,7 @@
 %%  ~~function to do ... ~~
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-This page summarizes the models that \code{stargazer} supports. Please note that I am always looking for comments and suggestions. Do not hesitate to contact me at hlavac [at] fas.harvard.edu.
+This page summarizes the models that \code{stargazer} supports. Please note that I am always looking for comments and suggestions. Do not hesitate to contact me at mhlavac [at] alumni.princeton.edu.
 }
 
 \section{Supported objects}{

@@ -6,10 +6,14 @@
 %%  ~~function to do ... ~~
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
-This page summarizes the models, features, and bug fixes that were introduced in each release of \code{stargazer}. Please note that I am always looking for comments and suggestions. Do not hesitate to contact me at hlavac [at] fas.harvard.edu.
+This page summarizes the models, features, and bug fixes that were introduced in each release of \code{stargazer}. Please note that I am always looking for comments and suggestions. Do not hesitate to contact me at mhlavac [at] alumni.princeton.edu.
 }
 
 \section{What's new?}{
+v. 5.2.1:\cr
+\cr
+- very minor update: updated author contact information\cr
+\cr
 v. 5.2:\cr
 \cr
 - New models:\cr

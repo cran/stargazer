@@ -273,8 +273,9 @@ To include \code{stargazer} tables in Microsoft Word documents (e.g., .doc or .d
 }
 \author{
 %%  ~~who you are~~
-Marek Hlavac   < hlavac at fas.harvard.edu > \cr
-Harvard University, Political Economy and Government \cr
+Dr. Marek Hlavac < mhlavac at alumni.princeton.edu > \cr
+Department of Economics, UWC Adriatic, Duino, Italy \cr
+Research Fellow, Central European Labour Studies Institute (CELSI), Bratislava, Slovakia \cr
 }
 \section{Acknowledgments and New Features}{
 I would like to thank everyone who has tested this package, or provided useful comments and suggestions. Please see \link{stargazer package acknowledgments}. \cr
@@ -283,7 +284,7 @@ See \link{stargazer news} for a list of new models and features in each release 
 }
 
 \section{Please cite as:}{
-Hlavac, Marek (2015). stargazer: Well-Formatted Regression and Summary Statistics Tables. R package version 5.2. http://CRAN.R-project.org/package=stargazer 
+Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables. R package version 5.2.1. https://CRAN.R-project.org/package=stargazer 
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
