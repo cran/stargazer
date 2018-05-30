@@ -5,6 +5,9 @@ This page summarizes the models, features, and bug fixes that were introduced in
 Please note that I am always looking for comments and suggestions. 
 Do not hesitate to contact me at mhlavac [at] alumni.princeton.edu
 
+v. 5.2.2:
+- very minor update: removed instances in code where if/while statement is used with a condition of length greater than one
+
 v. 5.2.1:
 - very minor update: updated author and maintainer contact information
 

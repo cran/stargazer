@@ -5,7 +5,7 @@ citEntry(
   title = "stargazer: Well-Formatted Regression and Summary Statistics Tables",
   author = as.person("Marek Hlavac"),
   year = "2018",
-  note = "R package version 5.2.1",
+  note = "R package version 5.2.2",
   organization = "Central European Labour Studies Institute (CELSI)",
   address = "Bratislava, Slovakia",
   textVersion = "Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables. R package version 5.2.1. https://CRAN.R-project.org/package=stargazer",

@@ -2,7 +2,7 @@
 function(libname, pkgname) {
   packageStartupMessage("\nPlease cite as: \n")
   packageStartupMessage(" Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables.")
-  packageStartupMessage(" R package version 5.2.1. https://CRAN.R-project.org/package=stargazer \n")
+  packageStartupMessage(" R package version 5.2.2. https://CRAN.R-project.org/package=stargazer \n")
 }
 
 .stargazer.wrap <-
@@ -109,7 +109,7 @@ function(libname, pkgname) {
   		  if (found == FALSE) {
    
           # append new variable to list of regressors
-          while ((position < how.many.gcv) & (!(temp.gcv[position+1] %in% coef.var))) {
+          while ((position < how.many.gcv) && (!(temp.gcv[position+1] %in% coef.var))) {
             position <- position + 1
           }
         
@@ -502,7 +502,7 @@ function(libname, pkgname) {
   .apply <-
   function(auto.t, auto.p)
   {
-    if ((!is.null(apply.coef)) | ((!is.null(apply.se)))) {
+    if ((!is.null(apply.coef)) || ((!is.null(apply.se)))) {
       if (!is.null(apply.coef)) { .global.coefficients <<- apply(.global.coefficients, c(1,2), apply.coef) }
       if (!is.null(apply.se)) { .global.std.errors <<- apply(.global.std.errors, c(1,2), apply.se) }
       
@@ -634,7 +634,7 @@ function(libname, pkgname) {
   	}
 	
   	# coefficients and stars
-  	else if ((part=="coefficient") | (part=="coefficient*")) {
+  	else if ((part=="coefficient") || (part=="coefficient*")) {
   		for (i in seq(1:length(.global.models))) {
   			if (!is.na(.global.coefficients[.global.coefficient.variables[which.variable],i])) {
 				
@@ -653,7 +653,7 @@ function(libname, pkgname) {
   			}
         
         # if single-row, follow up with standard error / confidence interval
-        if ((.format.single.row == TRUE) & (("standard error" %in% .format.coefficient.table.parts) | ("standard error*" %in% .format.coefficient.table.parts))) {
+        if ((.format.single.row == TRUE) && (("standard error" %in% .format.coefficient.table.parts) || ("standard error*" %in% .format.coefficient.table.parts))) {
             
             if (.format.dec.mark.align == TRUE) { space.char <- "$ $"}
             else { space.char <- " "}
@@ -730,7 +730,7 @@ function(libname, pkgname) {
   	}
 
   	# standard errors
-  	else if (((part=="standard error") | (part=="standard error*")) & (.format.single.row==FALSE)) {
+  	else if (((part=="standard error") || (part=="standard error*")) && (.format.single.row==FALSE)) {
   		for (i in seq(1:length(.global.models))) {
   			if (!is.na(.global.std.errors[.global.coefficient.variables[which.variable],i])) {
 
@@ -811,7 +811,7 @@ function(libname, pkgname) {
 
 
   	# p-values
-  	else if ((part=="p-value") | (part=="p-value*")) {
+  	else if ((part=="p-value") || (part=="p-value*")) {
   		for (i in seq(1:length(.global.models))) {
   			if (!is.na(.global.p.values[.global.coefficient.variables[which.variable],i])) {
 
@@ -833,7 +833,7 @@ function(libname, pkgname) {
   	}
 
   	# t-statistics
-  	else if ((part=="t-stat") | (part=="t-stat*")) {
+  	else if ((part=="t-stat") || (part=="t-stat*")) {
   		for (i in seq(1:length(.global.models))) {
   			if (!is.na(.global.t.stats[.global.coefficient.variables[which.variable],i])) {
   				# report t-statistics
@@ -1093,7 +1093,7 @@ function(libname, pkgname) {
 
   .enter.significance.stars <-
   function(p.value, force.math=FALSE) {
-    if ((!is.na(p.value)) & (!is.null(p.value))) {
+    if ((!is.na(p.value)) && (!is.null(p.value))) {
       
       if (.format.dec.mark.align == TRUE) {
         c <- "" 
@@ -1203,7 +1203,7 @@ function(libname, pkgname) {
     
         
     if (auto == TRUE) {
-      if ((!is.null(user.coef)) | (!is.null(user.se))) {
+      if ((!is.null(user.coef)) || (!is.null(user.se))) {
         
         #if (.model.identify(object.name) == "multinom") {
         #  f.coef <- as.vector(f.coef[model.num,])
@@ -1765,7 +1765,7 @@ function(libname, pkgname) {
     }
     
     if (auto == TRUE) {
-      if ((!is.null(user.coef)) | (!is.null(user.se))) {
+      if ((!is.null(user.coef)) || (!is.null(user.se))) {
         
         #if (.model.identify(object.name) == "multinom") {
         #  f.coef <- as.vector(f.coef[model.num,])
@@ -1969,7 +1969,7 @@ function(libname, pkgname) {
     model.name <- .get.model.name(object.name)
   
     if (!(model.name %in% c("arima","fGARCH","Arima","maBina", "coeftest", "Gls", "lmer", "glmer", "nlmer"))) {
-      if ((!is.null(object.name$theta)) & (!is.null(object.name$SE.theta))) {
+      if ((!is.null(object.name$theta)) && (!is.null(object.name$SE.theta))) {
         theta.value <- object.name$theta
         theta.se.value <- object.name$SE.theta
         theta.tstat.value <- theta.value / theta.se.value
@@ -2000,7 +2000,7 @@ function(libname, pkgname) {
         if (letter == "(") { inside.inner.bracket <- inside.inner.bracket + 1 }
         if (letter == ")") { inside.inner.bracket <- inside.inner.bracket - 1 }
         
-        if ((letter == ",") & (inside.inner.bracket == 0)) {
+        if ((letter == ",") && (inside.inner.bracket == 0)) {
           return.vector <- c(return.vector, process.string)
           process.string <- ""
         }
@@ -2017,7 +2017,7 @@ function(libname, pkgname) {
       x.original <- x
       first.part <- ""
       
-      if (is.na(x) | is.null(x)) { return("") }
+      if (is.na(x) || is.null(x)) { return("") }
       
       if (simply.output == TRUE) {
         if (!is.numeric(x)) { return(.remove.special.chars(x)) }
@@ -2027,13 +2027,13 @@ function(libname, pkgname) {
       
       if (!is.na(decimal.places)) {
         
-        if ((.format.until.nonzero.digit == FALSE) | (decimal.places <= 0)) {
+        if ((.format.until.nonzero.digit == FALSE) || (decimal.places <= 0)) {
           round.result <- round(x, digits=decimal.places)
         }
         else {
           temp.places <- decimal.places
           if (!.is.all.integers(x)) {
-            while ((round(x, digits=temp.places) == 0) & (temp.places < (decimal.places + .format.max.extra.digits))) {
+            while ((round(x, digits=temp.places) == 0) && (temp.places < (decimal.places + .format.max.extra.digits))) {
               temp.places <- temp.places + 1
             }
           }
@@ -2041,7 +2041,7 @@ function(libname, pkgname) {
           decimal.places <- temp.places
         }
         
-        if ((round.up.positive==TRUE) & (round.result < x)) {       # useful for p-values that should be rounded up
+        if ((round.up.positive==TRUE) && (round.result < x)) {       # useful for p-values that should be rounded up
           if (x > (10^((-1)*(decimal.places+1)))) {
             round.result <- round.result + 10^((-1)*decimal.places)
           }
@@ -2068,7 +2068,7 @@ function(libname, pkgname) {
       
       digits.in.separated.unit <- 0
       for (i in seq(from=length.integer.part, to=1)) {
-        if ((digits.in.separated.unit == .format.digit.separator.where[separator.count]) & (substr(split.round.result[1],i,i)!="-")){
+        if ((digits.in.separated.unit == .format.digit.separator.where[separator.count]) && (substr(split.round.result[1],i,i)!="-")){
           first.part <- paste(.format.digit.separator,first.part,sep="")
           if (separator.count < length(.format.digit.separator.where)) { separator.count <- separator.count + 1 }
           digits.in.separated.unit <- 0	
@@ -2080,8 +2080,8 @@ function(libname, pkgname) {
       
       # remove initial zero and there are decimal places, if that is requested
       if (.format.initial.zero==FALSE)  {
-        if ((round.result > 0) & (round.result < 1)) {
-          if ((is.na(decimal.places)) | (decimal.places > 0)) {
+        if ((round.result > 0) && (round.result < 1)) {
+          if ((is.na(decimal.places)) || (decimal.places > 0)) {
             first.part <- ""
           }
         }
@@ -2133,7 +2133,7 @@ function(libname, pkgname) {
   .is.all.integers <-
   function(x) {
       if (!is.numeric(x)) { return(FALSE) }
-      if (length(x[!is.na(x)]) == length(is.wholenumber(x)[(!is.na(x)) & (is.wholenumber(x)==TRUE)])) {
+      if (length(x[!is.na(x)]) == length(is.wholenumber(x)[(!is.na(x)) && (is.wholenumber(x)==TRUE)])) {
         return(TRUE)
       }
       else { return (FALSE) }
@@ -2314,7 +2314,7 @@ function(libname, pkgname) {
    if (!is.null(object.name$call)) {
     
   	if (object.name$call[1]=="lm()") { return("ls") }
-  	else if ((object.name$call[1]=="glm()") | (object.name$call[1]=="Glm()")) {
+  	else if ((object.name$call[1]=="glm()") || (object.name$call[1]=="Glm()")) {
   		if (object.name$family$family=="gaussian") {
   			if (object.name$family$link=="identity") {
   				return("normal")
@@ -2348,7 +2348,7 @@ function(libname, pkgname) {
   				return("normal.survey")
   			}
   		}
-  		else if ((object.name$family$family=="binomial") | (object.name$family$family=="quasibinomial")) {
+  		else if ((object.name$family$family=="binomial") || (object.name$family$family=="quasibinomial")) {
   			if (object.name$family$link=="probit") {
   				return("probit.survey")
   			}
@@ -2934,7 +2934,7 @@ function(libname, pkgname) {
   .order.data.frame <- 
     function(d, order, summary=FALSE) {
       
-      if ((.format.rownames == TRUE) & (summary == FALSE)) {  # if we want to report rownames, add them to data frame
+      if ((.format.rownames == TRUE) && (summary == FALSE)) {  # if we want to report rownames, add them to data frame
         if (!is.null(rownames(d))) { d <- .insert.col.front(d, rownames(d)) }
       }
       
@@ -3053,7 +3053,7 @@ function(libname, pkgname) {
   			.table.part.published[part.number] <<- TRUE
   		}
   	}
-  	else if ((is.matrix(.global.var.name) == TRUE) & (type.se == FALSE)) {     # for statistics that have degrees of freedom
+  	else if ((is.matrix(.global.var.name) == TRUE) && (type.se == FALSE)) {     # for statistics that have degrees of freedom
   		if (sum(!is.na(as.vector(.global.var.name["statistic",])))!=0) {
 
 	  		# intelligent df reporting (figure out whether only report it on left side, or also)
@@ -3077,7 +3077,7 @@ function(libname, pkgname) {
 
 	  		# put df on the left if only one unique df in the table, and not just one column w/ given df
 	  		if (intelligent.df == TRUE) {
-	  			if ((length(df.all.together.no.NA.unique)==1) & (length(df.all.together.no.NA)>=2)) { report.df.left.column <- TRUE }				
+	  			if ((length(df.all.together.no.NA.unique)==1) && (length(df.all.together.no.NA)>=2)) { report.df.left.column <- TRUE }				
 	  		}
 
   			# write down the line	
@@ -3111,12 +3111,12 @@ function(libname, pkgname) {
             }
 
   					# significance stars
-  					if ((significance.stars == TRUE) & (!is.na(.global.var.name["p-value",i]))) { .enter.significance.stars(.global.var.name["p-value",i], force.math) }
+  					if ((significance.stars == TRUE) && (!is.na(.global.var.name["p-value",i]))) { .enter.significance.stars(.global.var.name["p-value",i], force.math) }
 
 										
   					# degrees of freedom - only report by statistics if not in the left column already
   					if (report.df.left.column == FALSE) {
-  						if ((report.df == TRUE) & (!is.na(.global.var.name["df1",i]))) {
+  						if ((report.df == TRUE) && (!is.na(.global.var.name["df1",i]))) {
   							cat(" ",.format.df.left,sep="")
   							for (j in seq(1:(nrow(.global.var.name)- 2))) {
   								if (!is.na(.global.var.name[paste("df",as.character(j),sep=""),i])) {
@@ -3129,7 +3129,7 @@ function(libname, pkgname) {
   					}
 
   					# p-values
-  					if ((report.p.value == TRUE) & (!is.na(.global.var.name["p-value",i]))) {
+  					if ((report.p.value == TRUE) && (!is.na(.global.var.name["p-value",i]))) {
   						cat(" ",.format.p.value.left,sep="")
   						if (!is.na(.global.var.name[paste("df",as.character(j),sep=""),i])) { 
   							cat(.iround(.global.var.name["p-value",i],.format.round.digits, round.up.positive=TRUE),sep="") 
@@ -3151,7 +3151,7 @@ function(libname, pkgname) {
   			.table.part.published[part.number] <<- TRUE
   		}
   	}
-  	else if ((is.matrix(.global.var.name) == TRUE) & (type.se == TRUE)) {       # for statistics that have a standard error
+  	else if ((is.matrix(.global.var.name) == TRUE) && (type.se == TRUE)) {       # for statistics that have a standard error
   	  if (sum(!is.na(as.vector(.global.var.name["statistic",])))!=0) {
 	    
   	    # write down the line	
@@ -3170,16 +3170,16 @@ function(libname, pkgname) {
   	        
 	        
   	        # significance stars
-  	        if ((significance.stars == TRUE) & (!is.na(.global.var.name["p-value",i]))) { .enter.significance.stars(.global.var.name["p-value",i], force.math) }
+  	        if ((significance.stars == TRUE) && (!is.na(.global.var.name["p-value",i]))) { .enter.significance.stars(.global.var.name["p-value",i], force.math) }
 	        
   	        # standard errors
-  	        if ((report.se == TRUE) & (!is.na(.global.var.name["se",i]))) { cat(" ",.format.se.left,.iround(.global.var.name["se",i], decimal.digits),.format.se.right,sep="") }
+  	        if ((report.se == TRUE) && (!is.na(.global.var.name["se",i]))) { cat(" ",.format.se.left,.iround(.global.var.name["se",i], decimal.digits),.format.se.right,sep="") }
           
   	        # t-statistics
-  	        if ((report.tstat == TRUE) & (!is.na(.global.var.name["tstat",i]))) { cat(" ",.format.tstat.left, .iround(.global.var.name["tstat",i], decimal.digits),.format.tstat.right,sep="") }
+  	        if ((report.tstat == TRUE) && (!is.na(.global.var.name["tstat",i]))) { cat(" ",.format.tstat.left, .iround(.global.var.name["tstat",i], decimal.digits),.format.tstat.right,sep="") }
           
   	        # p-values
-  	        if ((report.p.value == TRUE) & (!is.na(.global.var.name["p-value",i]))) { cat(" ",.format.p.value.left,.iround(.global.var.name["p-value",i], decimal.digits),.format.p.value.right,sep="") }
+  	        if ((report.p.value == TRUE) && (!is.na(.global.var.name["p-value",i]))) { cat(" ",.format.p.value.left,.iround(.global.var.name["p-value",i], decimal.digits),.format.p.value.right,sep="") }
             
             if (.format.dec.mark.align == TRUE) {
               cat("}")
@@ -3214,7 +3214,7 @@ function(libname, pkgname) {
   			.publish.table.part(part=.format.table.parts[i], which.part.number=i)
 
   			if (.table.part.published[i]==TRUE) { .publish.horizontal.line <<- TRUE }
-  			if ((.format.table.parts[i]=="-") | (.format.table.parts[i]=="-!") | (.format.table.parts[i]=="=") | (.format.table.parts[i]=="=!")) { .publish.horizontal.line <<- FALSE }
+  			if ((.format.table.parts[i]=="-") || (.format.table.parts[i]=="-!") || (.format.table.parts[i]=="=") || (.format.table.parts[i]=="=!")) { .publish.horizontal.line <<- FALSE }
   		}
   	}
 
@@ -3294,7 +3294,7 @@ function(libname, pkgname) {
 
   	# models
   	else if (part=="models")  {
-     	   if ((.format.model.names.include==TRUE) & ((.format.models.skip.if.one == FALSE) | ((.format.models.skip.if.one == TRUE) & (length(unique(.global.models))>=2)))) {
+     	   if ((.format.model.names.include==TRUE) && ((.format.models.skip.if.one == FALSE) || ((.format.models.skip.if.one == TRUE) && (length(unique(.global.models))>=2)))) {
 		
   		.table.insert.space()
   		cat(.format.models.text)
@@ -3308,13 +3308,13 @@ function(libname, pkgname) {
   					renamed.global.models[1,i] <- .format.model.names[2,j] 
   					renamed.global.models[2,i] <- .format.model.names[3,j]
   				}
-  				else if ((model.strsplit[1]=="glm()") | (model.strsplit[1]=="svyglm()") | (model.strsplit[1]=="gee()") | (model.strsplit[1]=="gam()")) {
+  				else if ((model.strsplit[1]=="glm()") || (model.strsplit[1]=="svyglm()") || (model.strsplit[1]=="gee()") || (model.strsplit[1]=="gam()")) {
   					if ( .format.model.function == TRUE ) { renamed.global.models[1,i] <- paste(substr(model.strsplit[1],1,nchar(model.strsplit[1])-2),": ", .format.model.family, model.strsplit[2], sep="") }
   					else { renamed.global.models[1,i] <- paste(.format.model.family, model.strsplit[2], sep="")}
 
   					renamed.global.models[2,i] <- paste(.format.model.link, model.strsplit[3], sep="")
   				}
-  				else if ((model.strsplit[1]=="survreg()") | (model.strsplit[1]=="polr()")) {
+  				else if ((model.strsplit[1]=="survreg()") || (model.strsplit[1]=="polr()")) {
   					if ( .format.model.function == TRUE ) { renamed.global.models[1,i] <- paste(substr(model.strsplit[1],1,nchar(model.strsplit[1])-2),": ", .format.model.dist, model.strsplit[2], sep="") }
   					else { renamed.global.models[1,i] <- paste(.format.model.dist, model.strsplit[2], sep="")}
   					renamed.global.models[2,i] <- ""
@@ -3449,7 +3449,7 @@ function(libname, pkgname) {
 
   	# numbers
   	else if (part=="numbers") {
-      if ((.format.model.numbers == TRUE) & (length(.global.models)>1)) {
+      if ((.format.model.numbers == TRUE) && (length(.global.models)>1)) {
   		  .table.insert.space()
   		  cat(.format.numbers.text)
   		  for (i in seq(1:length(.global.models))) {
@@ -3502,7 +3502,7 @@ function(libname, pkgname) {
 
   	# fixed effects table
   	else if (part=="omit") {
-      if ((!is.null(.format.omit.regexp)) & (!is.null(.format.omit.labels))) {
+      if ((!is.null(.format.omit.regexp)) && (!is.null(.format.omit.labels))) {
   		  .format.omit.table <<- matrix(.format.omit.no, nrow=length(.format.omit.regexp), ncol=length(.global.models)) 
   		  for (i in seq(1:length(.global.models))) {
   				for (j in seq(1:length(.format.omit.regexp))) {
@@ -3765,7 +3765,7 @@ function(libname, pkgname) {
   function(regular.number) {
 
   	# unique representation only for integers between 1 and 3899
-  	if ((regular.number < 1) | (regular.number > 3899)) {
+  	if ((regular.number < 1) || (regular.number > 3899)) {
   		return(NULL)
   	}
   	else {
@@ -3960,7 +3960,7 @@ function(libname, pkgname) {
       rownames(object) <- obj.colnames
     }
     
-    if ((nrow(object) < 1) | (ncol(object) < 1)) {
+    if ((nrow(object) < 1) || (ncol(object) < 1)) {
       cat("% Error: Data frame must have at least one row and one column.\n")
     }
     else {
@@ -3980,7 +3980,7 @@ function(libname, pkgname) {
           .data.frame.table.part(object,.format.s.stat.parts[i], which.part.number = i)
           
           if (.table.part.published[i]==TRUE) { .publish.horizontal.line <<- TRUE }
-          if ((.format.s.stat.parts[i]=="-") | (.format.s.stat.parts[i]=="-!") | (.format.s.stat.parts[i]=="=") | (.format.s.stat.parts[i]=="=!")) { .publish.horizontal.line <<- FALSE }
+          if ((.format.s.stat.parts[i]=="-") || (.format.s.stat.parts[i]=="-!") || (.format.s.stat.parts[i]=="=") || (.format.s.stat.parts[i]=="=!")) { .publish.horizontal.line <<- FALSE }
         }
       }
       
@@ -3997,7 +3997,7 @@ function(libname, pkgname) {
     
     .table.part.published[which.part.number] <<- FALSE
     
-    if ((part=="stat names") & (.format.colnames==TRUE)) {
+    if ((part=="stat names") && (.format.colnames==TRUE)) {
       
       x.which <- 0
       
@@ -4143,7 +4143,7 @@ function(libname, pkgname) {
         
     
     # notes
-    else if ((part=="notes") & (!is.null(.format.s.note.content))) {
+    else if ((part=="notes") && (!is.null(.format.s.note.content))) {
       if (.format.s.note != "") cat(.format.s.note)
       for (i in seq(1:length(.format.s.note.content))) {
         .format.s.note.content[i] <- .format.s.note.content[i]
@@ -4203,7 +4203,7 @@ function(libname, pkgname) {
     if (length(names(object)) < 1) {
       cat("% Error: Data frame columns do not have any names.\n")
     }
-    else if ((nrow(object) < 1) | (ncol(object) < 1)) {
+    else if ((nrow(object) < 1) || (ncol(object) < 1)) {
       cat("% Error: Data frame must have at least one row and one column.\n")
     }
     else {
@@ -4231,9 +4231,9 @@ function(libname, pkgname) {
   .summ.stat.publish.statistic <-
   function(object, which.variable, which.statistic) {
     
-  	if ((is.numeric(object[,which.variable]) == TRUE) | ((is.logical(object[,which.variable])) & (.format.summ.logical==TRUE)))  {
+  	if ((is.numeric(object[,which.variable]) == TRUE) || ((is.logical(object[,which.variable])) && (.format.summ.logical==TRUE)))  {
       
-      if ((is.logical(object[,which.variable])) & (.format.summ.logical==TRUE)) {
+      if ((is.logical(object[,which.variable])) && (.format.summ.logical==TRUE)) {
         temp.var <- rep(NA, time=length(object[,which.variable]))
         temp.var[object[,which.variable]==TRUE] <- 1
         temp.var[object[,which.variable]==FALSE] <- 0
@@ -4331,7 +4331,7 @@ function(libname, pkgname) {
       # skip all of this if omitted based on regular expression
       omitted <- FALSE
         
-      if ((is.numeric(object[,i]) == TRUE) | (is.logical(object[,i]) & (.format.summ.logical==TRUE))) {
+      if ((is.numeric(object[,i]) == TRUE) || (is.logical(object[,i]) && (.format.summ.logical==TRUE))) {
         
         # also omit if all missing values
         if (!any(!is.na(object[,i]))) { omitted <- TRUE }
@@ -4386,7 +4386,7 @@ function(libname, pkgname) {
         if (length(.format.s.statistics.list)>=1) {
   		    for (i in seq(1:length(.format.s.statistics.list))) {
   			    for (j in seq(1:ncol(.format.s.statistics.names))) {
-  				    if ((substr(.format.s.statistics.list[i],1,1)=="p") & (substr(.format.s.statistics.list[i],1,1)==.format.s.statistics.names[1,j])) {
+  				    if ((substr(.format.s.statistics.list[i],1,1)=="p") && (substr(.format.s.statistics.list[i],1,1)==.format.s.statistics.names[1,j])) {
   					    cat(" & \\multicolumn{1}{c}{", .format.s.statistics.names.left, sub("!", substr(.format.s.statistics.list[i],2,nchar(.format.s.statistics.list[i])), .format.s.statistics.names[2,j], ignore.case =FALSE, fixed=TRUE), .format.s.statistics.names.right,"}", sep="")
   				    }
   				    else if (.format.s.statistics.list[i]==.format.s.statistics.names[1,j]) {
@@ -4472,7 +4472,7 @@ function(libname, pkgname) {
         if (length(.format.s.statistics.list)>=1) {
           for (i in seq(1:length(.format.s.statistics.list))) {
             for (j in seq(1:ncol(.format.s.statistics.names))) {
-              if ((substr(.format.s.statistics.list[i],1,1)=="p") & (substr(.format.s.statistics.list[i],1,1)==.format.s.statistics.names[1,j])) {
+              if ((substr(.format.s.statistics.list[i],1,1)=="p") && (substr(.format.s.statistics.list[i],1,1)==.format.s.statistics.names[1,j])) {
                 cat(.format.s.statistics.names.left, sub("!", substr(.format.s.statistics.list[i],2,nchar(.format.s.statistics.list[i])), .format.s.statistics.names[2,j], ignore.case =FALSE, fixed=TRUE), .format.s.statistics.names.right, sep="")
               }
               else if (.format.s.statistics.list[i]==.format.s.statistics.names[1,j]) {
@@ -4506,7 +4506,7 @@ function(libname, pkgname) {
   	}
 
   	# notes
-  	else if ((part=="notes") & (!is.null(.format.s.note.content))) {
+  	else if ((part=="notes") && (!is.null(.format.s.note.content))) {
   		if (.format.s.note != "") cat(.format.s.note)
       
       if (.format.s.note=="") { offset <- 1 }
@@ -4893,7 +4893,7 @@ function(libname, pkgname) {
   
   .turn.into.list <-
   function(x) {
-    if (is.vector(x) | is.matrix(x)) {
+    if (is.vector(x) || is.matrix(x)) {
       if (!is.list(x)) { return(as.list(x)) }
     }
     return(x)
@@ -4907,7 +4907,7 @@ function(libname, pkgname) {
       for (i in 1:length(x)) {
         elem <- x[[i]]
         if (!is.null(elem)) {
-          if (length(elem) != length(elem[is.numeric(elem) | (is.na(elem))])) { return(FALSE) }
+          if (length(elem) != length(elem[is.numeric(elem) || (is.na(elem))])) { return(FALSE) }
         }
       }
       return(TRUE)
@@ -4921,7 +4921,7 @@ function(libname, pkgname) {
       for (i in 1:length(x)) {
         elem <- as.matrix(x[[i]])
         if (!is.null(elem)) {
-          if (length(elem) != length(elem[is.numeric(elem) | (is.na(elem))])) { return(FALSE) }
+          if (length(elem) != length(elem[is.numeric(elem) || (is.na(elem))])) { return(FALSE) }
         }
       }
       return(TRUE)
@@ -4979,7 +4979,7 @@ function(libname, pkgname) {
     letters <- grepl("^[[:alpha:]]+$", s) 
     both <- grepl("^[[:digit:][:alpha:]]+$", s)
     
-    if ((numbers == TRUE) | (letters == TRUE) | (both == TRUE)) {
+    if ((numbers == TRUE) || (letters == TRUE) || (both == TRUE)) {
       alphanum <- TRUE
     }
     
@@ -5058,9 +5058,9 @@ function(libname, pkgname) {
         s.i <- substr(s, i, i)
         s.i2 <- substr(s, i, i+1)
         
-        if ((s.i %in% c("\\", "_", "^")) & (!(s.i2 %in% c("\\_","\\^"))) & (!(s.i0 %in% c("\\_","\\^"))) ) {
+        if ((s.i %in% c("\\", "_", "^")) && (!(s.i2 %in% c("\\_","\\^"))) && (!(s.i0 %in% c("\\_","\\^"))) ) {
           remainder.s <- substr(s, i+1, nchar(s))     # if control character not followed by curly brace
-          if ((strpos(" ", remainder.s) < strpos("{", remainder.s)) | (strpos("{", remainder.s)==-1))  {
+          if ((strpos(" ", remainder.s) < strpos("{", remainder.s)) || (strpos("{", remainder.s)==-1))  {
             i <- i + strpos(" ", remainder.s) + 1
           }
           else {   # control character followed by curly brace
@@ -5140,7 +5140,7 @@ function(libname, pkgname) {
   .text.cline <-
   function (cline, max.length, line.char="-") {
       for (i in 1:length(cline)) {
-        if ((cline[i]==0) & (sum(cline[i:length(cline)]) != 0)) {
+        if ((cline[i]==0) && (sum(cline[i:length(cline)]) != 0)) {
           .repeat.char(" ", rep=max.length[i]+1, new.line=FALSE)
         }
         else if (cline[i]>=1) {
@@ -5160,7 +5160,7 @@ function(libname, pkgname) {
     function (cline) {
       cat("<tr>")
       for (i in 1:length(cline)) {
-        if ((cline[i]==0) & (sum(cline[i:length(cline)]) != 0)) {
+        if ((cline[i]==0) && (sum(cline[i:length(cline)]) != 0)) {
           cat("<td></td>")
         }
         else if (cline[i]>=1) {
@@ -5646,7 +5646,7 @@ function(libname, pkgname) {
     
     for (i in 1:length(latex.code)) {
       line <- latex.code[i]
-      if ((substr(line, 1, 7) == "\\begin{") & (regexpr("}}",line,fixed=TRUE)[[1]] != -1)) {
+      if ((substr(line, 1, 7) == "\\begin{") && (regexpr("}}",line,fixed=TRUE)[[1]] != -1)) {
         formatting.string <- substr(line, regexpr("}}",line,fixed=TRUE)[[1]]+2, nchar(line)-1)
       }
     }
@@ -5935,7 +5935,7 @@ function(libname, pkgname) {
           obj.rownames <- rownames(objects[[i]])
           if (is.null(obj.rownames)) { .format.rownames <- FALSE }
         }
-        else if ((is.matrix(objects[[i]])) && (class(objects[[i]]) != "coeftest")) { 
+        else if ((is.matrix(objects[[i]])) && (class(objects[[i]])[1] != "coeftest")) { 
           
           .global.summary[i] <- FALSE   # content output default for matrices
           
@@ -5978,7 +5978,7 @@ function(libname, pkgname) {
         if (!is.data.frame(objects[[i]])) {
         
           # if zelig$result relevant, identify this automatically
-          if (class(objects[[i]]) %in% c("coeftest","lmerMod","glmerMod","nlmerMod","fGARCH")) {  # use this to eliminate lmer, glmer, nlmer
+          if (class(objects[[i]])[1] %in% c("coeftest","lmerMod","glmerMod","nlmerMod","fGARCH")) {  # use this to eliminate lmer, glmer, nlmer
             if (.model.identify(objects[[i]])=="unknown") { error.present <- c(error.present, "% Error: Unrecognized object type.\n",i) }
           }
           else {
@@ -5989,7 +5989,7 @@ function(libname, pkgname) {
             }
         
             ###
-            if (is.atomic(objects[[i]]) & (!is.null(objects[[i]]))) { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
+            if (is.atomic(objects[[i]]) && (!is.null(objects[[i]]))) { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
             else if (.model.identify(objects[[i]])=="unknown") { error.present <- c(error.present, "% Error: Unrecognized object type.\n") }
             else if (.model.identify(objects[[i]])=="unsupported zelig") { error.present <- c(error.present, "% Error: Unsupported 'zelig' model.\n") }
           }  
@@ -6016,22 +6016,22 @@ function(libname, pkgname) {
       }
     }
     
-    if ((!is.logical(summary)) & (!is.null(summary))) { error.present <- c(error.present, "% Error: Argument 'summary' must be NULL, or of type 'logical' (TRUE/FALSE) \n") }
+    if ((!is.logical(summary)) && (!is.null(summary))) { error.present <- c(error.present, "% Error: Argument 'summary' must be NULL, or of type 'logical' (TRUE/FALSE) \n") }
     
-    if ((!is.character(out)) & (!is.null(out))) { error.present <- c(error.present, "% Error: Argument 'out' must be NULL (default), or a vector of type 'character.' \n") }
+    if ((!is.character(out)) && (!is.null(out))) { error.present <- c(error.present, "% Error: Argument 'out' must be NULL (default), or a vector of type 'character.' \n") }
     if (!is.logical(out.header)) { error.present <- c(error.present, "% Error: Argument 'out.header' be of type 'logical' (TRUE/FALSE) \n") }
   
-    if ((!is.numeric(column.separate)) & (!is.null(column.separate))) { error.present <- c(error.present, "% Error: Argument 'column.separate' must be NULL (default), a vector of type 'numeric.'\n") }
+    if ((!is.numeric(column.separate)) && (!is.null(column.separate))) { error.present <- c(error.present, "% Error: Argument 'column.separate' must be NULL (default), a vector of type 'numeric.'\n") }
   
-    if ((!is.character(column.labels)) & (!is.null(column.labels))) { error.present <- c(error.present, "% Error: Argument 'column.labels' must be NULL (default), or a vector of type 'character.'\n") }
-    if ((!is.character(covariate.labels)) & (!is.null(covariate.labels))) { error.present <- c(error.present, "% Error: Argument 'covariate.labels' must be NULL (default), or a vector of type 'character.'\n") }
-    if ((!is.character(dep.var.labels)) & (!is.null(dep.var.labels))) { error.present <- c(error.present, "% Error: Argument 'dep.var.labels' must be NULL (default), or a vector of type 'character.'\n") }
+    if ((!is.character(column.labels)) && (!is.null(column.labels))) { error.present <- c(error.present, "% Error: Argument 'column.labels' must be NULL (default), or a vector of type 'character.'\n") }
+    if ((!is.character(covariate.labels)) && (!is.null(covariate.labels))) { error.present <- c(error.present, "% Error: Argument 'covariate.labels' must be NULL (default), or a vector of type 'character.'\n") }
+    if ((!is.character(dep.var.labels)) && (!is.null(dep.var.labels))) { error.present <- c(error.present, "% Error: Argument 'dep.var.labels' must be NULL (default), or a vector of type 'character.'\n") }
     
-    if ((!is.logical(dep.var.labels.include)) & (!is.null(dep.var.labels.include))) { error.present <- c(error.present, "% Error: Argument 'dep.var.labels.include' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
-    if ((length(dep.var.labels.include) != 1) & (!is.null(dep.var.labels.include))) { error.present <- c(error.present, "% Error: Argument 'dep.var.labels.include' must be of length 1.'\n") }
+    if ((!is.logical(dep.var.labels.include)) && (!is.null(dep.var.labels.include))) { error.present <- c(error.present, "% Error: Argument 'dep.var.labels.include' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(dep.var.labels.include) != 1) && (!is.null(dep.var.labels.include))) { error.present <- c(error.present, "% Error: Argument 'dep.var.labels.include' must be of length 1.'\n") }
     
-    if ((!is.character(dep.var.caption)) & (!is.null(dep.var.caption))) { error.present <- c(error.present, "% Error: Argument 'dep.var.caption must be NULL (default), or of type 'character.'\n") }
-    if ((length(dep.var.caption) != 1) & (!is.null(dep.var.caption))) { error.present <- c(error.present, "% Error: Argument 'dep.var.caption' must be of length 1.'\n") }  
+    if ((!is.character(dep.var.caption)) && (!is.null(dep.var.caption))) { error.present <- c(error.present, "% Error: Argument 'dep.var.caption must be NULL (default), or of type 'character.'\n") }
+    if ((length(dep.var.caption) != 1) && (!is.null(dep.var.caption))) { error.present <- c(error.present, "% Error: Argument 'dep.var.caption' must be of length 1.'\n") }  
   
     coef <- .turn.into.list(coef); se <- .turn.into.list(se)
     t <- .turn.into.list(t); p <- .turn.into.list(p)
@@ -6068,62 +6068,62 @@ function(libname, pkgname) {
     
     if (!is.numeric(ci.level)) { error.present <- c(error.present, "% Error: Argument 'ci.level' must be of type 'numeric.' \n") }
   
-    if ((!is.character(ci.separator)) & (!is.null(ci.separator))) { error.present <- c(error.present, "% Error: Argument 'ci.separator' must be NULL (default), or of type 'character.'\n") }
-    if ((length(ci.separator) != 1) & (!is.null(ci.separator))) { error.present <- c(error.present, "% Error: Argument 'ci.separator' must be of length 1.'\n") }
+    if ((!is.character(ci.separator)) && (!is.null(ci.separator))) { error.present <- c(error.present, "% Error: Argument 'ci.separator' must be NULL (default), or of type 'character.'\n") }
+    if ((length(ci.separator) != 1) && (!is.null(ci.separator))) { error.present <- c(error.present, "% Error: Argument 'ci.separator' must be of length 1.'\n") }
   
     add.lines <- .turn.into.list(add.lines)
-    if ((!is.list(add.lines)) & (!is.null(add.lines))) { error.present <- c(error.present, "% Error: Argument 'add.lines' must be NULL (default), or a list of vectors. \n") }
+    if ((!is.list(add.lines)) && (!is.null(add.lines))) { error.present <- c(error.present, "% Error: Argument 'add.lines' must be NULL (default), or a list of vectors. \n") }
     if (!is.null(add.lines)) {
       if (length(add.lines) < 1) { error.present <- c(error.present, "% Error: The list in argument 'add.lines' must be of length 1 or more. \n") }
       if (!all(unlist(lapply(add.lines, is.vector)))) { error.present <- c(error.present, "% Error: Argument 'add.lines' must be NULL (default), or a list of vectors. \n") }
     }
   
-    if ((!is.function(apply.coef)) & (!is.null(apply.coef))) { error.present <- c(error.present, "% Error: Argument 'apply.coef' must be NULL (default), or a function.'\n") }
-    if ((!is.function(apply.se)) & (!is.null(apply.se))) { error.present <- c(error.present, "% Error: Argument 'apply.se' must be NULL (default), or a function.'\n") }
-    if ((!is.function(apply.t)) & (!is.null(apply.t))) { error.present <- c(error.present, "% Error: Argument 'apply.t' must be NULL (default), or a function.'\n") }
-    if ((!is.function(apply.p)) & (!is.null(apply.p))) { error.present <- c(error.present, "% Error: Argument 'apply.p' must be NULL (default), or a function.'\n") }
-    if ((!is.function(apply.ci)) & (!is.null(apply.ci))) { error.present <- c(error.present, "% Error: Argument 'apply.ci' must be NULL (default), or a function.'\n") }
+    if ((!is.function(apply.coef)) && (!is.null(apply.coef))) { error.present <- c(error.present, "% Error: Argument 'apply.coef' must be NULL (default), or a function.'\n") }
+    if ((!is.function(apply.se)) && (!is.null(apply.se))) { error.present <- c(error.present, "% Error: Argument 'apply.se' must be NULL (default), or a function.'\n") }
+    if ((!is.function(apply.t)) && (!is.null(apply.t))) { error.present <- c(error.present, "% Error: Argument 'apply.t' must be NULL (default), or a function.'\n") }
+    if ((!is.function(apply.p)) && (!is.null(apply.p))) { error.present <- c(error.present, "% Error: Argument 'apply.p' must be NULL (default), or a function.'\n") }
+    if ((!is.function(apply.ci)) && (!is.null(apply.ci))) { error.present <- c(error.present, "% Error: Argument 'apply.ci' must be NULL (default), or a function.'\n") }
 
     if (!is.character(column.sep.width)) { error.present <- c(error.present, "% Error: Argument 'column.sep.width' must be of type 'character.'\n") }
     if (length(column.sep.width) != 1)  { error.present <- c(error.present, "% Error: Argument 'column.sep.width' must be of length 1.'\n") }
   
-    if ((!is.character(decimal.mark)) & (!is.null(decimal.mark))) { error.present <- c(error.present, "% Error: Argument 'decimal.mark' must be NULL (default), or of type 'character.'\n") }
-    if ((length(decimal.mark) != 1) & (!is.null(decimal.mark))) { error.present <- c(error.present, "% Error: Argument 'decimal.mark' must be of length 1.'\n") }
+    if ((!is.character(decimal.mark)) && (!is.null(decimal.mark))) { error.present <- c(error.present, "% Error: Argument 'decimal.mark' must be NULL (default), or of type 'character.'\n") }
+    if ((length(decimal.mark) != 1) && (!is.null(decimal.mark))) { error.present <- c(error.present, "% Error: Argument 'decimal.mark' must be of length 1.'\n") }
   
     if (!is.logical(df)) { error.present <- c(error.present, "% Error: Argument 'df' must be of type 'logical' (TRUE/FALSE) \n") }
     if (length(df) != 1) { error.present <- c(error.present, "% Error: Argument 'df' must be of length 1.'\n") }
     
-    if ((!is.numeric(digit.separate)) & (!is.null(digit.separate)) & (!is.character(digit.separate))) { error.present <- c(error.present, "% Error: Argument 'digit.separate' must be NULL (default), a vector of type 'numeric,' or of type 'character.' \n") }
+    if ((!is.numeric(digit.separate)) && (!is.null(digit.separate)) & (!is.character(digit.separate))) { error.present <- c(error.present, "% Error: Argument 'digit.separate' must be NULL (default), a vector of type 'numeric,' or of type 'character.' \n") }
     if (is.character(digit.separate)) {
       if (!(digit.separate %in% c("lakh","japan","china"))) { error.present <- c(error.present, "% Error: If argument 'digit.separate' is of type character, it must be one of \"lakh\"/\"china\"/\"japan\".\n") }
     }
     
-    if ((!is.character(digit.separator)) & (!is.null(digit.separator))) { error.present <- c(error.present, "% Error: Argument 'digit.separator' must be NULL (default), or of type 'character.'\n") }
-    if ((length(digit.separator) != 1) & (!is.null(digit.separator))) { error.present <- c(error.present, "% Error: Argument 'digit.separator' must be of length 1.'\n") }
+    if ((!is.character(digit.separator)) && (!is.null(digit.separator))) { error.present <- c(error.present, "% Error: Argument 'digit.separator' must be NULL (default), or of type 'character.'\n") }
+    if ((length(digit.separator) != 1) && (!is.null(digit.separator))) { error.present <- c(error.present, "% Error: Argument 'digit.separator' must be of length 1.'\n") }
     
-    if ((!is.numeric(digits)) & (!is.null(digits))) { 
+    if ((!is.numeric(digits)) && (!is.null(digits))) { 
       if (!is.na(digits)) { error.present <- c(error.present, "% Error: Argument 'digits' must be NULL (default), or of type 'numeric.'\n") }
     }
-    if ((length(digits) != 1) & (!is.null(digits))) { 
+    if ((length(digits) != 1) && (!is.null(digits))) { 
       if (!is.na(digits)) { error.present <- c(error.present, "% Error: Argument 'digits' must be of length 1.'\n") }
     }
     if (!is.null(digits)) {
       if (!is.na(digits)) {
-        if ((digits<0) & (is.numeric(digits))) { error.present <- c(error.present, "% Error: Argument 'digits' must be >= 0.'\n") }
+        if ((digits<0) && (is.numeric(digits))) { error.present <- c(error.present, "% Error: Argument 'digits' must be >= 0.'\n") }
       }
     }
     
-    if ((!is.numeric(digits.extra)) & (!is.null(digits.extra))) { error.present <- c(error.present, "% Error: Argument 'digits.extra' must be NULL (default), or of type 'numeric.'\n") }
-    if ((length(digits.extra) != 1) & (!is.null(digits.extra))) { error.present <- c(error.present, "% Error: Argument 'digits.extra' must be of length 1.'\n") }
+    if ((!is.numeric(digits.extra)) && (!is.null(digits.extra))) { error.present <- c(error.present, "% Error: Argument 'digits.extra' must be NULL (default), or of type 'numeric.'\n") }
+    if ((length(digits.extra) != 1) && (!is.null(digits.extra))) { error.present <- c(error.present, "% Error: Argument 'digits.extra' must be of length 1.'\n") }
     if (!is.null(digits.extra)) {
-      if ((digits.extra<0) & (is.numeric(digits.extra))) { error.present <- c(error.present, "% Error: Argument 'digits.extra' must be >= 0.'\n") }
+      if ((digits.extra<0) && (is.numeric(digits.extra))) { error.present <- c(error.present, "% Error: Argument 'digits.extra' must be >= 0.'\n") }
     }
   
     if (!is.logical(flip)) { error.present <- c(error.present, "% Error: Argument 'flip' must be of type 'logical' (TRUE/FALSE) \n") }
-    if ((length(flip) != 1) & (!is.null(flip))) { error.present <- c(error.present, "% Error: Argument 'flip' must be of length 1.'\n") }
+    if ((length(flip) != 1) && (!is.null(flip))) { error.present <- c(error.present, "% Error: Argument 'flip' must be of length 1.'\n") }
   
     if (!is.logical(float)) { error.present <- c(error.present, "% Error: Argument 'float' must be of type 'logical' (TRUE/FALSE) \n") }
-    if ((length(float) != 1) & (!is.null(float))) { error.present <- c(error.present, "% Error: Argument 'float' must be of length 1.'\n") }
+    if ((length(float) != 1) && (!is.null(float))) { error.present <- c(error.present, "% Error: Argument 'float' must be of length 1.'\n") }
     
     if (!(float.env %in% c("table","table*","sidewaystable"))) { error.present <- c(error.present, "% Error: Argument 'float.env' must be one of \"table\", \"table*\" or \"sidewaystable\".\n") }  
     if (length(float.env) != 1) { error.present <- c(error.present, "% Error: Argument 'float.env' must be of length 1.'\n") }
@@ -6131,13 +6131,13 @@ function(libname, pkgname) {
     if (!is.null(font.size)) {
       if (!(font.size %in% c("tiny","scriptsize","footnotesize","small","normalsize","large","Large","LARGE","huge","Huge"))) { error.present <- c(error.present, "% Error: Argument 'font.size' must be NULL (default), or one of the available font sizes. See documentation.") }  
     }
-    if ((length(font.size) != 1) & (!is.null(font.size))) { error.present <- c(error.present, "% Error: Argument 'font.size' must be of length 1.'\n") }
+    if ((length(font.size) != 1) && (!is.null(font.size))) { error.present <- c(error.present, "% Error: Argument 'font.size' must be of length 1.'\n") }
   
     if (!is.logical(header)) { error.present <- c(error.present, "% Error: Argument 'header' must be of type 'logical' (TRUE/FALSE) \n") }
     if (length(header) != 1) { error.present <- c(error.present, "% Error: Argument 'header' must be of length 1.'\n") }
       
-    if ((!is.logical(initial.zero)) & (!is.null(initial.zero))) { error.present <- c(error.present, "% Error: Argument 'initial.zero' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
-    if ((length(initial.zero) != 1) & (!is.null(initial.zero))) { error.present <- c(error.present, "% Error: Argument 'initial.zero' must be of length 1.'\n") }
+    if ((!is.logical(initial.zero)) && (!is.null(initial.zero))) { error.present <- c(error.present, "% Error: Argument 'initial.zero' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(initial.zero) != 1) && (!is.null(initial.zero))) { error.present <- c(error.present, "% Error: Argument 'initial.zero' must be of length 1.'\n") }
   
     if (!is.logical(intercept.bottom)) { error.present <- c(error.present, "% Error: Argument 'intercept.bottom' must be of type 'logical' (TRUE/FALSE) \n") }
     if (length(intercept.bottom) != 1) { error.present <- c(error.present, "% Error: Argument 'intercept.bottom' must be of length 1.'\n") }
@@ -6145,11 +6145,11 @@ function(libname, pkgname) {
     if (!is.logical(intercept.top)) { error.present <- c(error.present, "% Error: Argument 'intercept.top' must be of type 'logical' (TRUE/FALSE) \n") }
     if (length(intercept.top) != 1) { error.present <- c(error.present, "% Error: Argument 'intercept.top' must be of length 1.'\n") }
   
-    if (intercept.top & intercept.bottom) { error.present <- c(error.present, "% Error: Arguments 'intercept.bottom' and 'intercept.top' cannot both be TRUE. \n")}
+    if (intercept.top && intercept.bottom) { error.present <- c(error.present, "% Error: Arguments 'intercept.bottom' and 'intercept.top' cannot both be TRUE. \n")}
   
-    if ((!is.character(keep)) & (!is.numeric(keep)) & (!is.null(keep))) { error.present <- c(error.present, "% Error: Argument 'keep' must be NULL (default; all variables kept), or a vector of type 'character' or 'numeric.'\n") }
+    if ((!is.character(keep)) && (!is.numeric(keep)) && (!is.null(keep))) { error.present <- c(error.present, "% Error: Argument 'keep' must be NULL (default; all variables kept), or a vector of type 'character' or 'numeric.'\n") }
   
-    if ((!is.character(keep.stat)) & (!is.null(keep.stat))) { error.present <- c(error.present, "% Error: Argument 'keep.stat' must be NULL (default), or a vector of type 'character.'\n") }
+    if ((!is.character(keep.stat)) && (!is.null(keep.stat))) { error.present <- c(error.present, "% Error: Argument 'keep.stat' must be NULL (default), or a vector of type 'character.'\n") }
     keep.stat.acceptable <- c("all","n","rsq","adj.rsq","max.rsq","ll","aic","bic","scale","ubre","rho(se)*","Mills(se)*","sigma2","ser","f","theta","chi2","wald","lr","logrank","null.dev","res.dev")     # list of statistic codes that are acceptable
     if (is.character(keep.stat)) {
       is.acceptable <- unique(tolower(keep.stat) %in% keep.stat.acceptable)
@@ -6159,41 +6159,41 @@ function(libname, pkgname) {
       
     if (!is.character(label)) { error.present <- c(error.present, "% Error: Argument 'label' must be of type 'character.'\n") }
   
-    if ((!is.logical(model.names)) & (!is.null(model.names))) { error.present <- c(error.present, "% Error: Argument 'model.names' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
-    if ((length(model.names) != 1) & (!is.null(model.names))) { error.present <- c(error.present, "% Error: Argument 'model.names' must be of length 1.'\n") }
+    if ((!is.logical(model.names)) && (!is.null(model.names))) { error.present <- c(error.present, "% Error: Argument 'model.names' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(model.names) != 1) && (!is.null(model.names))) { error.present <- c(error.present, "% Error: Argument 'model.names' must be of length 1.'\n") }
     
-    if ((!is.logical(model.numbers)) & (!is.null(model.numbers))) { error.present <- c(error.present, "% Error: Argument 'model.numbers' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
-    if ((length(model.numbers) != 1) & (!is.null(model.numbers))) { error.present <- c(error.present, "% Error: Argument 'model.numbers' must be of length 1.'\n") }
+    if ((!is.logical(model.numbers)) && (!is.null(model.numbers))) { error.present <- c(error.present, "% Error: Argument 'model.numbers' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(model.numbers) != 1) && (!is.null(model.numbers))) { error.present <- c(error.present, "% Error: Argument 'model.numbers' must be of length 1.'\n") }
   
     if (!is.logical(multicolumn)) { error.present <- c(error.present, "% Error: Argument 'multicolumn' must be of type 'logical' (TRUE/FALSE) \n") }
     if (length(multicolumn) != 1) { error.present <- c(error.present, "% Error: Argument 'multicolumn' must be of length 1.'\n") }
   
-    if ((!is.logical(no.space)) & (!is.null(no.space))) { error.present <- c(error.present, "% Error: Argument 'no.space' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
-    if ((length(no.space) != 1) & (!is.null(no.space))) { error.present <- c(error.present, "% Error: Argument 'no.space' must be of length 1.'\n") }
+    if ((!is.logical(no.space)) && (!is.null(no.space))) { error.present <- c(error.present, "% Error: Argument 'no.space' must be NULL (default), or of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(no.space) != 1) && (!is.null(no.space))) { error.present <- c(error.present, "% Error: Argument 'no.space' must be of length 1.'\n") }
     
-    if ((!is.character(notes)) & (!is.null(notes))) { error.present <- c(error.present, "% Error: Argument 'notes' must be NULL (default), or a vector of type 'character.'\n") }
+    if ((!is.character(notes)) && (!is.null(notes))) { error.present <- c(error.present, "% Error: Argument 'notes' must be NULL (default), or a vector of type 'character.'\n") }
     
     if (!is.null(notes.align)) {
       if (!(tolower(notes.align) %in% c("l","c","r"))) { error.present <- c(error.present, "% Error: Argument 'notes.align' must be NULL (default), or \"l\"/\"c\"/\"r\".\n") }  
     }
-    if ((length(notes.align) != 1) & (!is.null(notes.align))) { error.present <- c(error.present, "% Error: Argument 'notes.align' must be of length 1.'\n") }
+    if ((length(notes.align) != 1) && (!is.null(notes.align))) { error.present <- c(error.present, "% Error: Argument 'notes.align' must be of length 1.'\n") }
   
     if (!is.logical(notes.append)) { error.present <- c(error.present, "% Error: Argument 'notes.append' must be of type 'logical' (TRUE/FALSE) \n") }
     if (length(notes.append) != 1) { error.present <- c(error.present, "% Error: Argument 'notes.append' must be of length 1.'\n") }
   
-    if ((!is.character(notes.label)) & (!is.null(notes.label))) { error.present <- c(error.present, "% Error: Argument 'notes.label' must be NULL (default), or of type 'character.'\n") }
-    if ((length(notes.label) != 1) & (!is.null(notes.label))) { error.present <- c(error.present, "% Error: Argument 'notes.label' must be of length 1.'\n") }
+    if ((!is.character(notes.label)) && (!is.null(notes.label))) { error.present <- c(error.present, "% Error: Argument 'notes.label' must be NULL (default), or of type 'character.'\n") }
+    if ((length(notes.label) != 1) && (!is.null(notes.label))) { error.present <- c(error.present, "% Error: Argument 'notes.label' must be of length 1.'\n") }
   
     if (!is.logical(object.names)) { error.present <- c(error.present, "% Error: Argument 'object.names' must be of type 'logical' (TRUE/FALSE) \n") }
     if (length(object.names) != 1) { error.present <- c(error.present, "% Error: Argument 'object.names' must be of length 1.'\n") }
     
-    if ((!is.character(omit)) & (!is.numeric(omit)) & (!is.null(omit))) { error.present <- c(error.present, "% Error: Argument 'omit' must be NULL (default; no omissions), or a vector of type 'character' or 'numeric.'\n") }
-    if ((!is.character(omit.labels)) & (!is.null(omit.labels))) { error.present <- c(error.present, "% Error: Argument 'omit' must be NULL (default; no omissions), or a vector of type 'character.'\n") }
+    if ((!is.character(omit)) && (!is.numeric(omit)) && (!is.null(omit))) { error.present <- c(error.present, "% Error: Argument 'omit' must be NULL (default; no omissions), or a vector of type 'character' or 'numeric.'\n") }
+    if ((!is.character(omit.labels)) && (!is.null(omit.labels))) { error.present <- c(error.present, "% Error: Argument 'omit' must be NULL (default; no omissions), or a vector of type 'character.'\n") }
     if (!is.null(omit.labels)) {
       if (length(omit) != length(omit.labels)) { error.present <- c(error.present, "% Error: Arguments 'omit.labels' must be NULL (default; no omissions), or equal in length to 'omit.labels'.'\n") }
     }
   
-    if ((!is.character(omit.stat)) & (!is.null(omit.stat))) { error.present <- c(error.present, "% Error: Argument 'omit.stat' must be NULL (default), or a vector of type 'character.'\n") }
+    if ((!is.character(omit.stat)) && (!is.null(omit.stat))) { error.present <- c(error.present, "% Error: Argument 'omit.stat' must be NULL (default), or a vector of type 'character.'\n") }
     omit.stat.acceptable <- c("all","n","rsq","adj.rsq","max.rsq","ll","aic","bic","scale","ubre","rho(se)*","Mills(se)*","sigma2","ser","f","theta","chi2","wald","lr","logrank","null.dev","res.dev")     # list of statistic codes that are acceptable
     if (is.character(omit.stat)) {
       is.acceptable <- unique(tolower(omit.stat) %in% omit.stat.acceptable)
@@ -6201,7 +6201,7 @@ function(libname, pkgname) {
       if (!is.acceptable) { error.present <- c(error.present, "% Error: Unknown statistic in 'omit.stat' argument.\n") }
     } 
   
-    if ((!is.character(omit.summary.stat)) & (!is.null(omit.summary.stat))) { error.present <- c(error.present, "% Error: Argument 'omit.summary.stat' must be NULL (default), or a vector of type 'character.'\n") }
+    if ((!is.character(omit.summary.stat)) && (!is.null(omit.summary.stat))) { error.present <- c(error.present, "% Error: Argument 'omit.summary.stat' must be NULL (default), or a vector of type 'character.'\n") }
     omit.summary.stat.acceptable <- c("n","mean","sd","min","p25","median","p75","max")
     if (is.character(omit.summary.stat)) {
       is.acceptable <- unique(tolower(omit.summary.stat) %in% omit.summary.stat.acceptable)
@@ -6209,10 +6209,10 @@ function(libname, pkgname) {
       if (!is.acceptable) { error.present <- c(error.present, "% Error: Unknown statistic in 'omit.summary.stat' argument.\n") }
     } 
   
-    if ((!is.character(omit.yes.no)) & (!is.null(omit.yes.no))) { error.present <- c(error.present, "% Error: Argument 'omit.yes.no' must be a vector of type 'character.'\n") }
-    if ((length(omit.yes.no) != 2) & (!is.null(omit.yes.no))) { error.present <- c(error.present, "% Error: Argument 'omit.yes.no' must be of length 2.'\n") }
+    if ((!is.character(omit.yes.no)) && (!is.null(omit.yes.no))) { error.present <- c(error.present, "% Error: Argument 'omit.yes.no' must be a vector of type 'character.'\n") }
+    if ((length(omit.yes.no) != 2) && (!is.null(omit.yes.no))) { error.present <- c(error.present, "% Error: Argument 'omit.yes.no' must be of length 2.'\n") }
   
-    if ((!is.character(order)) & (!is.numeric(order)) & (!is.null(order))) { error.present <- c(error.present, "% Error: Argument 'order' must be NULL (default; no omissions), or a vector of type 'character' or 'numeric.'\n") }
+    if ((!is.character(order)) && (!is.numeric(order)) & (!is.null(order))) { error.present <- c(error.present, "% Error: Argument 'order' must be NULL (default; no omissions), or a vector of type 'character' or 'numeric.'\n") }
     
     if (!is.logical(ord.intercepts)) { error.present <- c(error.present, "% Error: Argument 'ord.intercepts' must be of type 'logical' (TRUE/FALSE) \n") }
     if (length(ord.intercepts) != 1) { error.present <- c(error.present, "% Error: Argument 'ord.intercepts' must be of length 1.'\n") }
@@ -6220,11 +6220,11 @@ function(libname, pkgname) {
     if (!is.logical(perl)) { error.present <- c(error.present, "% Error: Argument 'perl' must be of type 'logical' (TRUE/FALSE) \n") }
     if (length(perl) != 1) { error.present <- c(error.present, "% Error: Argument 'perl' must be of length 1.'\n") }
   
-    if (!(is.logical(colnames)) & (!is.null(colnames))) { error.present <- c(error.present, "% Error: Argument 'colnames' must be NULL, or of type 'logical' (TRUE/FALSE) \n") }
-    if ((length(colnames) != 1) & (!is.null(colnames))) { error.present <- c(error.present, "% Error: Argument 'colnames' must be of length 1.'\n") }
+    if (!(is.logical(colnames)) && (!is.null(colnames))) { error.present <- c(error.present, "% Error: Argument 'colnames' must be NULL, or of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(colnames) != 1) && (!is.null(colnames))) { error.present <- c(error.present, "% Error: Argument 'colnames' must be of length 1.'\n") }
   
-    if (!(is.logical(rownames)) & (!is.null(rownames))) { error.present <- c(error.present, "% Error: Argument 'rownames' must be NULL, or of type 'logical' (TRUE/FALSE) \n") }
-    if ((length(rownames) != 1) & (!is.null(rownames))) { error.present <- c(error.present, "% Error: Argument 'rownames' must be of length 1.'\n") }
+    if (!(is.logical(rownames)) && (!is.null(rownames))) { error.present <- c(error.present, "% Error: Argument 'rownames' must be NULL, or of type 'logical' (TRUE/FALSE) \n") }
+    if ((length(rownames) != 1) && (!is.null(rownames))) { error.present <- c(error.present, "% Error: Argument 'rownames' must be of length 1.'\n") }
   
     if (!is.character(rq.se)) { error.present <- c(error.present, "% Error: Argument 'rq.se' must be of type 'character.' \n") }
     if (length(rq.se) != 1) { error.present <- c(error.present, "% Error: Argument 'rq.se' must be of length 1.'\n") }
@@ -6233,23 +6233,23 @@ function(libname, pkgname) {
     }
   
     if (!is.logical(selection.equation)) { error.present <- c(error.present, "% Error: Argument 'selection.equation' must be of type 'logical' (TRUE/FALSE) \n") }
-    if ((length(selection.equation) != 1) & (!is.null(selection.equation))) { error.present <- c(error.present, "% Error: Argument 'selection.equation' must be of length 1.'\n") }
+    if ((length(selection.equation) != 1) && (!is.null(selection.equation))) { error.present <- c(error.present, "% Error: Argument 'selection.equation' must be of length 1.'\n") }
   
     if (!is.logical(single.row)) { error.present <- c(error.present, "% Error: Argument 'single.row' must be of type 'logical' (TRUE/FALSE) \n") }
     if (length(single.row) != 1) { error.present <- c(error.present, "% Error: Argument 'single.row' must be of length 1.'\n") }
   
-    if ((!is.character(star.char)) & (!is.null(star.char))) { error.present <- c(error.present, "% Error: Argument 'star.char' must be NULL (default), or of type 'character.'\n") }
-    if ((!(length(star.char) >= 1)) & (!is.null(star.char))) { error.present <- c(error.present, "% Error: Argument 'star.char' must be at least of length 1.'\n") }
+    if ((!is.character(star.char)) && (!is.null(star.char))) { error.present <- c(error.present, "% Error: Argument 'star.char' must be NULL (default), or of type 'character.'\n") }
+    if ((!(length(star.char) >= 1)) && (!is.null(star.char))) { error.present <- c(error.present, "% Error: Argument 'star.char' must be at least of length 1.'\n") }
     
     if (!is.null(star.cutoffs)) {
       if (sum(is.na(star.cutoffs)) != length(star.cutoffs)) {
         if (!is.numeric(star.cutoffs)) { error.present <- c(error.present, "% Error: Argument 'star.cutoffs' must be NULL (default), or a vector of type 'numeric.'\n") }
       }
-      if ( !(length(star.cutoffs) >= 1) & (!is.null(star.cutoffs))) { error.present <- c(error.present, "% Error: Argument 'star.cutoffs' must be a vector with at least one element.\n") }
+      if ( !(length(star.cutoffs) >= 1) && (!is.null(star.cutoffs))) { error.present <- c(error.present, "% Error: Argument 'star.cutoffs' must be a vector with at least one element.\n") }
       if (sum(star.cutoffs[!is.na(star.cutoffs)] == sort(star.cutoffs, decreasing = TRUE, na.last=NA)) != length(star.cutoffs[!is.na(star.cutoffs)])) { error.present <- c(error.present, "% Error: The elements of 'star.cutoffs' must be in weakly decreasing order.\n") }
     }
   
-    if ((!is.character(summary.stat)) & (!is.null(summary.stat))) { error.present <- c(error.present, "% Error: Argument 'summary.stat' must be NULL (default), or a vector of type 'character.'\n") }
+    if ((!is.character(summary.stat)) && (!is.null(summary.stat))) { error.present <- c(error.present, "% Error: Argument 'summary.stat' must be NULL (default), or a vector of type 'character.'\n") }
     summary.stat.acceptable <- c("n","mean","sd","min","p25","median","p75","max")     # list of statistic codes that are acceptable
     if (is.character(summary.stat)) {
       is.acceptable <- unique(tolower(summary.stat) %in% summary.stat.acceptable)
@@ -6257,9 +6257,9 @@ function(libname, pkgname) {
       if (!is.acceptable) { error.present <- c(error.present, "% Error: Unknown statistic in 'summary.stat' argument.\n") }
     } 
   
-    if ((!is.character(table.layout)) & (!is.null(table.layout))) { error.present <- c(error.present, "% Error: Argument 'table.layout' must be of type 'character.'\n") }
-    if ((length(table.layout) != 1) & (!is.null(table.layout)))  { error.present <- c(error.present, "% Error: Argument 'table.layout' must be of length 1.'\n") }
-    if (is.character(table.layout) & (length(table.layout)==1)) {   # test if report only contains allowed letters
+    if ((!is.character(table.layout)) && (!is.null(table.layout))) { error.present <- c(error.present, "% Error: Argument 'table.layout' must be of type 'character.'\n") }
+    if ((length(table.layout) != 1) && (!is.null(table.layout)))  { error.present <- c(error.present, "% Error: Argument 'table.layout' must be of length 1.'\n") }
+    if (is.character(table.layout) && (length(table.layout)==1)) {   # test if report only contains allowed letters
       layout.error <- FALSE
       for (i in 1:nchar(table.layout)) {
         ch <- substring(table.layout,i,i)
@@ -6268,9 +6268,9 @@ function(libname, pkgname) {
       if (layout.error) { error.present <- c(error.present, "% Error: Invalid characters in 'table.layout'. See package documentation. \n") }
     }  
   
-    if ((!is.character(omit.table.layout)) & (!is.null(omit.table.layout))) { error.present <- c(error.present, "% Error: Argument 'omit.table.layout' must be of type 'character.'\n") }
-    if ((length(omit.table.layout) != 1) & (!is.null(omit.table.layout)))  { error.present <- c(error.present, "% Error: Argument 'omit.table.layout' must be of length 1.'\n") }
-    if (is.character(omit.table.layout) & (length(omit.table.layout)==1)) {   # test if report only contains allowed letters
+    if ((!is.character(omit.table.layout)) && (!is.null(omit.table.layout))) { error.present <- c(error.present, "% Error: Argument 'omit.table.layout' must be of type 'character.'\n") }
+    if ((length(omit.table.layout) != 1) && (!is.null(omit.table.layout)))  { error.present <- c(error.present, "% Error: Argument 'omit.table.layout' must be of length 1.'\n") }
+    if (is.character(omit.table.layout) && (length(omit.table.layout)==1)) {   # test if report only contains allowed letters
       layout.error <- FALSE
       for (i in 1:nchar(omit.table.layout)) {
         ch <- substring(omit.table.layout,i,i)
@@ -6281,7 +6281,7 @@ function(libname, pkgname) {
   
     if (!is.character(table.placement)) { error.present <- c(error.present, "% Error: Argument 'table.placement' must be of type 'character.'\n") }
     if (length(table.placement) != 1)  { error.present <- c(error.present, "% Error: Argument 'table.placement' must be of length 1.'\n") }
-    if (is.character(table.placement) & (length(table.placement)==1)) {   # test if table.placement only contains allowed letters
+    if (is.character(table.placement) && (length(table.placement)==1)) {   # test if table.placement only contains allowed letters
       tp.error <- FALSE
       for (i in 1:nchar(table.placement)) {
         ch <- substring(table.placement,i,i)
@@ -6290,9 +6290,9 @@ function(libname, pkgname) {
       if (tp.error) { error.present <- c(error.present, "% Error: Argument 'table.placement' can only consist of \"h\",\"t\",\"b\",\"p\",\"!\",\"H\".\n") }
     }
   
-    if ((!is.character(report)) & (!is.null(report))) { error.present <- c(error.present, "% Error: Argument 'report' must be of type 'character.'\n") }
-    if ((length(report) != 1) & (!is.null(report)))  { error.present <- c(error.present, "% Error: Argument 'report' must be of length 1.'\n") }
-    if (is.character(report) & (length(report)==1)) {   # test if report only contains allowed letters
+    if ((!is.character(report)) && (!is.null(report))) { error.present <- c(error.present, "% Error: Argument 'report' must be of type 'character.'\n") }
+    if ((length(report) != 1) && (!is.null(report)))  { error.present <- c(error.present, "% Error: Argument 'report' must be of length 1.'\n") }
+    if (is.character(report) && (length(report)==1)) {   # test if report only contains allowed letters
       report.error <- FALSE
       for (i in 1:nchar(report)) {
         ch <- substring(report,i,i)
@@ -6338,7 +6338,7 @@ function(libname, pkgname) {
 
     # info about the package and author
     .global.package.name <- "stargazer"
-    .global.package.version <- "5.2"
+    .global.package.version <- "5.2.2"
     .global.package.author.name <- "Marek Hlavac"
     .global.package.author.affiliation <- "Harvard University"
     .global.package.author.email <- "hlavac at fas.harvard.edu"
@@ -6766,7 +6766,7 @@ function(libname, pkgname) {
       
       if (!is.null(digit.separate)) { 
         if (digit.separate=="lakh") { .format.digit.separator.where <- c(3,2) }  # lakhs 
-        else if ((digit.separate=="china") | (digit.separate=="japan")) { .format.digit.separator.where <- 4 }
+        else if ((digit.separate=="china") || (digit.separate=="japan")) { .format.digit.separator.where <- 4 }
         else { .format.digit.separator.where <- digit.separate}
       }
       
@@ -6806,9 +6806,9 @@ function(libname, pkgname) {
           if (component.letter == "s") { .format.coefficient.table.parts <- append(.format.coefficient.table.parts, "standard error") }
           if (component.letter == "t") { .format.coefficient.table.parts <- append(.format.coefficient.table.parts, "t-stat") }
           if (component.letter == "p") { .format.coefficient.table.parts <- append(.format.coefficient.table.parts, "p-value") }
-          if ((component.letter == "*") & (i > 1)) { 
+          if ((component.letter == "*") && (i > 1)) { 
             l <- length(.format.coefficient.table.parts)
-            if ((.format.coefficient.table.parts[l] != "variable name") & (substr(report,i-1,i-1) != "*")) {
+            if ((.format.coefficient.table.parts[l] != "variable name") && (substr(report,i-1,i-1) != "*")) {
               .format.coefficient.table.parts[l] <- paste(.format.coefficient.table.parts[l],"*",sep="")
             }
           }
@@ -6893,10 +6893,10 @@ function(libname, pkgname) {
       
       # summary statistics - what statistics to report - !!! this needs to come before summary.stat and omit.summary.stat
       if (!nobs) { .format.s.statistics.list <- .format.s.statistics.list[.format.s.statistics.list!="n"] }
-      if (!mean.sd) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="mean")&(.format.s.statistics.list!="sd")]}
-      if (!min.max) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="min")&(.format.s.statistics.list!="max")]}
+      if (!mean.sd) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="mean")&&(.format.s.statistics.list!="sd")]}
+      if (!min.max) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="min")&&(.format.s.statistics.list!="max")]}
       if (!median) { .format.s.statistics.list <- .format.s.statistics.list[.format.s.statistics.list!="median"] }
-      if (!iqr) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="p25")&(.format.s.statistics.list!="p75")]}
+      if (!iqr) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="p25")&&(.format.s.statistics.list!="p75")]}
       
       # keep summary statistics
       if (!is.null(summary.stat)) {
@@ -6922,7 +6922,7 @@ function(libname, pkgname) {
           component.letter <- substr(table.layout, i, i)
           if (component.letter == "=") { .format.table.parts.new <- append(.format.table.parts.new, "=") }
           if (component.letter == "-") { .format.table.parts.new <- append(.format.table.parts.new, "-") }
-          if ((component.letter == "!") & (i > 1)) { 
+          if ((component.letter == "!") && (i > 1)) { 
             if (.format.table.parts.new[i-1] %in% c("-","=")) {
               .format.table.parts.new[i-1] <- paste(.format.table.parts.new[i-1], "!", sep="")
             }
@@ -6961,7 +6961,7 @@ function(libname, pkgname) {
           component.letter <- substr(omit.table.layout, i, i)
           if (component.letter == "=") { .format.table.parts <- .format.table.parts[.format.table.parts!="="] }
           if (component.letter == "-") { .format.table.parts <- .format.table.parts[.format.table.parts!="-"] }
-          if ((component.letter == "!") & (i > 1)) {
+          if ((component.letter == "!") && (i > 1)) {
             if (substr(omit.table.layout, i-1, i-1) == "=") { .format.table.parts <- .format.table.parts[.format.table.parts!="=!"] }
             if (substr(omit.table.layout, i-1, i-1) == "-") { .format.table.parts <- .format.table.parts[.format.table.parts!="-!"] }
           }
@@ -7000,7 +7000,7 @@ function(libname, pkgname) {
               do.call(.stargazer.reg.table, as.list(objects[regression.table.objects]))  
               invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
             }
-            else if ((type == "text") | (type == "html") | (type == "mmd") ) {
+            else if ((type == "text") || (type == "html") || (type == "mmd") ) {
               latex.code <- c(latex.code, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
             }
           }
@@ -7017,7 +7017,7 @@ function(libname, pkgname) {
               .stargazer.summ.stat.table(objects[[i]])
               invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(.stargazer.summ.stat.table(objects[[i]]),file=NULL)) )
             }
-            else if ((type == "text") | (type == "html") | (type == "mmd")) {
+            else if ((type == "text") || (type == "html") || (type == "mmd")) {
               latex.code <- c(latex.code, invisible(capture.output(.stargazer.summ.stat.table(objects[[i]]),file=NULL)) )
             }
           }
@@ -7026,7 +7026,7 @@ function(libname, pkgname) {
               .stargazer.data.frame.table(objects[[i]])
               invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(.stargazer.data.frame.table(objects[[i]]),file=NULL)) )
             }
-            else if ((type == "text") | (type == "html") | (type == "mmd")) {
+            else if ((type == "text") || (type == "html") || (type == "mmd")) {
               latex.code <- c(latex.code, invisible(capture.output(.stargazer.data.frame.table(objects[[i]]),file=NULL)) )
             }
           }
@@ -7050,7 +7050,7 @@ function(libname, pkgname) {
           do.call(.stargazer.reg.table, as.list(objects[regression.table.objects]))  
           invisible.output <- latex.code <- c(invisible.output, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
         }
-        else if ((type == "text") | (type == "html") | (type == "mmd")) {
+        else if ((type == "text") || (type == "html") || (type == "mmd")) {
           latex.code <- c(latex.code, invisible(capture.output(do.call(.stargazer.reg.table, as.list(objects[regression.table.objects])),file=NULL)) )
         }
       }
