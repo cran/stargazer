@@ -2594,7 +2594,7 @@ function(libname, pkgname) {
   	else if (object.name$call[1]=="hurdle()") {
   	  return("hurdle")
   	}  	
-  	else if (object.name$call[1]=="plm()") {
+  	else if (object.name$call[1] %in% c("plm::plm()", "plm()")) {
   	  return("plm")
   	}
     else if (object.name$call[1]=="pgmm()") {
