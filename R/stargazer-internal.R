@@ -79,6 +79,10 @@ function(libname, pkgname) {
 
   	  # add RHS variables and coefficients
   	  coef.var <- .coefficient.variables(object.name)
+	  # cbind will drop vector rows, if vector is longer than matrix. Pad matrix if this is the case.
+	  if (length(coef.var) > nrow(.global.coef.vars.by.model)) {
+            .global.coef.vars.by.model <<- rbind(.global.coef.vars.by.model, .global.coef.vars.by.model[length(coef.var)-nrow(.global.coef.vars.by.model),])
+          }
   	  .global.coef.vars.by.model <<-  cbind(.global.coef.vars.by.model, coef.var)
 
   	  temp.gcv <- rep(NA,each=1,times=max.length)
