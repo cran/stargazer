@@ -10,6 +10,9 @@ This page summarizes the models, features, and bug fixes that were introduced in
 }
 
 \section{What's new?}{
+v. 5.2.3:\cr
+\cr
+- very minor update: logical coercion of length longer than one removed\cr
 v. 5.2.2:\cr
 \cr
 - very minor update: removed instances in code where if/while statement is used with a condition of length greater than one\cr

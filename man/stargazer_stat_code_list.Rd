@@ -10,7 +10,7 @@
 The following character strings can be used in the \code{keep.stat} and \code{omit.stat} arguments of the \code{\link{stargazer}} command. 
 }
 
-\section{}{
+\section{Statistics codes}{
 
 \tabular{ll}{
   \code{"all"} \tab all statistics \cr

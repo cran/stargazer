@@ -1,8 +1,8 @@
 .onAttach <- 
 function(libname, pkgname) {
   packageStartupMessage("\nPlease cite as: \n")
-  packageStartupMessage(" Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables.")
-  packageStartupMessage(" R package version 5.2.2. https://CRAN.R-project.org/package=stargazer \n")
+  packageStartupMessage(" Hlavac, Marek (2022). stargazer: Well-Formatted Regression and Summary Statistics Tables.")
+  packageStartupMessage(" R package version 5.2.3. https://CRAN.R-project.org/package=stargazer \n")
 }
 
 .stargazer.wrap <-
@@ -2133,7 +2133,7 @@ function(libname, pkgname) {
   .is.all.integers <-
   function(x) {
       if (!is.numeric(x)) { return(FALSE) }
-      if (length(x[!is.na(x)]) == length(is.wholenumber(x)[(!is.na(x)) && (is.wholenumber(x)==TRUE)])) {
+      if (length(x[!is.na(x)]) == length(is.wholenumber(x)[(!is.na(x)) & (is.wholenumber(x)==TRUE)])) {
         return(TRUE)
       }
       else { return (FALSE) }
@@ -6338,10 +6338,10 @@ function(libname, pkgname) {
 
     # info about the package and author
     .global.package.name <- "stargazer"
-    .global.package.version <- "5.2.2"
+    .global.package.version <- "5.2.3"
     .global.package.author.name <- "Marek Hlavac"
-    .global.package.author.affiliation <- "Harvard University"
-    .global.package.author.email <- "hlavac at fas.harvard.edu"
+    .global.package.author.affiliation <- "Social Policy Institute"
+    .global.package.author.email <- "marek.hlavac at gmail.com"
     
     # statistics (.global variables)
     .global.formulas.rhs <- NULL
@@ -6893,10 +6893,10 @@ function(libname, pkgname) {
       
       # summary statistics - what statistics to report - !!! this needs to come before summary.stat and omit.summary.stat
       if (!nobs) { .format.s.statistics.list <- .format.s.statistics.list[.format.s.statistics.list!="n"] }
-      if (!mean.sd) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="mean")&&(.format.s.statistics.list!="sd")]}
-      if (!min.max) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="min")&&(.format.s.statistics.list!="max")]}
+      if (!mean.sd) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="mean")&(.format.s.statistics.list!="sd")]}
+      if (!min.max) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="min")&(.format.s.statistics.list!="max")]}
       if (!median) { .format.s.statistics.list <- .format.s.statistics.list[.format.s.statistics.list!="median"] }
-      if (!iqr) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="p25")&&(.format.s.statistics.list!="p75")]}
+      if (!iqr) { .format.s.statistics.list <- .format.s.statistics.list[(.format.s.statistics.list!="p25")&(.format.s.statistics.list!="p75")]}
       
       # keep summary statistics
       if (!is.null(summary.stat)) {

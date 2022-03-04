@@ -10,7 +10,7 @@
 The following character strings can be used in the \code{summary.stat} and \code{omit.summary.stat} arguments of the \code{\link{stargazer}} command. 
 }
 
-\section{}{
+\section{Summary Statistics Codes}{
 
 \tabular{ll}{
   \code{"max"} \tab maximum \cr

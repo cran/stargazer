@@ -10,7 +10,7 @@
 The following character strings can be used in the \code{style} argument of the \code{\link{stargazer}} command. Most styles are designed to resemble an existing academic journal, as listed below.
 }
 
-\section{}{
+\section{Styles}{
 
 \tabular{ll}{
   \code{"all"} \tab publish every statistic available, incl. t-statistics and p-values \cr

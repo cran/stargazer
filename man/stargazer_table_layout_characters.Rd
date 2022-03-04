@@ -10,7 +10,7 @@
 The following character strings can be used in the \code{table.layout} and \code{omit.table.layout} arguments of the \code{\link{stargazer}} command. 
 }
 
-\section{}{
+\section{Table Layout Characters}{
 
 \tabular{ll}{
 
